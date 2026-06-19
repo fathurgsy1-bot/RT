@@ -199,6 +199,19 @@
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
+        
+        /* Tambahan untuk scroll styling */
+        .custom-scroll::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
+            border-radius: 4px;
+        }
+        .custom-scroll::-webkit-scrollbar-track {
+            background-color: #f1f5f9;
+        }
     </style>
 </head>
 
@@ -253,7 +266,16 @@
                 <div class="w-full">
                     <p class="text-gray-500 font-semibold">Total BO</p>
                     <p id="dashboard-total-bo" class="text-3xl font-black text-gray-800 opacity-0 transition-opacity duration-500">Memuat...</p>
+                    
+                    <div class="w-full bg-gray-200 h-1.5 rounded-full mt-2 overflow-hidden hidden" id="bo-progress-container">
+                        <div id="bo-progress-bar" class="bg-amber-500 h-full w-[0%] transition-all duration-1000"></div>
+                    </div>
+
                     <div class="mt-2 pt-2 border-t border-gray-100 text-[11px] text-gray-500 flex flex-col gap-1 w-full">
+                        <div class="flex justify-between gap-4">
+                            <span>Pagu Anggaran:</span> 
+                            <span id="dashboard-pagu" class="font-bold text-gray-700">Memuat...</span>
+                        </div>
                         <div class="flex justify-between gap-4">
                             <span>Terealisasi:</span> 
                             <span id="dashboard-realisasi" class="font-bold text-emerald-600">Memuat...</span>
@@ -301,11 +323,18 @@
 
     <section id="data-warga" class="py-24 bg-white">
         <div class="max-w-6xl mx-auto px-4">
-            <h2 class="text-3xl font-bold mb-6 text-gray-900">Data Warga</h2>
-            <div class="overflow-x-auto rounded-2xl shadow-lg border border-gray-100">
+            <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-6">
+                <h2 class="text-3xl font-bold text-gray-900">Data Warga</h2>
+                <div class="relative w-full md:w-72">
+                    <input type="text" id="search-warga" placeholder="Cari Data Warga..." class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm shadow-sm transition" onkeyup="filterWarga()">
+                    <i class="fas fa-search absolute left-3.5 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                </div>
+            </div>
+            
+            <div class="overflow-x-auto overflow-y-auto max-h-[400px] custom-scroll rounded-2xl shadow-lg border border-gray-100 relative bg-white">
                 <div id="warga-loader" class="p-8 text-center text-gray-500">Memuat data warga...</div>
-                <table id="tabel-warga" class="w-full text-left hidden border-collapse">
-                    <thead class="bg-emerald-600 text-white">
+                <table id="tabel-warga" class="w-full text-left hidden border-collapse relative">
+                    <thead class="bg-emerald-600 text-white sticky top-0 z-10 shadow-sm">
                         <tr id="table-head"></tr>
                     </thead>
                     <tbody id="table-body" class="divide-y divide-gray-200"></tbody>
@@ -380,36 +409,6 @@
                             </div>
                             <div class="tab-item" onclick="loadSheet('1180017217', 'Laporan Januari', this)">
                                 <i class="far fa-calendar-alt"></i> Januari
-                            </div>
-                            <div class="tab-item" onclick="loadSheet('1564446499', 'Laporan Februari', this)">
-                                <i class="far fa-calendar-alt"></i> Februari
-                            </div>
-                            <div class="tab-item" onclick="loadSheet('1027836950', 'Laporan Maret', this)">
-                                <i class="far fa-calendar-alt"></i> Maret
-                            </div>
-                            <div class="tab-item" onclick="loadSheet('2017336007', 'Laporan April', this)">
-                                <i class="far fa-calendar-alt"></i> April
-                            </div>
-                            <div class="tab-item" onclick="loadSheet('1688841850', 'Laporan Mei', this)">
-                                <i class="far fa-calendar-alt"></i> Mei
-                            </div>
-                            <div class="tab-item" onclick="loadSheet('1059029246', 'Laporan Juni', this)">
-                                <i class="far fa-calendar-alt"></i> Juni
-                            </div>
-                            <div class="tab-item" onclick="loadSheet('231951965', 'Laporan Juli', this)">
-                                <i class="far fa-calendar-alt"></i> Juli
-                            </div>
-                            <div class="tab-item" onclick="loadSheet('22029068', 'Laporan Agustus', this)">
-                                <i class="far fa-calendar-alt"></i> Agustus
-                            </div>
-                            <div class="tab-item" onclick="loadSheet('1839635398', 'Laporan September', this)">
-                                <i class="far fa-calendar-alt"></i> September
-                            </div>
-                            <div class="tab-item" onclick="loadSheet('1878174526', 'Laporan Oktober', this)">
-                                <i class="far fa-calendar-alt"></i> Oktober
-                            </div>
-                            <div class="tab-item" onclick="loadSheet('1274884744', 'Laporan November', this)">
-                                <i class="far fa-calendar-alt"></i> November
                             </div>
                             <div class="tab-item" onclick="loadSheet('569347622', 'Laporan Desember', this)">
                                 <i class="far fa-calendar-alt"></i> Desember
@@ -496,12 +495,19 @@
 
     <section id="tunggakan-warga" class="py-20 md:py-24 bg-gray-50">
         <div class="max-w-6xl mx-auto px-4">
-            <div class="flex items-center gap-3 mb-6">
-                <div class="p-3 bg-red-100 text-red-600 rounded-xl"><i class="fas fa-exclamation-triangle text-xl"></i></div>
-                <h2 class="text-3xl font-bold text-gray-900">Tunggakan Warga</h2>
+            <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-6">
+                <div class="flex items-center gap-3">
+                    <div class="p-3 bg-red-100 text-red-600 rounded-xl"><i class="fas fa-exclamation-triangle text-xl"></i></div>
+                    <h2 class="text-3xl font-bold text-gray-900">Tunggakan Warga</h2>
+                </div>
+                <div class="relative w-full md:w-72">
+                    <input type="text" id="search-tunggakan" placeholder="Cari Nama Warga..." class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm shadow-sm transition" onkeyup="filterTunggakan()">
+                    <i class="fas fa-search absolute left-3.5 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                </div>
             </div>
-            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-x-auto p-4">
-                <div id="content-tunggakan" class="min-h-[200px] flex items-center justify-center">Memuat data...</div>
+
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-x-auto overflow-y-auto max-h-[400px] custom-scroll p-0 relative">
+                <div id="content-tunggakan" class="min-h-[200px] flex items-center justify-center w-full">Memuat data...</div>
             </div>
         </div>
     </section>
@@ -519,7 +525,7 @@
                 </div>
             </div>
             
-            <div id="content-angsuran" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div id="content-angsuran" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-[500px] overflow-y-auto custom-scroll p-2 border border-gray-100 rounded-2xl bg-gray-50 shadow-inner">
                 <p class="text-center py-10 text-gray-400 col-span-full">Memuat data...</p>
             </div>
         </div>
@@ -615,7 +621,6 @@
                         indicatorEl.classList.remove('bg-gray-300', 'bg-green-500');
                         indicatorEl.classList.add('bg-red-500');
                     }
-                    displayEl.textContent = cleanData || "Data Kosong";
                     if(loadingEl) loadingEl.style.display = 'none';
                     displayEl.classList.remove('opacity-0');
                 }
@@ -683,14 +688,25 @@
                     document.getElementById('rekap-realisasi').textContent = formatRupiah(realisasi);
                     document.getElementById('rekap-sisa').textContent = formatRupiah(saldoAkhir);
 
-                    // Update UI Total BO Dashboard
+                    // Update UI Total BO Dashboard (Dilengkapi Pagu & Progress Bar)
                     const dashReal = document.getElementById('dashboard-realisasi');
                     const dashSisa = document.getElementById('dashboard-sisa');
+                    const boProgressBar = document.getElementById('bo-progress-bar');
+                    const boProgressContainer = document.getElementById('bo-progress-container');
+
                     if(dashReal) dashReal.textContent = formatRupiah(realisasi);
                     if(dashSisa) dashSisa.textContent = formatRupiah(saldoAkhir);
+
+                    if(boProgressBar && boProgressContainer) {
+                        boProgressContainer.classList.remove('hidden');
+                        const percent = Math.min(Math.round((realisasi / totalPagu) * 100), 100);
+                        boProgressBar.style.width = percent + '%';
+                    }
                 }
             } catch (error) {
                 console.error("Error loading keuangan:", error);
+                document.getElementById('dashboard-realisasi').textContent = "Gagal memuat";
+                document.getElementById('dashboard-sisa').textContent = "Gagal memuat";
             }
         }
 
@@ -759,7 +775,7 @@
             `;
         }
 
-        // 7. Fungsi Fetch Kas & Tunggakan
+        // 7. Fungsi Fetch Kas & Tunggakan (Ditambahkan Header Sticky)
         async function fetchKasTunggakan(sheetName, containerId) {
             const container = document.getElementById(containerId);
             const url = `https://docs.google.com/spreadsheets/d/${sheetIdKas}/gviz/tq?tqx=out:csv&sheet=${sheetName}`;
@@ -777,9 +793,9 @@
                 const headerLower = rows[0].map(h => h.toLowerCase());
                 const tunggakanIdx = headerLower.findIndex(h => h.includes('tunggakan'));
 
-                let html = `<table class="w-full text-left">
-                    <thead class="text-xs uppercase text-gray-500 border-b">
-                        <tr>${rows[0].map(h => `<th class="p-4">${h}</th>`).join('')}</tr>
+                let html = `<table class="w-full text-left relative">
+                    <thead class="text-xs uppercase text-gray-500 border-b bg-gray-50 sticky top-0 z-10 shadow-sm">
+                        <tr>${rows[0].map(h => `<th class="p-4 whitespace-nowrap">${h}</th>`).join('')}</tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100">
                         ${rows.slice(1).map(row => {
@@ -882,7 +898,7 @@
                 const dataWarga = rows.slice(1).filter(row => row[0] !== ""); 
                 const totalWarga = dataWarga.length;
                 
-                let kalkulasiTotalTunggakan = 0; // Variabel akumulasi tunggakan
+                let kalkulasiTotalTunggakan = 0; 
 
                 const sudahBayar = dataWarga.filter(row => {
                     const cellVal = row[tunggakanIdx];
@@ -916,7 +932,7 @@
             }
         }
 
-        // 10. Fungsi Fetch Data Angsuran (Diperkecil & Lebih Menarik)
+        // 10. Fungsi Fetch Data Angsuran
         async function fetchAngsuran() {
             const container = document.getElementById('content-angsuran');
             const url = `https://docs.google.com/spreadsheets/d/${sheetIdAngsuran}/gviz/tq?tqx=out:csv&sheet=Angsuran`;
@@ -945,7 +961,7 @@
                     const idNama = 'user-' + i;
 
                     htmlOutput += `
-                    <div class="angsuran-item bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden" data-name="${nama.toLowerCase()}">
+                    <div class="angsuran-item bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden h-max" data-name="${nama.toLowerCase()}">
                         <button onclick="toggle('${idNama}')" class="w-full p-3 flex justify-between items-center bg-gray-50 font-semibold text-gray-700 hover:bg-emerald-50 transition text-sm">
                             <span class="flex items-center gap-2"><i class="fas fa-user-circle text-gray-400"></i> ${nama}</span>
                             <i class="fas fa-chevron-down text-xs text-gray-400"></i>
@@ -1011,13 +1027,53 @@
                 }
             });
         }
+
+        // Filter Cari Warga
+        function filterWarga() {
+            const input = document.getElementById('search-warga').value.toLowerCase();
+            const rows = document.querySelectorAll('#table-body tr');
+            
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                if (text.includes(input)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+
+        // Filter Cari Tunggakan Warga
+        function filterTunggakan() {
+            const input = document.getElementById('search-tunggakan').value.toLowerCase();
+            const rows = document.querySelectorAll('#content-tunggakan tbody tr');
+            
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                if (text.includes(input)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
         
         // --- Eksekusi Saat Dokumen Siap ---
         document.addEventListener("DOMContentLoaded", () => {
+            
+            // Injeksi manual Pagu Anggaran agar tidak error memuat
+            const dashboardPagu = document.getElementById('dashboard-pagu');
+            const dashboardTotalBo = document.getElementById('dashboard-total-bo');
+            
+            if(dashboardPagu) dashboardPagu.textContent = formatRupiah(totalPagu);
+            if(dashboardTotalBo) {
+                dashboardTotalBo.textContent = formatRupiah(totalPagu);
+                dashboardTotalBo.classList.remove('opacity-0');
+            }
+
             updateBudget("Rekap BO!C37", "dynamic-real", "loading-real", "sync-real");
             updateBudget("Rekap BO!C38", "dynamic-sisa", "loading-sisa", "sync-sisa");
             updateBudget("Rekap BO!C37", "dynamic-total", "loading-total", "sync-total");
-            updateBudget("Rekap BO!C37", "dashboard-total-bo", null, null);
 
             fetchWargaData();
             loadRekapKeuangan();
