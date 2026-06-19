@@ -1,0 +1,1035 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SI-WARGA 2026 | Dashboard</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        .glass { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.3); }
+        .hover-card { transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .hover-card:hover { transform: translateY(-10px); }
+
+        :root {
+            --primary: #008585;
+            --primary-hover: #008585;
+            --bg-color: #f3f4f6;
+            --surface: #ffffff;
+            --text-main: #111827;
+            --text-muted: #6b7280;
+            --border-color: #e5e7eb;
+            --radius: 12px;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        .layout-container {
+            display: flex;
+            flex-direction: column; 
+            border-radius: var(--radius);
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            background-color: var(--surface);
+            height: 75vh; 
+            min-height: 500px;
+        }
+
+        @media (min-width: 768px) {
+            .layout-container {
+                flex-direction: row; 
+                height: 700px; 
+            }
+        }
+
+        .sidebar {
+            width: 100%;
+            background-color: var(--surface);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            flex-shrink: 0;
+            overflow-x: auto; 
+            scrollbar-width: none; 
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .sidebar::-webkit-scrollbar {
+            display: none;
+        }
+
+        @media (min-width: 768px) {
+            .sidebar {
+                width: 250px;
+                border-right: 1px solid var(--border-color);
+                border-bottom: none;
+                flex-direction: column;
+                overflow-y: auto;
+                overflow-x: hidden;
+            }
+            .sidebar::-webkit-scrollbar {
+                display: block;
+                width: 6px;
+            }
+            .sidebar::-webkit-scrollbar-thumb {
+                background-color: #008585;
+                border-radius: 10px;
+            }
+        }
+
+        .sidebar-nav {
+            display: flex;
+            flex-direction: row; 
+            gap: 8px;
+            padding: 12px;
+            flex: 1;
+        }
+
+        @media (min-width: 768px) {
+            .sidebar-nav {
+                flex-direction: column; 
+                padding: 20px 16px;
+            }
+        }
+
+        .tab-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 14px;
+            border-radius: 8px;
+            background-color: transparent;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            border: 1px solid transparent;
+            white-space: nowrap; 
+        }
+
+        @media (min-width: 768px) {
+            .tab-item {
+                width: 100%;
+                font-size: 0.95rem;
+            }
+        }
+
+        .tab-item i {
+            font-size: 1rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        .tab-item:hover {
+            background-color: #d6eadf;
+            color: var(--primary);
+        }
+
+        .tab-item.active {
+            background-color: #d6eadf;
+            color: var(--primary);
+            border-color: #008585;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 8px; 
+            display: flex;
+            flex-direction: column;
+            background-color: var(--bg-color);
+        }
+
+        @media (min-width: 768px) {
+            .main-content {
+                padding: 24px;
+            }
+        }
+
+        .iframe-container {
+            flex: 1;
+            position: relative;
+            background-color: var(--surface);
+            border-radius: 8px;
+            box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+            -webkit-overflow-scrolling: touch;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        #data-frame {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
+        }
+
+        .loader {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.9);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            gap: 16px;
+            display: none; 
+        }
+
+        .loader-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--border-color);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 font-[Plus_Jakarta_Sans]">
+
+    <nav class="fixed top-0 left-0 right-0 bg-white/90 backdrop-blur-md shadow-sm z-50 border-b border-gray-100 py-3 md:py-0">
+        <div class="max-w-6xl mx-auto px-4 min-h-[4rem] flex flex-col md:flex-row items-center justify-between gap-3 md:gap-0">
+            <div class="flex items-center gap-2">
+                <span class="text-xl font-bold text-emerald-600 tracking-tight">SI-WARGA</span>
+                <span class="bg-emerald-100 text-emerald-800 text-xs font-semibold px-2 py-0.5 rounded">RT. 04 - RW. 26</span>
+            </div>
+            <div class="flex flex-wrap justify-center gap-4 md:gap-6 font-medium text-sm">
+                <a href="#beranda" class="text-gray-600 hover:text-emerald-600 transition-colors">Beranda</a>
+                <a href="#data-warga" class="text-gray-600 hover:text-emerald-600 transition-colors">Data Warga</a>
+                <a href="#rencana-bo-2026" class="text-gray-600 hover:text-emerald-600 transition-colors">BO 2026</a>
+                <a href="#kas-warga" class="text-gray-600 hover:text-emerald-600 transition-colors">Kas</a>
+                <a href="#tunggakan-warga" class="text-gray-600 hover:text-emerald-600 transition-colors">Tunggakan</a>
+                <a href="#angsuran-warga" class="text-gray-600 hover:text-emerald-600 transition-colors">Angsuran</a>
+            </div>
+        </div>
+    </nav>
+
+    <header id="beranda" class="pt-32 pb-20 bg-emerald-900 text-white rounded-b-[3rem]">
+        <div class="max-w-6xl mx-auto px-6 text-center">
+            <h2 class="text-5xl font-extrabold mb-6">Informasi Warga</h2>
+            <p class="text-emerald-200 text-lg max-w-2xl mx-auto">Kelola data kependudukan dan transparansi anggaran RT 04 - RW 26 dengan sistem digital yang akuntabel.</p>
+        </div>
+        <div class="max-w-4xl mx-auto px-4 text-center mt-8">
+            <div class="flex flex-col sm:flex-row justify-center gap-4">
+                <a href="#data-warga" class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-6 py-3 rounded-lg shadow-sm transition-all text-center">
+                    Lihat Data Warga
+                </a>
+                <a href="#rencana-bo-2026" class="bg-white hover:bg-gray-50 text-gray-700 font-medium px-6 py-3 rounded-lg border border-gray-200 shadow-sm transition-all text-center">
+                    Rencana Program BO 2026
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <section class="max-w-6xl mx-auto px-6 -mt-16">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="hover-card glass p-8 rounded-3xl shadow-xl flex items-center gap-6">
+                <div class="p-4 bg-emerald-100 rounded-2xl text-emerald-600 text-2xl"><i class="fas fa-users"></i></div>
+                <div>
+                    <p class="text-gray-500 font-semibold">Total KK</p>
+                    <p id="total-warga-display" class="text-3xl font-black text-gray-800">0</p>
+                </div>
+            </div>
+            
+            <div class="hover-card glass p-8 rounded-3xl shadow-xl flex items-center gap-6">
+                <div class="p-4 bg-amber-100 rounded-2xl text-amber-600 text-2xl"><i class="fas fa-wallet"></i></div>
+                <div class="w-full">
+                    <p class="text-gray-500 font-semibold">Total BO</p>
+                    <p id="dashboard-total-bo" class="text-3xl font-black text-gray-800 opacity-0 transition-opacity duration-500">Memuat...</p>
+                    <div class="mt-2 pt-2 border-t border-gray-100 text-[11px] text-gray-500 flex flex-col gap-1 w-full">
+                        <div class="flex justify-between gap-4">
+                            <span>Terealisasi:</span> 
+                            <span id="dashboard-realisasi" class="font-bold text-emerald-600">Memuat...</span>
+                        </div>
+                        <div class="flex justify-between gap-4">
+                            <span>Sisa Anggaran:</span> 
+                            <span id="dashboard-sisa" class="font-bold text-amber-600">Memuat...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="hover-card glass p-8 rounded-3xl shadow-xl flex items-center gap-6">
+                <div class="p-4 bg-emerald-100 rounded-2xl text-emerald-600 text-2xl"><i class="fas fa-money-bill-wave"></i></div>
+                <div class="w-full">
+                    <p class="text-gray-500 font-semibold">Total Aset Kas</p>
+                    <p id="total-aset-kas" class="text-3xl font-black text-gray-800 opacity-0 transition-opacity duration-500">Memuat...</p>
+                   
+                    <div class="mt-2 pt-2 border-t border-gray-100 text-[11px] text-gray-500 flex flex-col gap-1 w-full">
+                        <div class="flex justify-between gap-4">
+                            <span>Total Tunggakan:</span> 
+                            <span id="info-tunggakan" class="font-bold text-red-500">Memuat...</span>
+                        </div>
+                        <div class="flex justify-between gap-4">
+                            <span>Grand Total:</span> 
+                            <span id="info-grand-total" class="font-bold text-emerald-600">Memuat...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hover-card glass p-8 rounded-3xl shadow-xl flex items-center gap-6">
+                <div class="p-4 bg-blue-100 rounded-2xl text-blue-600 text-2xl"><i class="fas fa-receipt"></i></div>
+                <div class="w-full">
+                    <p class="text-gray-500 font-semibold">Iuran Kas</p>
+                   <p id="persen-iuran" class="text-3xl font-black text-gray-800">0%</p>
+                    <div class="w-full bg-gray-200 h-2 rounded-full mt-2 overflow-hidden">
+                        <div id="bar-iuran" class="bg-blue-600 h-full w-[85%]"></div>
+                    </div>
+                     <p id="keterangan-iuran" class="text-[10px] text-gray-500 mt-1">Memuat data...</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="data-warga" class="py-24 bg-white">
+        <div class="max-w-6xl mx-auto px-4">
+            <h2 class="text-3xl font-bold mb-6 text-gray-900">Data Warga</h2>
+            <div class="overflow-x-auto rounded-2xl shadow-lg border border-gray-100">
+                <div id="warga-loader" class="p-8 text-center text-gray-500">Memuat data warga...</div>
+                <table id="tabel-warga" class="w-full text-left hidden border-collapse">
+                    <thead class="bg-emerald-600 text-white">
+                        <tr id="table-head"></tr>
+                    </thead>
+                    <tbody id="table-body" class="divide-y divide-gray-200"></tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <section id="rencana-bo-2026" class="py-20 md:py-24 bg-gray-50">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="mb-8 md:mb-12 text-center md:text-left">
+                <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-2">Rencana Bantuan Operasional (BO) 2026</h2>
+                <p class="text-gray-500 text-sm md:text-base">Rencana Alokasi dan realisasi anggaran Bantuan Operasional tahun 2026.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden">
+                    <div class="absolute top-0 right-0 p-2 opacity-10">
+                        <i class="fas fa-chart-line text-6xl text-emerald-600"></i>
+                    </div>
+                    <div class="flex justify-between items-start mb-2 z-10 relative">
+                        <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider flex items-center gap-1">
+                            Total Anggaran
+                            <span id="sync-total" title="Checking data..."></span>
+                        </span>
+                        <i class="fas fa-wallet text-emerald-100 text-2xl"></i>
+                    </div>
+                    <div id="loading-total" class="text-sm text-gray-400 italic">Mengambil data...</div>
+                    <h3 id="dynamic-total" class="text-2xl font-bold text-gray-900 opacity-0 transition-opacity duration-500 z-10 relative">Rp 0</h3>
+                    <p class="text-xs text-emerald-600 mt-2 font-medium bg-emerald-50 inline-block px-2 py-1 rounded z-10 relative">Sesuai Bantuan Operasional 2026</p>
+                </div>
+				
+                <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden">
+                    <div class="absolute top-0 right-0 p-2 opacity-10">
+                        <i class="fas fa-chart-line text-6xl text-emerald-600"></i>
+                    </div>
+                    <div class="flex justify-between items-start mb-2 z-10 relative">
+                        <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider flex items-center gap-1">
+                            Rencana Anggaran
+                            <span id="sync-real" class="w-2 h-2 rounded-full bg-gray-300" title="Checking data..."></span>
+                        </span>
+                        <i class="fas fa-bolt text-blue-100 text-2xl"></i>
+                    </div>
+                    <div id="loading-real" class="text-sm text-gray-400 italic">Mengambil data...</div>
+                    <h3 id="dynamic-real" class="text-2xl font-bold text-emerald-600 opacity-0 transition-opacity duration-500 z-10 relative">Rp 0</h3>
+                    <p class="text-xs text-gray-500 mt-2 z-10 relative">Data otomatis dari Rencana BO</p>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden">
+                    <div class="absolute top-0 right-0 p-2 opacity-10">
+                        <i class="fas fa-chart-line text-6xl text-emerald-600"></i>
+                    </div>
+                    <div class="flex justify-between items-start mb-2 z-10 relative">
+                        <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider flex items-center gap-1">
+                            Sisa Rencana
+                            <span id="sync-sisa" title="Checking data..."></span>
+                        </span>
+                        <i class="fas fa-piggy-bank text-amber-100 text-2xl"></i>
+                    </div>
+                    <div id="loading-sisa" class="text-sm text-gray-400 italic">Mengambil data...</div>
+                    <h3 id="dynamic-sisa" class="text-2xl font-bold text-gray-900 opacity-0 transition-opacity duration-500 z-10 relative">Rp 0</h3>
+                    <p class="text-xs text-gray-500 mt-2 z-10 relative">Anggaran Terealisasi Penuh</p>
+                </div>
+            </div>
+            
+            <div class="bg-white p-4 md:p-6 rounded-xl border border-gray-200 shadow-sm mb-8">
+                <div class="layout-container mb-8">
+                    <aside class="sidebar">
+                        <nav class="sidebar-nav" id="tab-nav">
+                            <div class="tab-item active" onclick="loadSheet('0', 'Rekap BO', this)">
+                                <i class="fas fa-star"></i> BO 2026
+                            </div>
+                            <div class="tab-item" onclick="loadSheet('1180017217', 'Laporan Januari', this)">
+                                <i class="far fa-calendar-alt"></i> Januari
+                            </div>
+                            <div class="tab-item" onclick="loadSheet('1564446499', 'Laporan Februari', this)">
+                                <i class="far fa-calendar-alt"></i> Februari
+                            </div>
+                            <div class="tab-item" onclick="loadSheet('1027836950', 'Laporan Maret', this)">
+                                <i class="far fa-calendar-alt"></i> Maret
+                            </div>
+                            <div class="tab-item" onclick="loadSheet('2017336007', 'Laporan April', this)">
+                                <i class="far fa-calendar-alt"></i> April
+                            </div>
+                            <div class="tab-item" onclick="loadSheet('1688841850', 'Laporan Mei', this)">
+                                <i class="far fa-calendar-alt"></i> Mei
+                            </div>
+                            <div class="tab-item" onclick="loadSheet('1059029246', 'Laporan Juni', this)">
+                                <i class="far fa-calendar-alt"></i> Juni
+                            </div>
+                            <div class="tab-item" onclick="loadSheet('231951965', 'Laporan Juli', this)">
+                                <i class="far fa-calendar-alt"></i> Juli
+                            </div>
+                            <div class="tab-item" onclick="loadSheet('22029068', 'Laporan Agustus', this)">
+                                <i class="far fa-calendar-alt"></i> Agustus
+                            </div>
+                            <div class="tab-item" onclick="loadSheet('1839635398', 'Laporan September', this)">
+                                <i class="far fa-calendar-alt"></i> September
+                            </div>
+                            <div class="tab-item" onclick="loadSheet('1878174526', 'Laporan Oktober', this)">
+                                <i class="far fa-calendar-alt"></i> Oktober
+                            </div>
+                            <div class="tab-item" onclick="loadSheet('1274884744', 'Laporan November', this)">
+                                <i class="far fa-calendar-alt"></i> November
+                            </div>
+                            <div class="tab-item" onclick="loadSheet('569347622', 'Laporan Desember', this)">
+                                <i class="far fa-calendar-alt"></i> Desember
+                            </div>
+                        </nav>
+                    </aside>
+
+                    <main class="main-content">
+                        <div class="iframe-container" id="iframe-container">
+                            <div class="loader" id="loader">
+                                <div class="loader-spinner"></div>
+                                <span class="text-sm">Memuat Data...</span>
+                            </div>
+                            <iframe id="data-frame" scrolling="yes" allowfullscreen src="https://docs.google.com/spreadsheets/d/12KGQ3389vZoDOWySmgKIG67q_jPiwOTo/htmlembed?gid=0&widget=false&chrome=false&headers=false"></iframe>
+                        </div>
+                    </main>
+                </div>
+            </div>
+        </div>
+    </section>
+	
+    <section id="rekap-bo-2026" class="py-20 md:py-24 bg-gray-50">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="mb-8 md:mb-12 text-center md:text-left">
+                <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-2">Rekap Bantuan Operasional (BO) 2026</h2>
+                <p class="text-gray-500 text-sm md:text-base">Transparansi alokasi dan realisasi anggaran Bantuan Operasional tahun 2026.</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+                    <div class="flex justify-between items-start mb-2">
+                        <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Total Anggaran</span>
+                        <i class="fas fa-wallet text-emerald-100 text-2xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-900">Rp 25.000.000</h3>
+                    <p class="text-xs text-emerald-600 mt-2 font-medium bg-emerald-50 inline-block px-2 py-1 rounded">Sesuai Bantuan Operasional 2026</p>
+                </div>
+                
+                <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden">
+                    <div class="absolute top-0 right-0 p-2 opacity-10">
+                        <i class="fas fa-chart-line text-6xl text-emerald-600"></i>
+                    </div>
+                    <div class="flex justify-between items-start mb-2 z-10 relative">
+                        <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider flex items-center gap-1">Terealisasi</span>
+                        <i class="fas fa-bolt text-blue-100 text-2xl"></i>
+                    </div>
+                    <h3 id="rekap-realisasi" class="text-2xl font-bold text-emerald-600">Rp 0</h3>
+                    <p class="text-xs text-gray-500 mt-2 z-10 relative">Data otomatis dari Rekap BO</p>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+                    <div class="flex justify-between items-start mb-2">
+                        <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Sisa Anggaran</span>
+                        <i class="fas fa-piggy-bank text-amber-100 text-2xl"></i>
+                    </div>
+                    <h3 id="rekap-sisa" class="text-2xl font-bold text-gray-900">Rp 0</h3>
+                </div>
+            </div>
+            
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                <div class="flex bg-gray-100 p-1 rounded-xl mb-6" id="tab-switcher">
+                    <button onclick="switchTab('pemasukan')" id="btn-pemasukan" class="flex-1 py-2 text-sm font-bold rounded-lg bg-white shadow text-emerald-600 transition">Pemasukan (Debit)</button>
+                    <button onclick="switchTab('pengeluaran')" id="btn-pengeluaran" class="flex-1 py-2 text-sm font-bold rounded-lg text-gray-500 transition">Pengeluaran (Kredit)</button>
+                </div>
+                
+                <div id="rekap-list-container" class="space-y-4">
+                    <p class="text-center text-gray-400 py-10">Memuat data...</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="kas-warga" class="py-20 md:py-24 bg-gray-50">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="flex items-center gap-3 mb-6">
+                <div class="p-3 bg-emerald-100 text-emerald-600 rounded-xl"><i class="fas fa-wallet text-xl"></i></div>
+                <h2 class="text-3xl font-bold text-gray-900">Kas Warga</h2>
+            </div>
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-x-auto p-4">
+                <div id="content-kas" class="min-h-[200px] flex items-center justify-center">Memuat data...</div>
+            </div>
+        </div>
+    </section>
+
+    <section id="tunggakan-warga" class="py-20 md:py-24 bg-gray-50">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="flex items-center gap-3 mb-6">
+                <div class="p-3 bg-red-100 text-red-600 rounded-xl"><i class="fas fa-exclamation-triangle text-xl"></i></div>
+                <h2 class="text-3xl font-bold text-gray-900">Tunggakan Warga</h2>
+            </div>
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-x-auto p-4">
+                <div id="content-tunggakan" class="min-h-[200px] flex items-center justify-center">Memuat data...</div>
+            </div>
+        </div>
+    </section>
+
+    <section id="angsuran-warga" class="py-20 md:py-24 bg-white">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-6">
+                <div class="flex items-center gap-3">
+                    <div class="p-3 bg-emerald-100 text-emerald-600 rounded-xl"><i class="fas fa-file-invoice-dollar text-xl"></i></div>
+                    <h2 class="text-3xl font-bold text-gray-900">Data Angsuran Warga</h2>
+                </div>
+                <div class="relative w-full md:w-72">
+                    <input type="text" id="search-angsuran" placeholder="Cari Nama Warga..." class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm shadow-sm transition" onkeyup="filterAngsuran()">
+                    <i class="fas fa-search absolute left-3.5 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                </div>
+            </div>
+            
+            <div id="content-angsuran" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <p class="text-center py-10 text-gray-400 col-span-full">Memuat data...</p>
+            </div>
+        </div>
+    </section>
+
+    <footer class="bg-gray-900 text-gray-400 py-6 md:py-8 border-t border-gray-800 text-center text-xs md:text-sm">
+        <p>&copy; 2026 RT 04 RW 26 Meteseh, Tembalang, Kota Semarang.</p>
+    </footer>
+
+    <script>
+        // Konfigurasi ID Sheet & Pagu
+        const sheetId = '12KGQ3389vZoDOWySmgKIG67q_jPiwOTo';
+        const sheetIdWarga = '1n58q1Rr-N0jU782C9IzVI75Mgnysxi9b';
+        const sheetIdR = '1wyr3VF5ossx6sx5MxcTu7Z6NF2T8uOph';
+        const sheetIdKas = '1ogf6El0XtFyYLtPxbmVoh8CbFvUClQQBm9pIhRtlaNQ';
+        const sheetIdAngsuran = '1_8d1cjaCtu2rXf9plDWiLAqtNFv2MQq7'; 
+        const totalPagu = 25000000; 
+
+        // Konstanta dan State Global
+        const daftarBulan = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+        let allData = [];
+        let currentTab = 'pemasukan';
+        let globalAsetKas = undefined;
+        let globalTotalTunggakan = undefined;
+
+        // 1. Fungsi Format Rupiah
+        function formatRupiah(number) {
+            return new Intl.NumberFormat('id-ID', { 
+                style: 'currency', 
+                currency: 'IDR', 
+                minimumFractionDigits: 0 
+            }).format(number);
+        }
+
+        // Fungsi Tambahan: Menghitung Grand Total
+        function updateGrandTotal() {
+            if (globalAsetKas !== undefined && globalTotalTunggakan !== undefined) {
+                const grandTotal = globalAsetKas + globalTotalTunggakan;
+                const elGrandTotal = document.getElementById('info-grand-total');
+                if (elGrandTotal) {
+                    elGrandTotal.textContent = formatRupiah(grandTotal);
+                }
+            }
+        }
+
+        // 2. Fungsi Load Iframe Sheet
+        function loadSheet(gid, title, el) {
+            const loader = document.getElementById('loader');
+            loader.style.display = 'flex';
+            
+            const iframe = document.getElementById('data-frame');
+            iframe.src = `https://docs.google.com/spreadsheets/d/${sheetId}/htmlembed?gid=${gid}&widget=false&chrome=false&headers=false`;
+            
+            iframe.onload = () => { loader.style.display = 'none'; };
+            
+            document.querySelectorAll('.tab-item').forEach(i => i.classList.remove('active'));
+            el.classList.add('active');
+        }
+
+        // 3. Fungsi Universal Fetch untuk Budget
+        async function updateBudget(range, displayElement, loadingElement, indicatorId) {
+            const displayEl = document.getElementById(displayElement);
+            const loadingEl = loadingElement ? document.getElementById(loadingElement) : null;
+            const indicatorEl = indicatorId ? document.getElementById(indicatorId) : null;
+            
+            if(!displayEl) return;
+            
+            const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv&range=${encodeURIComponent(range)}`;
+
+            fetch(url)
+            .then(response => {
+                if (!response.ok) throw new Error("Network response was not ok");
+                return response.text();
+            })
+            .then(csvData => {
+                let cleanData = csvData.replace(/"/g, '').trim();
+                const withoutCents = cleanData.replace(/[.,]\d{1,2}$/, '');
+                const numericString = withoutCents.replace(/[^0-9]/g, '');
+                const numericValue = parseInt(numericString, 10);
+
+                if(!isNaN(numericValue) && numericString.length > 0) {
+                    const formattedCurrency = formatRupiah(numericValue);
+
+                    if(loadingEl) loadingEl.style.display = 'none';
+                    displayEl.textContent = formattedCurrency;
+                    displayEl.classList.remove('opacity-0');
+                    if(indicatorEl) {
+                        indicatorEl.classList.remove('bg-gray-300', 'bg-red-500');
+                        indicatorEl.classList.add('bg-green-500');
+                    }
+                } else {
+                    if(indicatorEl) {
+                        indicatorEl.classList.remove('bg-gray-300', 'bg-green-500');
+                        indicatorEl.classList.add('bg-red-500');
+                    }
+                    displayEl.textContent = cleanData || "Data Kosong";
+                    if(loadingEl) loadingEl.style.display = 'none';
+                    displayEl.classList.remove('opacity-0');
+                }
+            })
+            .catch(error => {
+                console.error("Gagal mengambil data realtime:", error);
+                if(indicatorEl) {
+                    indicatorEl.classList.remove('bg-gray-300', 'bg-green-500');
+                    indicatorEl.classList.add('bg-red-500');
+                }
+                if(loadingEl) loadingEl.textContent = "Gagal memuat data.";
+            });
+        }
+
+        // 4. Fungsi Fetch Data Warga
+        async function fetchWargaData() {
+            const url = `https://docs.google.com/spreadsheets/d/${sheetIdWarga}/gviz/tq?tqx=out:csv`;
+            try {
+                const response = await fetch(url);
+                const csvText = await response.text();
+                const cleanRows = csvText.split('\n').map(row => row.split(',').map(cell => cell.replace(/"/g, '').trim()));
+                     
+                document.getElementById('total-warga-display').textContent = cleanRows.length - 1;
+
+                const head = document.getElementById('table-head');
+                const body = document.getElementById('table-body');
+                
+                if(cleanRows.length > 0){
+                    const headers = cleanRows[0].slice(0, 3); 
+                    head.innerHTML = headers.map(col => `<th class="px-6 py-4 text-sm font-semibold uppercase tracking-wider">${col}</th>`).join('');
+
+                    cleanRows.slice(1).forEach(row => {
+                        if(row.length > 1) {
+                            const filteredRow = row.slice(0, 3);
+                            body.innerHTML += `
+                                <tr class="hover:bg-emerald-50 transition-colors even:bg-gray-50">
+                                    ${filteredRow.map(cell => `<td class="px-6 py-4 text-sm text-gray-700">${cell}</td>`).join('')}
+                                </tr>`;
+                        }
+                    });
+                    document.getElementById('warga-loader').classList.add('hidden');
+                    document.getElementById('tabel-warga').classList.remove('hidden');
+                }
+            } catch (error) {
+                console.error(error);
+                document.getElementById('warga-loader').textContent = "Gagal memuat data.";
+            }
+        }
+
+        // 5. Fungsi Rekap Keuangan
+        async function loadRekapKeuangan() {
+            const url = `https://docs.google.com/spreadsheets/d/${sheetIdR}/gviz/tq?tqx=out:csv&sheet=Laporan Keuangan&range=A7:F80`;
+            try {
+                const response = await fetch(url);
+                const csvText = await response.text();
+                const rows = csvText.split('\n').map(row => row.split(',').map(cell => cell.replace(/"/g, '').trim()));
+                const dataRows = rows.filter(row => row.length >= 6 && row[2] !== "");
+                
+                if (dataRows.length > 0) {
+                    const lastRow = dataRows[dataRows.length - 1];
+                    const saldoAkhir = parseInt(lastRow[5].replace(/[^0-9]/g, '')) || 0;
+                    const realisasi = totalPagu - saldoAkhir;
+
+                    // Update UI Rekap
+                    document.getElementById('rekap-realisasi').textContent = formatRupiah(realisasi);
+                    document.getElementById('rekap-sisa').textContent = formatRupiah(saldoAkhir);
+
+                    // Update UI Total BO Dashboard
+                    const dashReal = document.getElementById('dashboard-realisasi');
+                    const dashSisa = document.getElementById('dashboard-sisa');
+                    if(dashReal) dashReal.textContent = formatRupiah(realisasi);
+                    if(dashSisa) dashSisa.textContent = formatRupiah(saldoAkhir);
+                }
+            } catch (error) {
+                console.error("Error loading keuangan:", error);
+            }
+        }
+
+        // 6. Fungsi Tabel Rekap Data (Pemasukan/Pengeluaran)
+        async function fetchDataRekap() {
+            const url = `https://docs.google.com/spreadsheets/d/${sheetIdR}/gviz/tq?tqx=out:csv&sheet=Laporan Keuangan&range=A7:F80`;
+            try {
+                const response = await fetch(url);
+                const csvText = await response.text();
+                const rows = csvText.split('\n').map(row => row.split(',').map(cell => cell.replace(/"/g, '').trim()));
+                allData = rows.filter(row => row.length >= 6 && row[2] !== "");
+                renderRekap();
+            } catch (err) {
+                document.getElementById('rekap-list-container').innerHTML = '<p class="text-red-500 text-center">Gagal memuat data.</p>';
+            }
+        }
+
+        function switchTab(tab) {
+            currentTab = tab;
+            document.getElementById('btn-pemasukan').className = tab === 'pemasukan' 
+                ? 'flex-1 py-2 text-sm font-bold rounded-lg bg-white shadow text-emerald-600 transition' 
+                : 'flex-1 py-2 text-sm font-bold rounded-lg text-gray-500 transition';
+            document.getElementById('btn-pengeluaran').className = tab === 'pengeluaran' 
+                ? 'flex-1 py-2 text-sm font-bold rounded-lg bg-white shadow text-red-600 transition' 
+                : 'flex-1 py-2 text-sm font-bold rounded-lg text-gray-500 transition';
+            renderRekap();
+        }
+
+        function renderRekap() {
+            const container = document.getElementById('rekap-list-container');
+            let filtered = allData.filter(row => {
+                if (currentTab === 'pemasukan') return row[4] && row[4] !== "0" && row[4] !== "";
+                return row[5] && row[5] !== "0" && row[5] !== "";
+            });
+
+            if (filtered.length === 0) {
+                container.innerHTML = '<p class="text-center text-gray-400 py-10">Tidak ada data tersedia.</p>';
+                return;
+            }
+
+            container.innerHTML = `
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="text-xs uppercase text-gray-500 border-b">
+                                <th class="p-3">Tgl</th>
+                                <th class="p-3">No</th>
+                                <th class="p-3">Keterangan</th>
+                                <th class="p-3 text-right">${currentTab === 'pemasukan' ? 'Debit' : 'Kredit'}</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100">
+                            ${filtered.map(item => `
+                                <tr class="hover:bg-gray-50 transition">
+                                    <td class="p-3 text-xs text-gray-500">${item[0]}</td>
+                                    <td class="p-3 text-sm font-bold text-gray-700">${item[1]}</td>
+                                    <td class="p-3 text-sm text-gray-800">${item[2]}</td>
+                                    <td class="p-3 text-sm font-bold text-right ${currentTab === 'pemasukan' ? 'text-emerald-600' : 'text-red-600'}">
+                                        ${currentTab === 'pemasukan' ? item[4] : item[5]}
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        // 7. Fungsi Fetch Kas & Tunggakan
+        async function fetchKasTunggakan(sheetName, containerId) {
+            const container = document.getElementById(containerId);
+            const url = `https://docs.google.com/spreadsheets/d/${sheetIdKas}/gviz/tq?tqx=out:csv&sheet=${sheetName}`;
+
+            try {
+                const response = await fetch(url);
+                const csvText = await response.text();
+                const rows = csvText.split('\n').map(row => row.split(',').map(cell => cell.replace(/"/g, '').trim()));
+
+                if (rows.length < 1 || rows[0].length === 0) {
+                    container.innerHTML = '<p class="text-gray-400 py-6 text-center">Data kosong atau gagal dimuat.</p>';
+                    return;
+                }
+
+                const headerLower = rows[0].map(h => h.toLowerCase());
+                const tunggakanIdx = headerLower.findIndex(h => h.includes('tunggakan'));
+
+                let html = `<table class="w-full text-left">
+                    <thead class="text-xs uppercase text-gray-500 border-b">
+                        <tr>${rows[0].map(h => `<th class="p-4">${h}</th>`).join('')}</tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100">
+                        ${rows.slice(1).map(row => {
+                            let nilaiTunggakan = 0;
+                            if (tunggakanIdx !== -1 && row[tunggakanIdx]) {
+                                nilaiTunggakan = parseInt(row[tunggakanIdx].replace(/[^0-9]/g, '')) || 0;
+                            } else if (row[3]) {
+                                nilaiTunggakan = parseInt(row[3].replace(/[^0-9]/g, '')) || 0;
+                            }
+
+                            let labelColor = '';
+                            let bgRow = '';
+
+                            if (sheetName === 'Tunggakan') {
+                                if (nilaiTunggakan > 100000) {
+                                    labelColor = 'bg-red-100 text-red-700';
+                                    bgRow = 'bg-red-50/50';
+                                } else if (nilaiTunggakan > 0) {
+                                    labelColor = 'bg-yellow-100 text-yellow-700';
+                                    bgRow = 'bg-yellow-50/50';
+                                } else {
+                                    labelColor = 'bg-green-100 text-green-700';
+                                    bgRow = 'bg-green-50/50';
+                                }
+                            }
+                            
+                            return `
+                            <tr class="hover:bg-gray-50 ${bgRow}">
+                                ${row.map((cell, index) => {
+                                    const colName = headerLower[index] || '';
+                                    const isTargetCol = colName.includes('nama') || colName.includes('tunggakan') || colName.includes('jimpitan') || colName.includes('kas');
+
+                                    if (sheetName === 'Tunggakan' && isTargetCol && cell.trim() !== '') {
+                                        return `<td class="p-4 text-sm"><span class="${labelColor} px-2 py-1 rounded font-bold whitespace-nowrap">${cell}</span></td>`;
+                                    }
+                                    return `<td class="p-4 text-sm text-gray-700">${cell}</td>`;
+                                }).join('')}
+                            </tr>`;
+                        }).join('')}
+                    </tbody>
+                </table>`;
+                container.innerHTML = html;
+            } catch (e) {
+                container.innerHTML = '<p class="text-red-500 italic">Gagal memuat data.</p>';
+            }
+        }
+        
+        // 8. Update Aset Kas
+        async function updateKas() {
+            const el = document.getElementById('total-aset-kas');
+            const url = `https://docs.google.com/spreadsheets/d/${sheetIdKas}/gviz/tq?tqx=out:csv&sheet=Kas&range=F:F`;
+            
+            try {
+                const response = await fetch(url);
+                const text = await response.text();
+                const rows = text.split('\n');
+                
+                let angkaTerakhir = 0;
+                for (let i = rows.length - 1; i >= 0; i--) {
+                    let val = rows[i].replace(/"/g, '').trim();
+                    let cleanVal = val.replace(/[^0-9]/g, ''); 
+                    let parsed = parseInt(cleanVal, 10);
+                    
+                    if (!isNaN(parsed) && parsed > 0) {
+                        angkaTerakhir = parsed;
+                        break; 
+                    }
+                }
+
+                // Update UI Total Kas
+                el.textContent = formatRupiah(angkaTerakhir);
+                el.classList.remove('opacity-0');
+
+                // Simpan ke variabel global dan coba kalkulasi grand total
+                globalAsetKas = angkaTerakhir;
+                updateGrandTotal();
+
+            } catch (error) {
+                console.error("Gagal memuat Kas:", error);
+                el.textContent = "Error";
+                el.classList.remove('opacity-0');
+            }
+        }
+
+        // 9. Update Iuran Kas
+        async function updateIuranKas() {
+            const url = `https://docs.google.com/spreadsheets/d/${sheetIdKas}/gviz/tq?tqx=out:csv&sheet=Tunggakan`;
+            
+            try {
+                const response = await fetch(url);
+                const csvText = await response.text();
+                const rows = csvText.split('\n').map(row => row.split(',').map(cell => cell.replace(/"/g, '').trim()));
+                
+                if (rows.length <= 1) return;
+
+                const headers = rows[0].map(h => h.toLowerCase());
+                let tunggakanIdx = headers.findIndex(h => h.includes('tunggakan'));
+                if (tunggakanIdx === -1) tunggakanIdx = 3; 
+
+                const dataWarga = rows.slice(1).filter(row => row[0] !== ""); 
+                const totalWarga = dataWarga.length;
+                
+                let kalkulasiTotalTunggakan = 0; // Variabel akumulasi tunggakan
+
+                const sudahBayar = dataWarga.filter(row => {
+                    const cellVal = row[tunggakanIdx];
+                    if (cellVal === undefined) return false;
+                    
+                    const valCleaned = cellVal.replace(/[^0-9]/g, '');
+                    const valNumber = parseInt(valCleaned, 10) || 0;
+
+                    // Menjumlahkan seluruh nominal tunggakan warga
+                    kalkulasiTotalTunggakan += valNumber;
+
+                    return valNumber === 0;
+                }).length;
+                
+                // Update text Total Tunggakan di layar
+                const elInfoTunggakan = document.getElementById('info-tunggakan');
+                if (elInfoTunggakan) elInfoTunggakan.textContent = formatRupiah(kalkulasiTotalTunggakan);
+
+                // Simpan ke variabel global dan kalkulasi grand total
+                globalTotalTunggakan = kalkulasiTotalTunggakan;
+                updateGrandTotal();
+
+                // Hitung persen iuran lunas
+                const persen = totalWarga > 0 ? Math.round((sudahBayar / totalWarga) * 100) : 0;
+                document.getElementById('persen-iuran').textContent = persen + "%";
+                document.getElementById('bar-iuran').style.width = persen + "%";
+                document.getElementById('keterangan-iuran').textContent = `${sudahBayar} dari ${totalWarga} KK lunas`;
+
+            } catch (error) {
+                console.error("Error memuat Iuran:", error);
+            }
+        }
+
+        // 10. Fungsi Fetch Data Angsuran (Diperkecil & Lebih Menarik)
+        async function fetchAngsuran() {
+            const container = document.getElementById('content-angsuran');
+            const url = `https://docs.google.com/spreadsheets/d/${sheetIdAngsuran}/gviz/tq?tqx=out:csv&sheet=Angsuran`;
+            
+            const now = new Date();
+            const currentMonthIndex = now.getMonth();
+            const currentYear = now.getFullYear();
+            
+            try {
+                const response = await fetch(url);
+                const text = await response.text();
+                const rows = text.split('\n').map(r => r.split(',').map(c => c.replace(/"/g, '').trim()));
+                
+                // 1. Ambil header untuk menentukan tahun
+                const header = rows[0];
+                const tahunList = [...new Set(header.filter(h => /^\d{4}$/.test(h)))];
+                
+                let htmlOutput = "";
+
+                // 2. Loop data warga
+                for (let i = 1; i < rows.length; i++) {
+                    const row = rows[i];
+                    if (!row || !row[0]) continue;
+
+                    const nama = row[0];
+                    const idNama = 'user-' + i;
+
+                    htmlOutput += `
+                    <div class="angsuran-item bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden" data-name="${nama.toLowerCase()}">
+                        <button onclick="toggle('${idNama}')" class="w-full p-3 flex justify-between items-center bg-gray-50 font-semibold text-gray-700 hover:bg-emerald-50 transition text-sm">
+                            <span class="flex items-center gap-2"><i class="fas fa-user-circle text-gray-400"></i> ${nama}</span>
+                            <i class="fas fa-chevron-down text-xs text-gray-400"></i>
+                        </button>
+                        <div id="${idNama}" class="p-3 space-y-3 hidden bg-white">
+                            ${tahunList.map((tahun, thnIdx) => {
+                                const startCol = header.indexOf(tahun);
+                                return `
+                                <div class="border border-gray-100 rounded-md overflow-hidden">
+                                    <div class="p-2 bg-emerald-50/50 text-emerald-800 font-bold text-xs border-b border-gray-100">Tahun ${tahun}</div>
+                                    <div class="p-2 grid grid-cols-3 md:grid-cols-4 gap-1.5">
+                                        ${daftarBulan.map((bln, blnIdx) => {
+                                            const kolomIndex = startCol + blnIdx;
+                                            const nilaiRaw = row[kolomIndex] || "0";
+                                            const nilai = parseInt(nilaiRaw.replace(/[^0-9]/g, '')) || 0;
+                                            
+                                            const isPaid = nilai > 0;
+                                            const isPast = (parseInt(tahun) < currentYear) || (parseInt(tahun) == currentYear && blnIdx < currentMonthIndex);
+                                            const isOverdue = isPast && !isPaid;
+                                            const formatBln = bln.substring(0, 3);
+                                            const formatNilai = nilai > 0 ? 'Rp' + (nilai / 1000) + 'k' : '-';
+
+                                            return `
+                                            <div class="p-1.5 border rounded text-[10px] ${isPaid ? 'bg-green-50 border-green-200' : (isOverdue ? 'bg-red-50 border-red-200' : 'bg-gray-50 border-gray-100')} flex flex-col items-center justify-center text-center">
+                                                <div class="font-bold mb-0.5 ${isPaid ? 'text-green-700' : (isOverdue ? 'text-red-600' : 'text-gray-500')}">
+                                                    ${formatBln}
+                                                </div>
+                                                <div class="font-mono text-[9px] ${isOverdue ? 'text-red-500 font-bold' : 'text-gray-600'}">
+                                                    ${isOverdue ? 'X' : formatNilai}
+                                                </div>
+                                            </div>`;
+                                        }).join('')}
+                                    </div>
+                                </div>`;
+                            }).join('')}
+                        </div>
+                    </div>`;
+                }
+                container.innerHTML = htmlOutput;
+            } catch(e) {
+                console.error(e);
+                container.innerHTML = "<p class='text-red-500 text-center col-span-full'>Gagal memuat data. Periksa kembali struktur sheet.</p>";
+            }
+        }
+
+        // Toggle Accordion
+        function toggle(id) {
+            const el = document.getElementById(id);
+            el.classList.toggle('hidden');
+        }
+
+        // Filter Cari Nama Angsuran
+        function filterAngsuran() {
+            const input = document.getElementById('search-angsuran').value.toLowerCase();
+            const items = document.querySelectorAll('.angsuran-item');
+            
+            items.forEach(item => {
+                const name = item.getAttribute('data-name');
+                if (name.includes(input)) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+        
+        // --- Eksekusi Saat Dokumen Siap ---
+        document.addEventListener("DOMContentLoaded", () => {
+            updateBudget("Rekap BO!C37", "dynamic-real", "loading-real", "sync-real");
+            updateBudget("Rekap BO!C38", "dynamic-sisa", "loading-sisa", "sync-sisa");
+            updateBudget("Rekap BO!C37", "dynamic-total", "loading-total", "sync-total");
+            updateBudget("Rekap BO!C37", "dashboard-total-bo", null, null);
+
+            fetchWargaData();
+            loadRekapKeuangan();
+            fetchDataRekap();
+            updateKas();
+            updateIuranKas();
+            fetchKasTunggakan('Kas', 'content-kas');
+            fetchKasTunggakan('Tunggakan', 'content-tunggakan');
+            
+            // Render Angsuran Warga
+            fetchAngsuran();
+        });
+    </script>
+</body>
+</html>
