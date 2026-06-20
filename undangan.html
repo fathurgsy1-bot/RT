@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generator Undangan RT 04 RW 26 Meteseh</title>
+    <style>
+        /* Gaya untuk UI Web */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f3f4f6;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            max-width: 1200px;
+            width: 100%;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        /* Panel Kontrol (Input) */
+        .controls {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 350px;
+            position: sticky;
+            top: 20px;
+        }
+
+        .controls h2 {
+            margin-top: 0;
+            font-size: 1.2rem;
+            color: #333;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #4b5563;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-family: inherit;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+
+        button.download-btn {
+            width: 100%;
+            background-color: #2563eb;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            margin-top: 10px;
+        }
+
+        button.download-btn:hover {
+            background-color: #1d4ed8;
+        }
+
+        /* Tampilan Kertas Surat A4 */
+        .paper-wrapper {
+            overflow-x: auto;
+            padding-bottom: 20px;
+        }
+
+        .paper {
+            width: 210mm;
+            min-height: 297mm;
+            background: white;
+            padding: 25mm 20mm;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            box-sizing: border-box;
+            font-family: 'Times New Roman', Times, serif;
+            color: black;
+            font-size: 12pt;
+            line-height: 1.5;
+            position: relative;
+        }
+
+        /* Kop Surat */
+        .kop-surat {
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 5px;
+            line-height: 1.2;
+        }
+
+        .kop-surat .judul {
+            font-size: 14pt;
+        }
+
+        .kop-surat .rt-rw {
+            font-size: 16pt;
+            text-decoration: underline;
+        }
+
+        .garis-kop {
+            border-top: 3px solid black;
+            border-bottom: 1px solid black;
+            height: 2px;
+            margin-top: 10px;
+            margin-bottom: 20px;
+        }
+
+        /* Isi Surat */
+        .meta-surat {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .meta-kiri table {
+            border-collapse: collapse;
+        }
+        .meta-kiri table td {
+            vertical-align: top;
+        }
+
+        .tujuan {
+            margin-bottom: 20px;
+        }
+
+        .tabel-acara {
+            margin: 15px 0 15px 30px;
+        }
+        
+        .tabel-acara td {
+            vertical-align: top;
+            padding-bottom: 5px;
+        }
+
+        .tabel-acara td:first-child {
+            width: 100px;
+        }
+
+        .tanda-tangan {
+            margin-top: 40px;
+            text-align: right;
+            padding-right: 20px;
+        }
+
+        .tanda-tangan p {
+            margin: 0;
+        }
+
+        .nama-ttd {
+            margin-top: 80px;
+            font-weight: bold;
+            text-decoration: underline;
+        }
+
+        /* KHUSUS UNTUK MODE DOWNLOAD/PRINT PDF */
+        @media print {
+            body {
+                background: white;
+                margin: 0;
+                padding: 0;
+            }
+            .controls {
+                display: none; /* Sembunyikan panel edit saat didownload */
+            }
+            .paper-wrapper {
+                padding: 0;
+                overflow: visible;
+            }
+            .paper {
+                box-shadow: none;
+                margin: 0;
+                padding: 0;
+                width: 100%;
+                min-height: auto;
+            }
+            @page {
+                size: A4 portrait;
+                margin: 25mm 20mm; /* Margin asli kertas */
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="controls">
+            <h2>⚙️ Edit Undangan</h2>
+            
+            <div class="form-group">
+                <label for="input-tgl-surat">Tanggal Surat dibuat</label>
+                <input type="text" id="input-tgl-surat" value="Semarang, 23 April 2026" oninput="updateSurat()">
+            </div>
+            
+            <div class="form-group">
+                <label for="input-nomor">Nomor Surat</label>
+                <input type="text" id="input-nomor" value="02/RT.04/XXVI/04/2026" oninput="updateSurat()">
+            </div>
+
+            <hr style="border: 0; border-top: 1px solid #e5e7eb; margin: 20px 0;">
+
+            <div class="form-group">
+                <label for="input-hari-tgl">Hari/Tanggal Acara</label>
+                <input type="text" id="input-hari-tgl" value="Minggu, 26 April 2026" oninput="updateSurat()">
+            </div>
+
+            <div class="form-group">
+                <label for="input-waktu">Waktu Acara</label>
+                <input type="text" id="input-waktu" value="Pukul 19.30-21.00 WIB" oninput="updateSurat()">
+            </div>
+
+            <div class="form-group">
+                <label for="input-tempat">Tempat Acara</label>
+                <input type="text" id="input-tempat" value="Bapak Surya (4C No.5)" oninput="updateSurat()">
+            </div>
+
+            <button class="download-btn" onclick="downloadPDF()">⬇️ Download PDF</button>
+        </div>
+
+        <div class="paper-wrapper">
+            <div class="paper" id="surat-undangan">
+                <div class="kop-surat">
+                    KOTA SEMARANG<br>
+                    PEMERINTAH KOTA SEMARANG<br>
+                    KEC. TEMBALANG KEL. METESEH<br>
+                    <div class="rt-rw">RT 04 RW XXVI</div>
+                </div>
+                <div class="garis-kop"></div>
+
+                <div class="meta-surat">
+                    <div class="meta-kiri">
+                        <table>
+                            <tr>
+                                <td>No</td>
+                                <td>:</td>
+                                <td><span id="out-nomor">02/RT.04/XXVI/04/2026</span></td>
+                            </tr>
+                            <tr>
+                                <td>Lamp.</td>
+                                <td>:</td>
+                                <td>-</td>
+                            </tr>
+                            <tr>
+                                <td>Hal.</td>
+                                <td>:</td>
+                                <td>UNDANGAN</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="meta-kanan">
+                        <span id="out-tgl-surat">Semarang, 23 April 2026</span>
+                    </div>
+                </div>
+
+                <div class="tujuan">
+                    Kepada Yth.:<br>
+                    Bapak-Bapak RT 04 RW 026 Cluster<br>
+                    Dinar Indah Meteseh di SEMARANG
+                </div>
+
+                <div class="isi">
+                    Dengan hormat,<br><br>
+                    Bersama ini kami mohon dengan hormat kehadiran Bapak-Bapak pada:
+                    
+                    <table class="tabel-acara">
+                        <tr>
+                            <td>Hari/Tanggal</td>
+                            <td>:</td>
+                            <td><strong id="out-hari-tgl">Minggu, 26 April 2026</strong></td>
+                        </tr>
+                        <tr>
+                            <td>Waktu</td>
+                            <td>:</td>
+                            <td><span id="out-waktu">Pukul 19.30-21.00 WIB</span></td>
+                        </tr>
+                        <tr>
+                            <td>Tempat.</td>
+                            <td>:</td>
+                            <td><strong id="out-tempat">Bapak Surya (4C No.5)</strong></td>
+                        </tr>
+                        <tr>
+                            <td>Acara</td>
+                            <td>:</td>
+                            <td>Pertemuan Rutin Warga RT 04 RW 026</td>
+                        </tr>
+                    </table>
+
+                    Demikian atas kehadiran Bapak-Bapak, kami ucapkan terimakasih.
+                </div>
+
+                <div class="tanda-tangan">
+                    <p>Hormat kami, RT 04 RW XXVI</p>
+                    <div class="nama-ttd">GATOT ENDRO YUDO EDI WIBOWO</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Fungsi untuk mengupdate teks di surat secara realtime
+        function updateSurat() {
+            document.getElementById('out-tgl-surat').innerText = document.getElementById('input-tgl-surat').value;
+            document.getElementById('out-nomor').innerText = document.getElementById('input-nomor').value;
+            document.getElementById('out-hari-tgl').innerText = document.getElementById('input-hari-tgl').value;
+            document.getElementById('out-waktu').innerText = document.getElementById('input-waktu').value;
+            document.getElementById('out-tempat').innerText = document.getElementById('input-tempat').value;
+        }
+
+        // Fungsi download diganti menggunakan print bawaan browser
+        function downloadPDF() {
+            window.print();
+        }
+    </script>
+</body>
+</html>
