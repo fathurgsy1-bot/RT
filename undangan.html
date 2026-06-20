@@ -4,22 +4,45 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Generator Undangan RT 04 RW 26 Meteseh</title>
+    <!-- Menggunakan font Google untuk UI -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        /* Gaya untuk UI Web */
+        /* ==========================================
+           GAYA UNTUK UI WEB (CONTROL PANEL & LAYOUT)
+           ========================================== */
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f3f4f6;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: linear-gradient(135deg, #f0f4f8 0%, #d9e2ec 100%);
             margin: 0;
-            padding: 20px;
+            padding: 30px 20px;
             display: flex;
             flex-direction: column;
             align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        .header-title {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #102a43;
+        }
+
+        .header-title h1 {
+            margin: 0 0 5px 0;
+            font-size: 1.8rem;
+        }
+
+        .header-title p {
+            margin: 0;
+            color: #486581;
+            font-size: 0.95rem;
         }
 
         .container {
             display: flex;
             flex-wrap: wrap;
-            gap: 20px;
+            gap: 30px;
             max-width: 1200px;
             width: 100%;
             justify-content: center;
@@ -28,135 +51,179 @@
 
         /* Panel Kontrol (Input) */
         .controls {
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            background: #ffffff;
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(16, 42, 67, 0.08);
             width: 100%;
             max-width: 350px;
             position: sticky;
-            top: 20px;
+            top: 30px;
+            border: 1px solid #e1e8ef;
         }
 
         .controls h2 {
             margin-top: 0;
-            font-size: 1.2rem;
-            color: #333;
-            border-bottom: 2px solid #e5e7eb;
-            padding-bottom: 10px;
+            font-size: 1.25rem;
+            color: #102a43;
+            border-bottom: 2px solid #f0f4f8;
+            padding-bottom: 15px;
             margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 18px;
         }
 
         .form-group label {
             display: block;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
             font-weight: 600;
-            font-size: 0.9rem;
-            color: #4b5563;
+            font-size: 0.85rem;
+            color: #334e68;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .form-group input {
             width: 100%;
-            padding: 10px;
-            border: 1px solid #d1d5db;
-            border-radius: 6px;
+            padding: 12px 15px;
+            border: 2px solid #d9e2ec;
+            border-radius: 8px;
             box-sizing: border-box;
             font-family: inherit;
+            font-size: 0.95rem;
+            color: #102a43;
+            transition: all 0.2s ease;
         }
 
         .form-group input:focus {
             outline: none;
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+            border-color: #3e90ff;
+            box-shadow: 0 0 0 3px rgba(62, 144, 255, 0.15);
+        }
+
+        .divider {
+            height: 1px;
+            background-color: #d9e2ec;
+            margin: 25px 0;
         }
 
         button.download-btn {
             width: 100%;
-            background-color: #2563eb;
+            background-color: #2680eb;
             color: white;
             border: none;
-            padding: 12px;
-            border-radius: 6px;
-            font-weight: bold;
+            padding: 14px;
+            border-radius: 8px;
+            font-weight: 700;
             font-size: 1rem;
             cursor: pointer;
-            transition: background-color 0.2s;
-            margin-top: 10px;
+            transition: all 0.2s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 10px rgba(38, 128, 235, 0.3);
         }
 
         button.download-btn:hover {
-            background-color: #1d4ed8;
+            background-color: #1664c8;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(38, 128, 235, 0.4);
         }
 
-        /* Tampilan Kertas Surat A4 */
+        /* ==========================================
+           GAYA UNTUK PREVIEW KERTAS (MIRIP WORD)
+           ========================================== */
         .paper-wrapper {
             overflow-x: auto;
             padding-bottom: 20px;
+            /* Scrollbar styling untuk wrapper */
+            scrollbar-width: thin;
+            scrollbar-color: #bcccdc transparent;
         }
 
         .paper {
             width: 210mm;
             min-height: 297mm;
             background: white;
-            padding: 25mm 20mm;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            padding: 2.5cm 2.5cm; /* Margin standar Word */
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1), 0 5px 15px rgba(0,0,0,0.05);
             box-sizing: border-box;
-            font-family: 'Times New Roman', Times, serif;
+            font-family: Arial, Helvetica, sans-serif; /* Diganti Arial agar sesuai referensi */
             color: black;
-            font-size: 12pt;
+            font-size: 12pt; /* Ukuran font standar */
             line-height: 1.5;
             position: relative;
         }
 
         /* Kop Surat */
-        .kop-surat {
+        .kop-surat-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+
+        .kop-surat-logo {
+            width: 90px;
+            height: auto;
+            margin-right: 15px;
+        }
+
+        .kop-surat-text {
+            flex-grow: 1;
             text-align: center;
             font-weight: bold;
-            margin-bottom: 5px;
-            line-height: 1.2;
+            line-height: 1.3;
         }
 
-        .kop-surat .judul {
-            font-size: 14pt;
-        }
-
-        .kop-surat .rt-rw {
-            font-size: 16pt;
-            text-decoration: underline;
-        }
+        .kop-surat-text .baris-1 { font-size: 16pt; }
+        .kop-surat-text .baris-2 { font-size: 14pt; }
+        .kop-surat-text .baris-3 { font-size: 14pt; margin-top: 5px; }
 
         .garis-kop {
             border-top: 3px solid black;
             border-bottom: 1px solid black;
             height: 2px;
             margin-top: 10px;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
         }
 
-        /* Isi Surat */
+        /* Meta Informasi Surat */
         .meta-surat {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
         }
 
         .meta-kiri table {
             border-collapse: collapse;
+            font-size: 12pt;
         }
+        
         .meta-kiri table td {
             vertical-align: top;
+            padding: 2px 5px 2px 0;
         }
 
+        /* Tujuan Surat */
         .tujuan {
-            margin-bottom: 20px;
+            margin-bottom: 25px;
+            line-height: 1.4;
+        }
+
+        /* Isi Surat */
+        .isi-surat {
+            text-align: justify;
         }
 
         .tabel-acara {
             margin: 15px 0 15px 30px;
+            border-collapse: collapse;
         }
         
         .tabel-acara td {
@@ -164,35 +231,58 @@
             padding-bottom: 5px;
         }
 
-        .tabel-acara td:first-child {
-            width: 100px;
+        .tabel-acara td:nth-child(1) {
+            width: 130px; /* Lebar kolom pertama disesuaikan */
+        }
+        
+        .tabel-acara td:nth-child(2) {
+            padding-right: 10px;
+            width: 10px;
         }
 
+        /* Tanda Tangan */
         .tanda-tangan {
-            margin-top: 40px;
+            margin-top: 50px;
             text-align: right;
-            padding-right: 20px;
+            padding-right: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
         }
 
         .tanda-tangan p {
             margin: 0;
+            margin-bottom: 5px;
+        }
+
+        .img-ttd {
+            height: 90px;
+            object-fit: contain;
+            margin-right: 15px;
+            margin-top: 5px;
+            margin-bottom: 5px;
+            mix-blend-mode: multiply; /* Agar background putih pada ttd menyatu */
         }
 
         .nama-ttd {
-            margin-top: 80px;
             font-weight: bold;
-            text-decoration: underline;
+            /* text-decoration: underline; -- Berdasarkan referensi, tidak digarisbawahi, tapi jika ingin ditambahkan, uncomment ini */
         }
 
-        /* KHUSUS UNTUK MODE DOWNLOAD/PRINT PDF */
+        /* ==========================================
+           KHUSUS UNTUK MODE DOWNLOAD/PRINT PDF
+           ========================================== */
         @media print {
             body {
                 background: white;
                 margin: 0;
                 padding: 0;
             }
-            .controls {
-                display: none; /* Sembunyikan panel edit saat didownload */
+            .header-title, .controls {
+                display: none; /* Sembunyikan UI saat print */
+            }
+            .container {
+                gap: 0;
             }
             .paper-wrapper {
                 padding: 0;
@@ -207,64 +297,84 @@
             }
             @page {
                 size: A4 portrait;
-                margin: 25mm 20mm; /* Margin asli kertas */
+                margin: 25mm 25mm; /* Margin dicetak mengikuti pengaturan ini */
             }
         }
     </style>
 </head>
 <body>
 
+    <div class="header-title">
+        <h1>Generator Undangan RT</h1>
+        <p>Sesuaikan data di bawah ini untuk mengupdate surat secara otomatis</p>
+    </div>
+
     <div class="container">
+        <!-- Panel Edit -->
         <div class="controls">
-            <h2>⚙️ Edit Undangan</h2>
+            <h2>⚙️ Data Surat</h2>
             
             <div class="form-group">
-                <label for="input-tgl-surat">Tanggal Surat dibuat</label>
-                <input type="text" id="input-tgl-surat" value="Semarang, 23 April 2026" oninput="updateSurat()">
+                <label for="input-tgl-surat">Tanggal Pembuatan Surat</label>
+                <input type="text" id="input-tgl-surat" value="Semarang, 3 Februari 2026" oninput="updateSurat()">
             </div>
             
             <div class="form-group">
                 <label for="input-nomor">Nomor Surat</label>
-                <input type="text" id="input-nomor" value="02/RT.04/XXVI/04/2026" oninput="updateSurat()">
+                <input type="text" id="input-nomor" value="02/RT.04/XXVI/02/2026" oninput="updateSurat()">
             </div>
 
-            <hr style="border: 0; border-top: 1px solid #e5e7eb; margin: 20px 0;">
+            <div class="divider"></div>
 
             <div class="form-group">
-                <label for="input-hari-tgl">Hari/Tanggal Acara</label>
-                <input type="text" id="input-hari-tgl" value="Minggu, 26 April 2026" oninput="updateSurat()">
+                <label for="input-hari-tgl">Hari / Tanggal Acara</label>
+                <input type="text" id="input-hari-tgl" value="Sabtu, 7 Februari 2026" oninput="updateSurat()">
             </div>
 
             <div class="form-group">
                 <label for="input-waktu">Waktu Acara</label>
-                <input type="text" id="input-waktu" value="Pukul 19.30-21.00 WIB" oninput="updateSurat()">
+                <input type="text" id="input-waktu" value="Pukul 19.30 – 21.00 WIB" oninput="updateSurat()">
             </div>
 
             <div class="form-group">
                 <label for="input-tempat">Tempat Acara</label>
-                <input type="text" id="input-tempat" value="Bapak Surya (4C No.5)" oninput="updateSurat()">
+                <input type="text" id="input-tempat" value="Bapak Endy (4D No.4)" oninput="updateSurat()">
             </div>
 
-            <button class="download-btn" onclick="downloadPDF()">⬇️ Download PDF</button>
+            <button class="download-btn" onclick="downloadPDF()">
+                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" x2="12" y1="15" y2="3"></line>
+                </svg>
+                Print / Simpan PDF
+            </button>
         </div>
 
+        <!-- Area Kertas Surat -->
         <div class="paper-wrapper">
             <div class="paper" id="surat-undangan">
-                <div class="kop-surat">
-                    KOTA SEMARANG<br>
-                    PEMERINTAH KOTA SEMARANG<br>
-                    KEC. TEMBALANG KEL. METESEH<br>
-                    <div class="rt-rw">RT 04 RW XXVI</div>
+                <!-- Kop Surat -->
+                <div class="kop-surat-container">
+                    <!-- Ganti src dengan path file logo Anda yang sebenarnya -->
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Lambang_Kota_Semarang.png/400px-Lambang_Kota_Semarang.png" alt="Logo Pemkot" class="kop-surat-logo">
+                    
+                    <div class="kop-surat-text">
+                        <div class="baris-1">PEMERINTAH KOTA SEMARANG</div>
+                        <div class="baris-2">KEC. TEMBALANG KEL. METESEH</div>
+                        <div class="baris-3">RT 04 RW XXVI</div>
+                    </div>
                 </div>
                 <div class="garis-kop"></div>
 
+                <!-- Meta Informasi Surat -->
                 <div class="meta-surat">
                     <div class="meta-kiri">
                         <table>
                             <tr>
                                 <td>No</td>
                                 <td>:</td>
-                                <td><span id="out-nomor">02/RT.04/XXVI/04/2026</span></td>
+                                <td><span id="out-nomor">02/RT.04/XXVI/02/2026</span></td>
                             </tr>
                             <tr>
                                 <td>Lamp.</td>
@@ -279,35 +389,37 @@
                         </table>
                     </div>
                     <div class="meta-kanan">
-                        <span id="out-tgl-surat">Semarang, 23 April 2026</span>
+                        <span id="out-tgl-surat">Semarang, 3 Februari 2026</span>
                     </div>
                 </div>
 
+                <!-- Tujuan Surat -->
                 <div class="tujuan">
                     Kepada Yth.:<br>
                     Bapak-Bapak RT 04 RW 026 Cluster<br>
                     Dinar Indah Meteseh di SEMARANG
                 </div>
 
-                <div class="isi">
+                <!-- Isi Surat -->
+                <div class="isi-surat">
                     Dengan hormat,<br><br>
-                    Bersama ini kami mohon dengan hormat kehadiran Bapak-Bapak pada:
+                    Bersama ini kami mohon dengan hormat kehadiran Bapak-Bapak pada :
                     
                     <table class="tabel-acara">
                         <tr>
-                            <td>Hari/Tanggal</td>
+                            <td>Hari/ Tanggal</td>
                             <td>:</td>
-                            <td><strong id="out-hari-tgl">Minggu, 26 April 2026</strong></td>
+                            <td id="out-hari-tgl">Sabtu, 7 Februari 2026</td>
                         </tr>
                         <tr>
                             <td>Waktu</td>
                             <td>:</td>
-                            <td><span id="out-waktu">Pukul 19.30-21.00 WIB</span></td>
+                            <td id="out-waktu">Pukul 19.30 – 21.00 WIB</td>
                         </tr>
                         <tr>
                             <td>Tempat.</td>
                             <td>:</td>
-                            <td><strong id="out-tempat">Bapak Surya (4C No.5)</strong></td>
+                            <td id="out-tempat">Bapak Endy (4D No.4)</td>
                         </tr>
                         <tr>
                             <td>Acara</td>
@@ -319,8 +431,13 @@
                     Demikian atas kehadiran Bapak-Bapak, kami ucapkan terimakasih.
                 </div>
 
+                <!-- Bagian Tanda Tangan -->
                 <div class="tanda-tangan">
                     <p>Hormat kami, RT 04 RW XXVI</p>
+                    
+                    <!-- Ganti src dengan file tanda tangan Anda yang sebenarnya -->
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/f/f6/Signature_of_John_Hancock.png" alt="Tanda Tangan" class="img-ttd">
+                    
                     <div class="nama-ttd">GATOT ENDRO YUDO EDI WIBOWO</div>
                 </div>
             </div>
@@ -337,7 +454,7 @@
             document.getElementById('out-tempat').innerText = document.getElementById('input-tempat').value;
         }
 
-        // Fungsi download diganti menggunakan print bawaan browser
+        // Fungsi print PDF
         function downloadPDF() {
             window.print();
         }
