@@ -534,6 +534,7 @@
             </div>
         </div>
     </section>
+    
     <section id="angsuran-warga" class="py-20 md:py-24 bg-gray-50 border-t border-gray-100">
         <div class="max-w-6xl mx-auto px-4">
             <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-6">
@@ -552,6 +553,27 @@
             </div>
         </div>
     </section>
+
+    <!-- Modal Pop-up Untuk Notes -->
+    <div id="note-modal" class="fixed inset-0 bg-black/60 z-[100] hidden items-center justify-center p-4 backdrop-blur-sm transition-opacity">
+        <div class="bg-white rounded-2xl p-6 w-full max-w-sm shadow-2xl transform transition-all scale-95 opacity-0 duration-300" id="note-modal-box">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-bold text-gray-900 flex items-center gap-2">
+                    <i class="fas fa-sticky-note text-amber-500"></i> Catatan Warga
+                </h3>
+                <button onclick="closeNote()" class="text-gray-400 hover:text-red-500 transition-colors">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <div class="mb-5">
+                <p class="text-sm text-gray-500 mb-2 font-semibold border-b border-gray-100 pb-2" id="note-subtitle">Nama - Bulan Tahun</p>
+                <div class="p-4 bg-amber-50 text-amber-800 rounded-xl border border-amber-200 text-sm font-medium leading-relaxed" id="note-content">
+                    Memuat catatan...
+                </div>
+            </div>
+            <button onclick="closeNote()" class="w-full py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-xl font-bold transition-colors">Tutup</button>
+        </div>
+    </div>
 
     <footer class="bg-gray-900 text-gray-400 py-6 md:py-8 border-t border-gray-800 text-center text-xs md:text-sm">
         <p>&copy; 2026 RT 04 RW 26 Meteseh, Tembalang, Kota Semarang.</p>
@@ -577,6 +599,48 @@
         let allKasData = [];
         let currentTabKas = 'pemasukan';
         let kasDebitIdx = -1, kasKreditIdx = -1, kasBulanIdx = -1, kasKetIdx = -1;
+
+        // --- FUNGSI MODAL NOTES ---
+        function escapeHtml(text) {
+            return text
+                 .replace(/&/g, "&amp;")
+                 .replace(/</g, "&lt;")
+                 .replace(/>/g, "&gt;")
+                 .replace(/"/g, "&quot;")
+                 .replace(/'/g, "&#039;");
+        }
+
+        function showNote(nama, bulan, tahun, catatan) {
+            document.getElementById('note-subtitle').textContent = `${nama} - ${bulan} ${tahun}`;
+            // Render text with HTML safely, replacing newlines with <br> if needed
+            document.getElementById('note-content').innerHTML = catatan;
+            
+            const modal = document.getElementById('note-modal');
+            const box = document.getElementById('note-modal-box');
+            
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            
+            // Animasi masuk
+            setTimeout(() => {
+                box.classList.remove('scale-95', 'opacity-0');
+                box.classList.add('scale-100', 'opacity-100');
+            }, 10);
+        }
+
+        function closeNote() {
+            const modal = document.getElementById('note-modal');
+            const box = document.getElementById('note-modal-box');
+            
+            // Animasi keluar
+            box.classList.remove('scale-100', 'opacity-100');
+            box.classList.add('scale-95', 'opacity-0');
+            
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }, 200);
+        }
 
         // 1. Fungsi Format Rupiah & Angka
         function formatRupiah(number) {
@@ -669,7 +733,7 @@
             });
         }
 
-        // 4. Fungsi Fetch Data Warga (Perbaikan Kolom NO)
+        // 4. Fungsi Fetch Data Warga
         async function fetchWargaData() {
             const url = `https://docs.google.com/spreadsheets/d/${sheetIdWarga}/gviz/tq?tqx=out:csv`;
             try {
@@ -710,7 +774,7 @@
             }
         }
 
-        // 5. Fungsi Rekap Keuangan yang Disesuaikan (BO Masuk - Terealisasi)
+        // 5. Fungsi Rekap Keuangan
         async function loadRekapKeuangan() {
             const url = `https://docs.google.com/spreadsheets/d/${sheetIdR}/gviz/tq?tqx=out:csv&sheet=Laporan Keuangan&range=A7:G200`;
             try {
@@ -756,7 +820,7 @@
             }
         }
 
-        // 6. Fungsi Tabel Rekap Data BO (Pemasukan/Pengeluaran)
+        // 6. Fungsi Tabel Rekap Data BO
         async function fetchDataRekap() {
             const url = `https://docs.google.com/spreadsheets/d/${sheetIdR}/gviz/tq?tqx=out:csv&sheet=Laporan Keuangan&range=A7:G200`;
             try {
@@ -905,7 +969,7 @@
             }
         }
         
-        // 7.B Fungsi Rekap Kas 2 Tab (Disamakan dengan BO & Update Mapping Kolom)
+        // 7.B Fungsi Rekap Kas 2 Tab
         async function fetchDataKas() {
             const url = `https://docs.google.com/spreadsheets/d/${sheetIdKas}/gviz/tq?tqx=out:csv&sheet=Kas`;
             try {
@@ -917,16 +981,13 @@
                     const headers = rows[0].map(h => h.toLowerCase());
                     kasDebitIdx = headers.findIndex(h => h.includes('debit') || h.includes('masuk'));
                     kasKreditIdx = headers.findIndex(h => h.includes('kredit') || h.includes('keluar') || h.includes('pengeluaran'));
-                    
-                    // Mencari kolom Bulan & Keterangan
                     kasBulanIdx = headers.findIndex(h => h === 'bulan' || h.includes('bulan'));
                     kasKetIdx = headers.findIndex(h => h === 'keterangan' || h.includes('keterangan'));
 
-                    // Fallback jika tidak ditemukan header dengan nama tersebut
                     if(kasDebitIdx === -1) kasDebitIdx = 3;
                     if(kasKreditIdx === -1) kasKreditIdx = 4;
-                    if(kasBulanIdx === -1) kasBulanIdx = 0; // Default kolom 1
-                    if(kasKetIdx === -1) kasKetIdx = 2; // Default kolom 3 (Keterangan biasanya di index 2)
+                    if(kasBulanIdx === -1) kasBulanIdx = 0; 
+                    if(kasKetIdx === -1) kasKetIdx = 2; 
                     
                     allKasData = rows.slice(1).filter(row => row[0] !== "");
                     renderKas();
@@ -1071,7 +1132,7 @@
             }
         }
 
-        // 10. Fungsi Fetch Data Iuran Bulan Ini (Dengan Ceklist Hijau)
+        // 10. Fungsi Fetch Data Iuran Bulan Ini
         async function fetchIuranBulanIni() {
             const container = document.getElementById('content-iuran-bulan');
             const summaryContainer = document.getElementById('summary-section');
@@ -1135,7 +1196,7 @@
             }
         }
 
-        // 11. Fungsi Fetch Data Angsuran (Keseluruhan Tahun dan Sort Abjad)
+        // 11. Fungsi Fetch Data Angsuran (Dengan MODAL KLIK)
         async function fetchAngsuran() {
             const container = document.getElementById('content-angsuran');
             const url = `https://docs.google.com/spreadsheets/d/${sheetIdAngsuran}/gviz/tq?tqx=out:csv&sheet=Angsuran`;
@@ -1163,6 +1224,7 @@
                 for (let i = 0; i < dataWarga.length; i++) {
                     const row = dataWarga[i];
                     const nama = row[0];
+                    const safeNama = escapeHtml(nama);
                     const idNama = 'user-' + i;
 
                     htmlOutput += `
@@ -1177,26 +1239,62 @@
                                 return `
                                 <div class="border border-gray-100 rounded-md overflow-hidden">
                                     <div class="p-2 bg-emerald-50/50 text-emerald-800 font-bold text-xs border-b border-gray-100">Tahun ${tahun}</div>
-                                    <div class="p-2 grid grid-cols-3 md:grid-cols-4 gap-1.5">
+                                    <div class="p-2 grid grid-cols-3 md:grid-cols-4 gap-1.5 relative">
                                         ${daftarBulan.map((bln, blnIdx) => {
                                             const kolomIndex = startCol + blnIdx;
                                             const nilaiRaw = row[kolomIndex] || "0";
                                             const nilai = parseAngka(nilaiRaw);
                                             
+                                            const cleanedForNote = nilaiRaw.replace(/rp/gi, '').replace(/[0-9\.,\s\-]/g, '');
+                                            const hasTextNote = cleanedForNote.length > 0;
+                                            const safeNote = escapeHtml(nilaiRaw).replace(/\n/g, '<br>');
+
                                             const isPaid = nilai > 0;
                                             const isPast = (parseInt(tahun) < currentYear) || (parseInt(tahun) == currentYear && blnIdx < currentMonthIndex);
-                                            const isOverdue = isPast && !isPaid;
+                                            
+                                            // Jika memiliki catatan teks, tidak langsung dicap "X" (menunggak)
+                                            const isOverdue = isPast && !isPaid && !hasTextNote; 
+                                            
                                             const formatBln = bln.substring(0, 3);
-                                            const formatNilai = nilai > 0 ? 'Rp' + (nilai / 1000) + 'k' : '-';
+                                            const formatNilai = isPaid ? 'Rp' + (nilai / 1000) + 'k' : (hasTextNote ? '📝' : '-');
+
+                                            let bgClass = 'bg-gray-50 border-gray-100';
+                                            let textClassBln = 'text-gray-500';
+                                            let textClassNilai = 'text-gray-600';
+
+                                            if (isPaid) {
+                                                bgClass = 'bg-green-50 border-green-200';
+                                                textClassBln = 'text-green-700';
+                                                textClassNilai = 'text-green-600';
+                                            } else if (isOverdue) {
+                                                bgClass = 'bg-red-50 border-red-200';
+                                                textClassBln = 'text-red-600';
+                                                textClassNilai = 'text-red-500 font-bold';
+                                            } else if (hasTextNote) {
+                                                bgClass = 'bg-amber-50 border-amber-200 hover:bg-amber-100 hover:shadow-sm';
+                                                textClassBln = 'text-amber-700';
+                                                textClassNilai = 'text-amber-600';
+                                            }
+
+                                            // Logika OnClick ditambahkan di sini
+                                            const onClickAttr = hasTextNote ? `onclick="showNote('${safeNama}', '${bln}', '${tahun}', '${safeNote}')"` : '';
 
                                             return `
-                                            <div class="p-1.5 border rounded text-[10px] ${isPaid ? 'bg-green-50 border-green-200' : (isOverdue ? 'bg-red-50 border-red-200' : 'bg-gray-50 border-gray-100')} flex flex-col items-center justify-center text-center">
-                                                <div class="font-bold mb-0.5 ${isPaid ? 'text-green-700' : (isOverdue ? 'text-red-600' : 'text-gray-500')}">
+                                            <div ${onClickAttr} class="relative group p-1.5 border rounded text-[10px] ${bgClass} flex flex-col items-center justify-center text-center transition-all ${hasTextNote ? 'cursor-pointer' : ''}">
+                                                
+                                                ${hasTextNote ? `
+                                                <div class="absolute -top-1 -right-1 w-3.5 h-3.5 bg-amber-400 rounded-full flex items-center justify-center text-white shadow-sm border border-white z-10 animate-pulse">
+                                                    <i class="fas fa-info text-[6px]"></i>
+                                                </div>
+                                                ` : ''}
+
+                                                <div class="font-bold mb-0.5 ${textClassBln}">
                                                     ${formatBln}
                                                 </div>
-                                                <div class="font-mono text-[9px] ${isOverdue ? 'text-red-500 font-bold' : 'text-gray-600'}">
+                                                <div class="font-mono text-[9px] ${textClassNilai}">
                                                     ${isOverdue ? 'X' : formatNilai}
                                                 </div>
+                                                
                                             </div>`;
                                         }).join('')}
                                     </div>
@@ -1261,7 +1359,6 @@
             fetchIuranBulanIni();
             fetchAngsuran();
             
-            // --- Script Tambahan Update Bulan Realtime Untuk Jadwal Pertemuan ---
             const currentBulanIdx = new Date().getMonth();
             const nextBulanIdx = (currentBulanIdx + 1) % 12;
             const currentTahun = new Date().getFullYear();
