@@ -7,6 +7,7 @@
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
     
     <style>
         .glass { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.3); }
@@ -200,7 +201,6 @@
             to { transform: rotate(360deg); }
         }
         
-        /* Tambahan untuk scroll styling */
         .custom-scroll::-webkit-scrollbar {
             width: 6px;
             height: 6px;
@@ -215,7 +215,7 @@
     </style>
 </head>
 
-<body class="bg-gray-50 font-[Plus_Jakarta_Sans]">
+<body class="bg-gray-50 text-gray-900">
 
     <nav class="fixed top-0 left-0 right-0 bg-white/90 backdrop-blur-md shadow-sm z-50 border-b border-gray-100 py-3 md:py-0">
         <div class="max-w-6xl mx-auto px-4 min-h-[4rem] flex flex-col md:flex-row items-center justify-between gap-3 md:gap-0">
@@ -225,10 +225,11 @@
             </div>
             <div class="flex flex-wrap justify-center gap-4 md:gap-6 font-medium text-sm">
                 <a href="#beranda" class="text-gray-600 hover:text-emerald-600 transition-colors">Beranda</a>
-                <a href="#data-warga" class="text-gray-600 hover:text-emerald-600 transition-colors">Data Warga</a>
+                <a href="#data-warga" class="text-gray-600 hover:text-emerald-600 transition-colors">Data</a>
                 <a href="#rencana-bo-2026" class="text-gray-600 hover:text-emerald-600 transition-colors">BO 2026</a>
                 <a href="#kas-warga" class="text-gray-600 hover:text-emerald-600 transition-colors">Kas</a>
                 <a href="#tunggakan-warga" class="text-gray-600 hover:text-emerald-600 transition-colors">Tunggakan</a>
+                <a href="#iuran-bulan-ini" class="text-emerald-600 font-bold hover:text-emerald-700 transition-colors">Iuran</a>
                 <a href="#angsuran-warga" class="text-gray-600 hover:text-emerald-600 transition-colors">Angsuran</a>
             </div>
         </div>
@@ -236,7 +237,7 @@
 
     <header id="beranda" class="pt-32 pb-20 bg-emerald-900 text-white rounded-b-[3rem]">
         <div class="max-w-6xl mx-auto px-6 text-center">
-            <h2 class="text-5xl font-extrabold mb-6">Informasi Warga</h2>
+            <h2 class="text-4xl md:text-5xl font-extrabold mb-6">Informasi Warga 2026</h2>
             <p class="text-emerald-200 text-lg max-w-2xl mx-auto">Kelola data kependudukan dan transparansi anggaran RT 04 - RW 26 dengan sistem digital yang akuntabel.</p>
         </div>
         <div class="max-w-4xl mx-auto px-4 text-center mt-8">
@@ -244,79 +245,79 @@
                 <a href="#data-warga" class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-6 py-3 rounded-lg shadow-sm transition-all text-center">
                     Lihat Data Warga
                 </a>
-                <a href="#rencana-bo-2026" class="bg-white hover:bg-gray-50 text-gray-700 font-medium px-6 py-3 rounded-lg border border-gray-200 shadow-sm transition-all text-center">
-                    Rencana Program BO 2026
+                <a href="#iuran-bulan-ini" class="bg-white hover:bg-gray-50 text-gray-700 font-medium px-6 py-3 rounded-lg border border-gray-200 shadow-sm transition-all text-center">
+                    Cek Iuran Bulan Ini
                 </a>
             </div>
         </div>
     </header>
 
     <section class="max-w-6xl mx-auto px-6 -mt-16">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div class="hover-card glass p-8 rounded-3xl shadow-xl flex items-center gap-6">
-                <div class="p-4 bg-emerald-100 rounded-2xl text-emerald-600 text-2xl"><i class="fas fa-users"></i></div>
-                <div>
-                    <p class="text-gray-500 font-semibold">Total KK</p>
-                    <p id="total-warga-display" class="text-3xl font-black text-gray-800">0</p>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div class="hover-card glass p-6 rounded-3xl shadow-xl flex flex-col justify-center gap-2">
+                <div class="flex items-center gap-3 mb-2">
+                    <div class="p-3 bg-emerald-100 rounded-xl text-emerald-600 text-xl"><i class="fas fa-users"></i></div>
+                    <p class="text-gray-500 font-semibold text-sm">Total KK</p>
+                </div>
+                <p id="total-warga-display" class="text-3xl font-black text-gray-800">0</p>
+            </div>
+            
+            <div class="hover-card glass p-6 rounded-3xl shadow-xl flex flex-col gap-2">
+                <div class="flex items-center gap-3 mb-2">
+                    <div class="p-3 bg-amber-100 rounded-xl text-amber-600 text-xl"><i class="fas fa-wallet"></i></div>
+                    <p class="text-gray-500 font-semibold text-sm">Sisa Bantuan Operasional</p>
+                </div>
+                <p id="dashboard-total-bo" class="text-2xl font-black text-gray-800 opacity-0 transition-opacity duration-500">Memuat...</p>
+                
+                <div class="w-full bg-gray-200 h-1.5 rounded-full mt-1 overflow-hidden hidden" id="bo-progress-container">
+                    <div id="bo-progress-bar" class="bg-amber-500 h-full w-[0%] transition-all duration-1000"></div>
+                </div>
+
+                <div class="mt-2 pt-2 border-t border-gray-100 text-[10px] text-gray-500 flex flex-col gap-1 w-full">
+                    <div class="flex justify-between gap-2">
+                        <span>Total BO:</span> 
+                        <span class="font-bold text-gray-700 truncate">Rp 25.000.000</span>
+                    </div>
+                    <div class="flex justify-between gap-2">
+                        <span>BO Masuk:</span> 
+                        <span id="dashboard-bo-masuk" class="font-bold text-blue-600 truncate">...</span>
+                    </div>
+                    <div class="flex justify-between gap-2">
+                        <span>Terealisasi:</span> 
+                        <span id="dashboard-terealisasi" class="font-bold text-gray-700 truncate">...</span>
+                    </div>
                 </div>
             </div>
             
-            <div class="hover-card glass p-8 rounded-3xl shadow-xl flex items-center gap-6">
-                <div class="p-4 bg-amber-100 rounded-2xl text-amber-600 text-2xl"><i class="fas fa-wallet"></i></div>
-                <div class="w-full">
-                    <p class="text-gray-500 font-semibold">Total BO</p>
-                    <p id="dashboard-total-bo" class="text-3xl font-black text-gray-800 opacity-0 transition-opacity duration-500">Memuat...</p>
-                    
-                    <div class="w-full bg-gray-200 h-1.5 rounded-full mt-2 overflow-hidden hidden" id="bo-progress-container">
-                        <div id="bo-progress-bar" class="bg-amber-500 h-full w-[0%] transition-all duration-1000"></div>
-                    </div>
-
-                    <div class="mt-2 pt-2 border-t border-gray-100 text-[11px] text-gray-500 flex flex-col gap-1 w-full">
-                        <div class="flex justify-between gap-4">
-                            <span>Pagu Anggaran:</span> 
-                            <span id="dashboard-pagu" class="font-bold text-gray-700">Memuat...</span>
-                        </div>
-                        <div class="flex justify-between gap-4">
-                            <span>Terealisasi:</span> 
-                            <span id="dashboard-realisasi" class="font-bold text-emerald-600">Memuat...</span>
-                        </div>
-                        <div class="flex justify-between gap-4">
-                            <span>Sisa Anggaran:</span> 
-                            <span id="dashboard-sisa" class="font-bold text-amber-600">Memuat...</span>
-                        </div>
-                    </div>
+            <div class="hover-card glass p-6 rounded-3xl shadow-xl flex flex-col gap-2">
+                <div class="flex items-center gap-3 mb-2">
+                    <div class="p-3 bg-emerald-100 rounded-xl text-emerald-600 text-xl"><i class="fas fa-money-bill-wave"></i></div>
+                    <p class="text-gray-500 font-semibold text-sm">Aset Kas RT</p>
                 </div>
-            </div>
-            
-            <div class="hover-card glass p-8 rounded-3xl shadow-xl flex items-center gap-6">
-                <div class="p-4 bg-emerald-100 rounded-2xl text-emerald-600 text-2xl"><i class="fas fa-money-bill-wave"></i></div>
-                <div class="w-full">
-                    <p class="text-gray-500 font-semibold">Total Aset Kas</p>
-                    <p id="total-aset-kas" class="text-3xl font-black text-gray-800 opacity-0 transition-opacity duration-500">Memuat...</p>
-                   
-                    <div class="mt-2 pt-2 border-t border-gray-100 text-[11px] text-gray-500 flex flex-col gap-1 w-full">
-                        <div class="flex justify-between gap-4">
-                            <span>Total Tunggakan:</span> 
-                            <span id="info-tunggakan" class="font-bold text-red-500">Memuat...</span>
-                        </div>
-                        <div class="flex justify-between gap-4">
-                            <span>Grand Total:</span> 
-                            <span id="info-grand-total" class="font-bold text-emerald-600">Memuat...</span>
-                        </div>
+                <p id="total-aset-kas" class="text-2xl font-black text-gray-800 opacity-0 transition-opacity duration-500">Memuat...</p>
+                
+                <div class="mt-2 pt-2 border-t border-gray-100 text-[10px] text-gray-500 flex flex-col gap-1 w-full">
+                    <div class="flex justify-between gap-2">
+                        <span>Tunggakan:</span> 
+                        <span id="info-tunggakan" class="font-bold text-red-500 truncate">...</span>
+                    </div>
+                    <div class="flex justify-between gap-2">
+                        <span>Grand Total:</span> 
+                        <span id="info-grand-total" class="font-bold text-emerald-600 truncate">...</span>
                     </div>
                 </div>
             </div>
 
-            <div class="hover-card glass p-8 rounded-3xl shadow-xl flex items-center gap-6">
-                <div class="p-4 bg-blue-100 rounded-2xl text-blue-600 text-2xl"><i class="fas fa-receipt"></i></div>
-                <div class="w-full">
-                    <p class="text-gray-500 font-semibold">Iuran Kas</p>
-                   <p id="persen-iuran" class="text-3xl font-black text-gray-800">0%</p>
-                    <div class="w-full bg-gray-200 h-2 rounded-full mt-2 overflow-hidden">
-                        <div id="bar-iuran" class="bg-blue-600 h-full w-[85%]"></div>
-                    </div>
-                     <p id="keterangan-iuran" class="text-[10px] text-gray-500 mt-1">Memuat data...</p>
+            <div class="hover-card glass p-6 rounded-3xl shadow-xl flex flex-col justify-center gap-2">
+                <div class="flex items-center gap-3 mb-2">
+                    <div class="p-3 bg-blue-100 rounded-xl text-blue-600 text-xl"><i class="fas fa-receipt"></i></div>
+                    <p class="text-gray-500 font-semibold text-sm">Iuran Lunas</p>
                 </div>
+                <p id="persen-iuran" class="text-3xl font-black text-gray-800">0%</p>
+                <div class="w-full bg-gray-200 h-2 rounded-full mt-1 overflow-hidden">
+                    <div id="bar-iuran" class="bg-blue-600 h-full w-[0%]"></div>
+                </div>
+                <p id="keterangan-iuran" class="text-[10px] text-gray-500 mt-1">Memuat data...</p>
             </div>
         </div>
     </section>
@@ -351,52 +352,35 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-                <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden">
-                    <div class="absolute top-0 right-0 p-2 opacity-10">
-                        <i class="fas fa-chart-line text-6xl text-emerald-600"></i>
-                    </div>
+                <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm relative overflow-hidden">
                     <div class="flex justify-between items-start mb-2 z-10 relative">
                         <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider flex items-center gap-1">
-                            Total Anggaran
-                            <span id="sync-total" title="Checking data..."></span>
+                            Total Anggaran <span id="sync-total"></span>
                         </span>
                         <i class="fas fa-wallet text-emerald-100 text-2xl"></i>
                     </div>
                     <div id="loading-total" class="text-sm text-gray-400 italic">Mengambil data...</div>
                     <h3 id="dynamic-total" class="text-2xl font-bold text-gray-900 opacity-0 transition-opacity duration-500 z-10 relative">Rp 0</h3>
-                    <p class="text-xs text-emerald-600 mt-2 font-medium bg-emerald-50 inline-block px-2 py-1 rounded z-10 relative">Sesuai Bantuan Operasional 2026</p>
                 </div>
-				
-                <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden">
-                    <div class="absolute top-0 right-0 p-2 opacity-10">
-                        <i class="fas fa-chart-line text-6xl text-emerald-600"></i>
-                    </div>
+                <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm relative overflow-hidden">
                     <div class="flex justify-between items-start mb-2 z-10 relative">
                         <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider flex items-center gap-1">
-                            Rencana Anggaran
-                            <span id="sync-real" class="w-2 h-2 rounded-full bg-gray-300" title="Checking data..."></span>
+                            Rencana Anggaran <span id="sync-real" class="w-2 h-2 rounded-full bg-gray-300"></span>
                         </span>
                         <i class="fas fa-bolt text-blue-100 text-2xl"></i>
                     </div>
                     <div id="loading-real" class="text-sm text-gray-400 italic">Mengambil data...</div>
                     <h3 id="dynamic-real" class="text-2xl font-bold text-emerald-600 opacity-0 transition-opacity duration-500 z-10 relative">Rp 0</h3>
-                    <p class="text-xs text-gray-500 mt-2 z-10 relative">Data otomatis dari Rencana BO</p>
                 </div>
-
-                <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden">
-                    <div class="absolute top-0 right-0 p-2 opacity-10">
-                        <i class="fas fa-chart-line text-6xl text-emerald-600"></i>
-                    </div>
+                <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm relative overflow-hidden">
                     <div class="flex justify-between items-start mb-2 z-10 relative">
                         <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider flex items-center gap-1">
-                            Sisa Rencana
-                            <span id="sync-sisa" title="Checking data..."></span>
+                            Sisa Rencana <span id="sync-sisa"></span>
                         </span>
                         <i class="fas fa-piggy-bank text-amber-100 text-2xl"></i>
                     </div>
                     <div id="loading-sisa" class="text-sm text-gray-400 italic">Mengambil data...</div>
                     <h3 id="dynamic-sisa" class="text-2xl font-bold text-gray-900 opacity-0 transition-opacity duration-500 z-10 relative">Rp 0</h3>
-                    <p class="text-xs text-gray-500 mt-2 z-10 relative">Anggaran Terealisasi Penuh</p>
                 </div>
             </div>
             
@@ -415,7 +399,6 @@
                             </div>
                         </nav>
                     </aside>
-
                     <main class="main-content">
                         <div class="iframe-container" id="iframe-container">
                             <div class="loader" id="loader">
@@ -430,72 +413,41 @@
         </div>
     </section>
 	
-    <section id="rekap-bo-2026" class="py-20 md:py-24 bg-gray-50">
+    <section id="rekap-bo-2026" class="py-20 md:py-24 bg-white">
         <div class="max-w-6xl mx-auto px-4">
             <div class="mb-8 md:mb-12 text-center md:text-left">
                 <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-2">Rekap Bantuan Operasional (BO) 2026</h2>
-                <p class="text-gray-500 text-sm md:text-base">Transparansi alokasi dan realisasi anggaran Bantuan Operasional tahun 2026.</p>
             </div>
-            
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-                <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
-                    <div class="flex justify-between items-start mb-2">
-                        <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Total Anggaran</span>
-                        <i class="fas fa-wallet text-emerald-100 text-2xl"></i>
-                    </div>
-                    <h3 class="text-2xl font-bold text-gray-900">Rp 25.000.000</h3>
-                    <p class="text-xs text-emerald-600 mt-2 font-medium bg-emerald-50 inline-block px-2 py-1 rounded">Sesuai Bantuan Operasional 2026</p>
-                </div>
-                
-                <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden">
-                    <div class="absolute top-0 right-0 p-2 opacity-10">
-                        <i class="fas fa-chart-line text-6xl text-emerald-600"></i>
-                    </div>
-                    <div class="flex justify-between items-start mb-2 z-10 relative">
-                        <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider flex items-center gap-1">Terealisasi</span>
-                        <i class="fas fa-bolt text-blue-100 text-2xl"></i>
-                    </div>
-                    <h3 id="rekap-realisasi" class="text-2xl font-bold text-emerald-600">Rp 0</h3>
-                    <p class="text-xs text-gray-500 mt-2 z-10 relative">Data otomatis dari Rekap BO</p>
-                </div>
-
-                <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
-                    <div class="flex justify-between items-start mb-2">
-                        <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Sisa Anggaran</span>
-                        <i class="fas fa-piggy-bank text-amber-100 text-2xl"></i>
-                    </div>
-                    <h3 id="rekap-sisa" class="text-2xl font-bold text-gray-900">Rp 0</h3>
-                </div>
-            </div>
-            
             <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
                 <div class="flex bg-gray-100 p-1 rounded-xl mb-6" id="tab-switcher">
                     <button onclick="switchTab('pemasukan')" id="btn-pemasukan" class="flex-1 py-2 text-sm font-bold rounded-lg bg-white shadow text-emerald-600 transition">Pemasukan (Debit)</button>
                     <button onclick="switchTab('pengeluaran')" id="btn-pengeluaran" class="flex-1 py-2 text-sm font-bold rounded-lg text-gray-500 transition">Pengeluaran (Kredit)</button>
                 </div>
-                
-                <div id="rekap-list-container" class="space-y-4">
+                <div id="rekap-list-container" class="space-y-4 max-h-[400px] overflow-y-auto custom-scroll">
                     <p class="text-center text-gray-400 py-10">Memuat data...</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <section id="kas-warga" class="py-20 md:py-24 bg-gray-50">
+    <section id="kas-warga" class="py-20 bg-gray-50">
         <div class="max-w-6xl mx-auto px-4">
             <div class="flex items-center gap-3 mb-6">
                 <div class="p-3 bg-emerald-100 text-emerald-600 rounded-xl"><i class="fas fa-wallet text-xl"></i></div>
                 <h2 class="text-3xl font-bold text-gray-900">Kas Warga</h2>
             </div>
-            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-x-auto p-4">
-                <div id="content-kas" class="min-h-[200px] flex items-center justify-center">Memuat data...</div>
+            
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-16">
+                <div class="flex bg-gray-100 p-1 rounded-xl mb-6" id="tab-switcher-kas">
+                    <button onclick="switchTabKas('pemasukan')" id="btn-kas-pemasukan" class="flex-1 py-2 text-sm font-bold rounded-lg bg-white shadow text-emerald-600 transition">Pemasukan (Debit)</button>
+                    <button onclick="switchTabKas('pengeluaran')" id="btn-kas-pengeluaran" class="flex-1 py-2 text-sm font-bold rounded-lg text-gray-500 transition">Pengeluaran (Kredit)</button>
+                </div>
+                <div id="kas-list-container" class="space-y-4 max-h-[400px] overflow-y-auto custom-scroll">
+                    <p class="text-center text-gray-400 py-10">Memuat data...</p>
+                </div>
             </div>
-        </div>
-    </section>
 
-    <section id="tunggakan-warga" class="py-20 md:py-24 bg-gray-50">
-        <div class="max-w-6xl mx-auto px-4">
-            <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-6">
+            <div id="tunggakan-warga" class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-6 pt-10 border-t border-gray-200">
                 <div class="flex items-center gap-3">
                     <div class="p-3 bg-red-100 text-red-600 rounded-xl"><i class="fas fa-exclamation-triangle text-xl"></i></div>
                     <h2 class="text-3xl font-bold text-gray-900">Tunggakan Warga</h2>
@@ -505,19 +457,33 @@
                     <i class="fas fa-search absolute left-3.5 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
                 </div>
             </div>
-
             <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-x-auto overflow-y-auto max-h-[400px] custom-scroll p-0 relative">
                 <div id="content-tunggakan" class="min-h-[200px] flex items-center justify-center w-full">Memuat data...</div>
             </div>
         </div>
     </section>
 
-    <section id="angsuran-warga" class="py-20 md:py-24 bg-white">
+    <section id="iuran-bulan-ini" class="py-20 md:py-24 bg-white border-t border-gray-100">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-gray-900">Iuran <span id="nama-bulan-berjalan" class="text-emerald-600">...</span></h2>
+                <p class="text-gray-500 mt-2">Daftar warga yang telah melakukan pembayaran dan total yang terkumpul pada bulan ini.</p>
+            </div>
+
+            <div id="summary-section" class="mb-8">
+                </div>
+
+            <div id="content-iuran-bulan" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-h-[500px] overflow-y-auto custom-scroll p-2 border border-gray-100 rounded-2xl bg-gray-50 shadow-inner">
+                <p class="text-center text-gray-400 col-span-full py-10">Memuat data iuran bulan ini...</p>
+            </div>
+        </div>
+    </section>
+    <section id="angsuran-warga" class="py-20 md:py-24 bg-gray-50 border-t border-gray-100">
         <div class="max-w-6xl mx-auto px-4">
             <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-6">
                 <div class="flex items-center gap-3">
                     <div class="p-3 bg-emerald-100 text-emerald-600 rounded-xl"><i class="fas fa-file-invoice-dollar text-xl"></i></div>
-                    <h2 class="text-3xl font-bold text-gray-900">Data Angsuran Warga</h2>
+                    <h2 class="text-3xl font-bold text-gray-900">Rekap Angsuran Warga</h2>
                 </div>
                 <div class="relative w-full md:w-72">
                     <input type="text" id="search-angsuran" placeholder="Cari Nama Warga..." class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm shadow-sm transition" onkeyup="filterAngsuran()">
@@ -525,7 +491,7 @@
                 </div>
             </div>
             
-            <div id="content-angsuran" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-[500px] overflow-y-auto custom-scroll p-2 border border-gray-100 rounded-2xl bg-gray-50 shadow-inner">
+            <div id="content-angsuran" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-[500px] overflow-y-auto custom-scroll p-2 border border-gray-100 rounded-2xl bg-white shadow-sm">
                 <p class="text-center py-10 text-gray-400 col-span-full">Memuat data...</p>
             </div>
         </div>
@@ -551,13 +517,25 @@
         let globalAsetKas = undefined;
         let globalTotalTunggakan = undefined;
 
-        // 1. Fungsi Format Rupiah
+        // State Kas
+        let allKasData = [];
+        let currentTabKas = 'pemasukan';
+        let kasDebitIdx = -1, kasKreditIdx = -1, kasBulanIdx = -1, kasKetIdx = -1;
+
+        // 1. Fungsi Format Rupiah & Angka
         function formatRupiah(number) {
             return new Intl.NumberFormat('id-ID', { 
                 style: 'currency', 
                 currency: 'IDR', 
                 minimumFractionDigits: 0 
             }).format(number);
+        }
+
+        function parseAngka(text) {
+            if (!text) return 0;
+            let str = text.toLowerCase().toString();
+            str = str.replace(/ribu/g, '000').replace(/jt/g, '000000').replace(/[^0-9]/g, '');
+            return parseInt(str) || 0;
         }
 
         // Fungsi Tambahan: Menghitung Grand Total
@@ -635,7 +613,7 @@
             });
         }
 
-        // 4. Fungsi Fetch Data Warga
+        // 4. Fungsi Fetch Data Warga (Perbaikan Kolom NO)
         async function fetchWargaData() {
             const url = `https://docs.google.com/spreadsheets/d/${sheetIdWarga}/gviz/tq?tqx=out:csv`;
             try {
@@ -650,14 +628,20 @@
                 
                 if(cleanRows.length > 0){
                     const headers = cleanRows[0].slice(0, 3); 
+                    headers[0] = "No"; 
                     head.innerHTML = headers.map(col => `<th class="px-6 py-4 text-sm font-semibold uppercase tracking-wider">${col}</th>`).join('');
 
+                    let noUrut = 1;
                     cleanRows.slice(1).forEach(row => {
                         if(row.length > 1) {
                             const filteredRow = row.slice(0, 3);
+                            filteredRow[0] = noUrut++; 
+                            
                             body.innerHTML += `
                                 <tr class="hover:bg-emerald-50 transition-colors even:bg-gray-50">
-                                    ${filteredRow.map(cell => `<td class="px-6 py-4 text-sm text-gray-700">${cell}</td>`).join('')}
+                                    <td class="px-6 py-4 text-sm text-gray-700 w-12 text-center font-semibold">${filteredRow[0]}</td>
+                                    <td class="px-6 py-4 text-sm text-gray-700">${filteredRow[1] || '-'}</td>
+                                    <td class="px-6 py-4 text-sm text-gray-700">${filteredRow[2] || '-'}</td>
                                 </tr>`;
                         }
                     });
@@ -670,9 +654,9 @@
             }
         }
 
-        // 5. Fungsi Rekap Keuangan
+        // 5. Fungsi Rekap Keuangan yang Disesuaikan (BO Masuk - Terealisasi)
         async function loadRekapKeuangan() {
-            const url = `https://docs.google.com/spreadsheets/d/${sheetIdR}/gviz/tq?tqx=out:csv&sheet=Laporan Keuangan&range=A7:F80`;
+            const url = `https://docs.google.com/spreadsheets/d/${sheetIdR}/gviz/tq?tqx=out:csv&sheet=Laporan Keuangan&range=A7:G200`;
             try {
                 const response = await fetch(url);
                 const csvText = await response.text();
@@ -680,39 +664,45 @@
                 const dataRows = rows.filter(row => row.length >= 6 && row[2] !== "");
                 
                 if (dataRows.length > 0) {
-                    const lastRow = dataRows[dataRows.length - 1];
-                    const saldoAkhir = parseInt(lastRow[5].replace(/[^0-9]/g, '')) || 0;
-                    const realisasi = totalPagu - saldoAkhir;
+                    let totalDebit = 0;
+                    let totalKredit = 0;
 
-                    // Update UI Rekap
-                    document.getElementById('rekap-realisasi').textContent = formatRupiah(realisasi);
-                    document.getElementById('rekap-sisa').textContent = formatRupiah(saldoAkhir);
+                    dataRows.forEach(row => {
+                        const debit = parseInt((row[4] || '0').replace(/[^0-9]/g, '')) || 0;
+                        const kredit = parseInt((row[5] || '0').replace(/[^0-9]/g, '')) || 0;
+                        totalDebit += debit;
+                        totalKredit += kredit;
+                    });
 
-                    // Update UI Total BO Dashboard (Dilengkapi Pagu & Progress Bar)
-                    const dashReal = document.getElementById('dashboard-realisasi');
-                    const dashSisa = document.getElementById('dashboard-sisa');
+                    const sisaBO = totalDebit - totalKredit;
+                    
+                    const dashTotalBo = document.getElementById('dashboard-total-bo');
+                    const dashBoMasuk = document.getElementById('dashboard-bo-masuk');
+                    const dashTerealisasi = document.getElementById('dashboard-terealisasi');
                     const boProgressBar = document.getElementById('bo-progress-bar');
                     const boProgressContainer = document.getElementById('bo-progress-container');
 
-                    if(dashReal) dashReal.textContent = formatRupiah(realisasi);
-                    if(dashSisa) dashSisa.textContent = formatRupiah(saldoAkhir);
+                    if(dashTotalBo) {
+                        dashTotalBo.textContent = formatRupiah(sisaBO);
+                        dashTotalBo.classList.remove('opacity-0');
+                    }
+                    if(dashBoMasuk) dashBoMasuk.textContent = formatRupiah(totalDebit);
+                    if(dashTerealisasi) dashTerealisasi.textContent = formatRupiah(totalKredit);
 
                     if(boProgressBar && boProgressContainer) {
                         boProgressContainer.classList.remove('hidden');
-                        const percent = Math.min(Math.round((realisasi / totalPagu) * 100), 100);
+                        const percent = Math.min(Math.round((totalKredit / totalPagu) * 100), 100);
                         boProgressBar.style.width = percent + '%';
                     }
                 }
             } catch (error) {
                 console.error("Error loading keuangan:", error);
-                document.getElementById('dashboard-realisasi').textContent = "Gagal memuat";
-                document.getElementById('dashboard-sisa').textContent = "Gagal memuat";
             }
         }
 
-        // 6. Fungsi Tabel Rekap Data (Pemasukan/Pengeluaran)
+        // 6. Fungsi Tabel Rekap Data BO (Pemasukan/Pengeluaran)
         async function fetchDataRekap() {
-            const url = `https://docs.google.com/spreadsheets/d/${sheetIdR}/gviz/tq?tqx=out:csv&sheet=Laporan Keuangan&range=A7:F80`;
+            const url = `https://docs.google.com/spreadsheets/d/${sheetIdR}/gviz/tq?tqx=out:csv&sheet=Laporan Keuangan&range=A7:G200`;
             try {
                 const response = await fetch(url);
                 const csvText = await response.text();
@@ -775,7 +765,7 @@
             `;
         }
 
-        // 7. Fungsi Fetch Kas & Tunggakan (Ditambahkan Header Sticky)
+        // 7. Fungsi Fetch Tunggakan
         async function fetchKasTunggakan(sheetName, containerId) {
             const container = document.getElementById(containerId);
             const url = `https://docs.google.com/spreadsheets/d/${sheetIdKas}/gviz/tq?tqx=out:csv&sheet=${sheetName}`;
@@ -793,12 +783,28 @@
                 const headerLower = rows[0].map(h => h.toLowerCase());
                 const tunggakanIdx = headerLower.findIndex(h => h.includes('tunggakan'));
 
-                let html = `<table class="w-full text-left relative">
-                    <thead class="text-xs uppercase text-gray-500 border-b bg-gray-50 sticky top-0 z-10 shadow-sm">
-                        <tr>${rows[0].map(h => `<th class="p-4 whitespace-nowrap">${h}</th>`).join('')}</tr>
+                let dataRows = rows.slice(1).filter(row => row[0] && row[0].trim() !== "");
+
+                if (sheetName === 'Tunggakan') {
+                    dataRows.sort((a, b) => {
+                        let valA = 0;
+                        if (tunggakanIdx !== -1 && a[tunggakanIdx]) valA = parseInt(a[tunggakanIdx].replace(/[^0-9]/g, '')) || 0;
+                        else if (a[3]) valA = parseInt(a[3].replace(/[^0-9]/g, '')) || 0;
+
+                        let valB = 0;
+                        if (tunggakanIdx !== -1 && b[tunggakanIdx]) valB = parseInt(b[tunggakanIdx].replace(/[^0-9]/g, '')) || 0;
+                        else if (b[3]) valB = parseInt(b[3].replace(/[^0-9]/g, '')) || 0;
+
+                        return valB - valA; 
+                    });
+                }
+
+                let html = `<table class="w-full text-left border-collapse">
+                    <thead class="text-xs uppercase text-gray-500 border-b">
+                        <tr>${rows[0].map(h => `<th class="p-3 whitespace-nowrap">${h}</th>`).join('')}</tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100">
-                        ${rows.slice(1).map(row => {
+                        ${dataRows.map(row => {
                             let nilaiTunggakan = 0;
                             if (tunggakanIdx !== -1 && row[tunggakanIdx]) {
                                 nilaiTunggakan = parseInt(row[tunggakanIdx].replace(/[^0-9]/g, '')) || 0;
@@ -823,15 +829,15 @@
                             }
                             
                             return `
-                            <tr class="hover:bg-gray-50 ${bgRow}">
+                            <tr class="hover:bg-gray-50 transition ${bgRow}">
                                 ${row.map((cell, index) => {
                                     const colName = headerLower[index] || '';
                                     const isTargetCol = colName.includes('nama') || colName.includes('tunggakan') || colName.includes('jimpitan') || colName.includes('kas');
 
                                     if (sheetName === 'Tunggakan' && isTargetCol && cell.trim() !== '') {
-                                        return `<td class="p-4 text-sm"><span class="${labelColor} px-2 py-1 rounded font-bold whitespace-nowrap">${cell}</span></td>`;
+                                        return `<td class="p-3 text-sm"><span class="${labelColor} px-2 py-1 rounded font-bold whitespace-nowrap">${cell}</span></td>`;
                                     }
-                                    return `<td class="p-4 text-sm text-gray-700">${cell}</td>`;
+                                    return `<td class="p-3 text-sm text-gray-700">${cell}</td>`;
                                 }).join('')}
                             </tr>`;
                         }).join('')}
@@ -843,6 +849,91 @@
             }
         }
         
+        // 7.B Fungsi Rekap Kas 2 Tab (Disamakan dengan BO & Update Mapping Kolom)
+        async function fetchDataKas() {
+            const url = `https://docs.google.com/spreadsheets/d/${sheetIdKas}/gviz/tq?tqx=out:csv&sheet=Kas`;
+            try {
+                const response = await fetch(url);
+                const csvText = await response.text();
+                const rows = csvText.split('\n').map(row => row.split(',').map(cell => cell.replace(/"/g, '').trim()));
+                
+                if(rows.length > 0) {
+                    const headers = rows[0].map(h => h.toLowerCase());
+                    kasDebitIdx = headers.findIndex(h => h.includes('debit') || h.includes('masuk'));
+                    kasKreditIdx = headers.findIndex(h => h.includes('kredit') || h.includes('keluar') || h.includes('pengeluaran'));
+                    
+                    // Mencari kolom Bulan & Keterangan
+                    kasBulanIdx = headers.findIndex(h => h === 'bulan' || h.includes('bulan'));
+                    kasKetIdx = headers.findIndex(h => h === 'keterangan' || h.includes('keterangan'));
+
+                    // Fallback jika tidak ditemukan header dengan nama tersebut
+                    if(kasDebitIdx === -1) kasDebitIdx = 3;
+                    if(kasKreditIdx === -1) kasKreditIdx = 4;
+                    if(kasBulanIdx === -1) kasBulanIdx = 0; // Default kolom 1
+                    if(kasKetIdx === -1) kasKetIdx = 2; // Default kolom 3 (Keterangan biasanya di index 2)
+                    
+                    allKasData = rows.slice(1).filter(row => row[0] !== "");
+                    renderKas();
+                }
+            } catch (err) {
+                document.getElementById('kas-list-container').innerHTML = '<p class="text-red-500 text-center">Gagal memuat data Kas.</p>';
+            }
+        }
+
+        function switchTabKas(tab) {
+            currentTabKas = tab;
+            document.getElementById('btn-kas-pemasukan').className = tab === 'pemasukan' 
+                ? 'flex-1 py-2 text-sm font-bold rounded-lg bg-white shadow text-emerald-600 transition' 
+                : 'flex-1 py-2 text-sm font-bold rounded-lg text-gray-500 transition';
+            document.getElementById('btn-kas-pengeluaran').className = tab === 'pengeluaran' 
+                ? 'flex-1 py-2 text-sm font-bold rounded-lg bg-white shadow text-red-600 transition' 
+                : 'flex-1 py-2 text-sm font-bold rounded-lg text-gray-500 transition';
+            renderKas();
+        }
+
+        function renderKas() {
+            const container = document.getElementById('kas-list-container');
+            let filtered = allKasData.filter(row => {
+                if (currentTabKas === 'pemasukan') {
+                    const val = row[kasDebitIdx];
+                    return val && parseAngka(val) > 0;
+                } else {
+                    const val = row[kasKreditIdx];
+                    return val && parseAngka(val) > 0;
+                }
+            });
+
+            if (filtered.length === 0) {
+                container.innerHTML = '<p class="text-center text-gray-400 py-10">Tidak ada data tersedia.</p>';
+                return;
+            }
+
+            container.innerHTML = `
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="text-xs uppercase text-gray-500 border-b">
+                                <th class="p-3">Bulan</th>
+                                <th class="p-3">Keterangan</th>
+                                <th class="p-3 text-right">${currentTabKas === 'pemasukan' ? 'Debit' : 'Kredit'}</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100">
+                            ${filtered.map(item => `
+                                <tr class="hover:bg-gray-50 transition">
+                                    <td class="p-3 text-xs text-gray-500">${item[kasBulanIdx] || '-'}</td>
+                                    <td class="p-3 text-sm text-gray-800">${item[kasKetIdx] || '-'}</td>
+                                    <td class="p-3 text-sm font-bold text-right ${currentTabKas === 'pemasukan' ? 'text-emerald-600' : 'text-red-600'}">
+                                        ${currentTabKas === 'pemasukan' ? item[kasDebitIdx] : item[kasKreditIdx]}
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
         // 8. Update Aset Kas
         async function updateKas() {
             const el = document.getElementById('total-aset-kas');
@@ -865,11 +956,8 @@
                     }
                 }
 
-                // Update UI Total Kas
                 el.textContent = formatRupiah(angkaTerakhir);
                 el.classList.remove('opacity-0');
-
-                // Simpan ke variabel global dan coba kalkulasi grand total
                 globalAsetKas = angkaTerakhir;
                 updateGrandTotal();
 
@@ -880,7 +968,7 @@
             }
         }
 
-        // 9. Update Iuran Kas
+        // 9. Update Iuran Kas (Tunggakan & Persentase)
         async function updateIuranKas() {
             const url = `https://docs.google.com/spreadsheets/d/${sheetIdKas}/gviz/tq?tqx=out:csv&sheet=Tunggakan`;
             
@@ -907,21 +995,16 @@
                     const valCleaned = cellVal.replace(/[^0-9]/g, '');
                     const valNumber = parseInt(valCleaned, 10) || 0;
 
-                    // Menjumlahkan seluruh nominal tunggakan warga
                     kalkulasiTotalTunggakan += valNumber;
-
                     return valNumber === 0;
                 }).length;
                 
-                // Update text Total Tunggakan di layar
                 const elInfoTunggakan = document.getElementById('info-tunggakan');
                 if (elInfoTunggakan) elInfoTunggakan.textContent = formatRupiah(kalkulasiTotalTunggakan);
 
-                // Simpan ke variabel global dan kalkulasi grand total
                 globalTotalTunggakan = kalkulasiTotalTunggakan;
                 updateGrandTotal();
 
-                // Hitung persen iuran lunas
                 const persen = totalWarga > 0 ? Math.round((sudahBayar / totalWarga) * 100) : 0;
                 document.getElementById('persen-iuran').textContent = persen + "%";
                 document.getElementById('bar-iuran').style.width = persen + "%";
@@ -932,7 +1015,71 @@
             }
         }
 
-        // 10. Fungsi Fetch Data Angsuran
+        // 10. Fungsi Fetch Data Iuran Bulan Ini (Dengan Ceklist Hijau)
+        async function fetchIuranBulanIni() {
+            const container = document.getElementById('content-iuran-bulan');
+            const summaryContainer = document.getElementById('summary-section');
+            const now = new Date();
+            const bulanIndex = now.getMonth();
+            document.getElementById('nama-bulan-berjalan').textContent = daftarBulan[bulanIndex];
+
+            const url = `https://docs.google.com/spreadsheets/d/${sheetIdAngsuran}/gviz/tq?tqx=out:csv&sheet=Angsuran`;
+            
+            try {
+                const response = await fetch(url);
+                const text = await response.text();
+                const rows = text.split('\n').map(r => r.split(',').map(c => c.replace(/"/g, '').trim()));
+                
+                const header = rows[0];
+                const dataWarga = rows.slice(1).filter(row => row[0] !== "");
+                
+                const tahunSekarang = now.getFullYear().toString();
+                const startColTahun = header.indexOf(tahunSekarang);
+                const kolomBulan = startColTahun + bulanIndex;
+
+                let totalTerbayar = 0;
+                let html = '';
+
+                if (startColTahun !== -1 && kolomBulan < header.length) {
+                    for (let i = 0; i < dataWarga.length; i++) {
+                        const nama = dataWarga[i][0];
+                        const nilai = parseAngka(dataWarga[i][kolomBulan]);
+                        
+                        if (nilai > 0) {
+                            totalTerbayar += nilai;
+                            html += `
+                            <div class="group bg-white p-4 rounded-xl border border-gray-100 shadow-sm hover:shadow-md hover:border-emerald-200 transition-all duration-300">
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="font-bold text-gray-800 truncate pr-2 text-sm">${nama}</span>
+                                    <i class="fas fa-check-circle text-emerald-500 text-xl" title="Lunas"></i>
+                                </div>
+                                <p class="text-lg font-black text-gray-900">${formatRupiah(nilai)}</p>
+                            </div>`;
+                        }
+                    }
+                }
+                
+                summaryContainer.innerHTML = `
+                    <div class="bg-emerald-900 text-white p-6 rounded-2xl flex justify-between items-center shadow-lg">
+                        <div>
+                            <p class="text-emerald-200 text-xs font-medium uppercase tracking-wider mb-1">Total Terkumpul Bulan Ini</p>
+                            <h3 class="text-2xl font-black">${formatRupiah(totalTerbayar)}</h3>
+                        </div>
+                        <div class="h-12 w-12 bg-emerald-700/50 rounded-xl flex items-center justify-center">
+                            <i class="fa-solid fa-wallet text-xl"></i>
+                        </div>
+                    </div>
+                `;
+
+                container.innerHTML = html || '<p class="col-span-full text-center text-gray-500 py-10">Belum ada pembayaran masuk bulan ini.</p>';
+                
+            } catch (e) { 
+                console.error(e);
+                container.innerHTML = "<p class='col-span-full text-center text-red-500 py-10'>Gagal memuat data.</p>"; 
+            }
+        }
+
+        // 11. Fungsi Fetch Data Angsuran (Keseluruhan Tahun dan Sort Abjad)
         async function fetchAngsuran() {
             const container = document.getElementById('content-angsuran');
             const url = `https://docs.google.com/spreadsheets/d/${sheetIdAngsuran}/gviz/tq?tqx=out:csv&sheet=Angsuran`;
@@ -946,17 +1093,19 @@
                 const text = await response.text();
                 const rows = text.split('\n').map(r => r.split(',').map(c => c.replace(/"/g, '').trim()));
                 
-                // 1. Ambil header untuk menentukan tahun
                 const header = rows[0];
                 const tahunList = [...new Set(header.filter(h => /^\d{4}$/.test(h)))];
                 
+                // Ambil data warga selain header dan buang baris kosong
+                let dataWarga = rows.slice(1).filter(row => row && row[0] && row[0].trim() !== "");
+                
+                // Mengurutkan data berdasarkan nama warga (abjad A-Z)
+                dataWarga.sort((a, b) => a[0].localeCompare(b[0]));
+
                 let htmlOutput = "";
 
-                // 2. Loop data warga
-                for (let i = 1; i < rows.length; i++) {
-                    const row = rows[i];
-                    if (!row || !row[0]) continue;
-
+                for (let i = 0; i < dataWarga.length; i++) {
+                    const row = dataWarga[i];
                     const nama = row[0];
                     const idNama = 'user-' + i;
 
@@ -966,7 +1115,7 @@
                             <span class="flex items-center gap-2"><i class="fas fa-user-circle text-gray-400"></i> ${nama}</span>
                             <i class="fas fa-chevron-down text-xs text-gray-400"></i>
                         </button>
-                        <div id="${idNama}" class="p-3 space-y-3 hidden bg-white">
+                        <div id="${idNama}" class="p-3 space-y-3 hidden bg-white border-t border-gray-100">
                             ${tahunList.map((tahun, thnIdx) => {
                                 const startCol = header.indexOf(tahun);
                                 return `
@@ -976,7 +1125,7 @@
                                         ${daftarBulan.map((bln, blnIdx) => {
                                             const kolomIndex = startCol + blnIdx;
                                             const nilaiRaw = row[kolomIndex] || "0";
-                                            const nilai = parseInt(nilaiRaw.replace(/[^0-9]/g, '')) || 0;
+                                            const nilai = parseAngka(nilaiRaw);
                                             
                                             const isPaid = nilai > 0;
                                             const isPast = (parseInt(tahun) < currentYear) || (parseInt(tahun) == currentYear && blnIdx < currentMonthIndex);
@@ -1013,64 +1162,33 @@
             el.classList.toggle('hidden');
         }
 
-        // Filter Cari Nama Angsuran
+        // Filters
         function filterAngsuran() {
             const input = document.getElementById('search-angsuran').value.toLowerCase();
             const items = document.querySelectorAll('.angsuran-item');
-            
             items.forEach(item => {
-                const name = item.getAttribute('data-name');
-                if (name.includes(input)) {
-                    item.style.display = 'block';
-                } else {
-                    item.style.display = 'none';
-                }
+                item.style.display = item.getAttribute('data-name').includes(input) ? 'block' : 'none';
             });
         }
 
-        // Filter Cari Warga
         function filterWarga() {
             const input = document.getElementById('search-warga').value.toLowerCase();
             const rows = document.querySelectorAll('#table-body tr');
-            
             rows.forEach(row => {
-                const text = row.textContent.toLowerCase();
-                if (text.includes(input)) {
-                    row.style.display = '';
-                } else {
-                    row.style.display = 'none';
-                }
+                row.style.display = row.textContent.toLowerCase().includes(input) ? '' : 'none';
             });
         }
 
-        // Filter Cari Tunggakan Warga
         function filterTunggakan() {
             const input = document.getElementById('search-tunggakan').value.toLowerCase();
             const rows = document.querySelectorAll('#content-tunggakan tbody tr');
-            
             rows.forEach(row => {
-                const text = row.textContent.toLowerCase();
-                if (text.includes(input)) {
-                    row.style.display = '';
-                } else {
-                    row.style.display = 'none';
-                }
+                row.style.display = row.textContent.toLowerCase().includes(input) ? '' : 'none';
             });
         }
         
         // --- Eksekusi Saat Dokumen Siap ---
         document.addEventListener("DOMContentLoaded", () => {
-            
-            // Injeksi manual Pagu Anggaran agar tidak error memuat
-            const dashboardPagu = document.getElementById('dashboard-pagu');
-            const dashboardTotalBo = document.getElementById('dashboard-total-bo');
-            
-            if(dashboardPagu) dashboardPagu.textContent = formatRupiah(totalPagu);
-            if(dashboardTotalBo) {
-                dashboardTotalBo.textContent = formatRupiah(totalPagu);
-                dashboardTotalBo.classList.remove('opacity-0');
-            }
-
             updateBudget("Rekap BO!C37", "dynamic-real", "loading-real", "sync-real");
             updateBudget("Rekap BO!C38", "dynamic-sisa", "loading-sisa", "sync-sisa");
             updateBudget("Rekap BO!C37", "dynamic-total", "loading-total", "sync-total");
@@ -1078,12 +1196,13 @@
             fetchWargaData();
             loadRekapKeuangan();
             fetchDataRekap();
+            
             updateKas();
             updateIuranKas();
-            fetchKasTunggakan('Kas', 'content-kas');
+            fetchDataKas(); 
             fetchKasTunggakan('Tunggakan', 'content-tunggakan');
             
-            // Render Angsuran Warga
+            fetchIuranBulanIni();
             fetchAngsuran();
         });
     </script>
