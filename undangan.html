@@ -142,7 +142,6 @@
         .paper-wrapper {
             overflow-x: auto;
             padding-bottom: 20px;
-            /* Scrollbar styling untuk wrapper */
             scrollbar-width: thin;
             scrollbar-color: #bcccdc transparent;
         }
@@ -154,9 +153,9 @@
             padding: 2.5cm 2.5cm; /* Margin standar Word */
             box-shadow: 0 20px 40px rgba(0,0,0,0.1), 0 5px 15px rgba(0,0,0,0.05);
             box-sizing: border-box;
-            font-family: Arial, Helvetica, sans-serif; /* Diganti Arial agar sesuai referensi */
+            font-family: Arial, Helvetica, sans-serif;
             color: black;
-            font-size: 12pt; /* Ukuran font standar */
+            font-size: 12pt;
             line-height: 1.5;
             position: relative;
         }
@@ -232,7 +231,7 @@
         }
 
         .tabel-acara td:nth-child(1) {
-            width: 130px; /* Lebar kolom pertama disesuaikan */
+            width: 130px;
         }
         
         .tabel-acara td:nth-child(2) {
@@ -261,43 +260,57 @@
             margin-right: 15px;
             margin-top: 5px;
             margin-bottom: 5px;
-            mix-blend-mode: multiply; /* Agar background putih pada ttd menyatu */
+            mix-blend-mode: multiply;
         }
 
         .nama-ttd {
             font-weight: bold;
-            /* text-decoration: underline; -- Berdasarkan referensi, tidak digarisbawahi, tapi jika ingin ditambahkan, uncomment ini */
         }
 
         /* ==========================================
            KHUSUS UNTUK MODE DOWNLOAD/PRINT PDF
            ========================================== */
         @media print {
-            body {
+            /* Reset root agar tidak merender halaman berlebih */
+            html, body {
                 background: white;
-                margin: 0;
-                padding: 0;
+                margin: 0 !important;
+                padding: 0 !important;
+                height: 100%;
+                min-height: 0;
+                overflow: hidden; /* Paksa potong jika ada elemen yang keluar jalur */
             }
+            
             .header-title, .controls {
-                display: none; /* Sembunyikan UI saat print */
+                display: none !important; /* Sembunyikan UI dengan paksa */
             }
+            
             .container {
                 gap: 0;
+                margin: 0;
+                padding: 0;
+                display: block;
             }
+            
             .paper-wrapper {
                 padding: 0;
+                margin: 0;
                 overflow: visible;
             }
+            
             .paper {
                 box-shadow: none;
                 margin: 0;
                 padding: 0;
                 width: 100%;
-                min-height: auto;
+                min-height: 0;
+                height: auto;
+                page-break-after: avoid; /* Hindari pembuatan halaman baru setelah surat */
             }
+            
             @page {
                 size: A4 portrait;
-                margin: 25mm 25mm; /* Margin dicetak mengikuti pengaturan ini */
+                margin: 25mm; /* Pengaturan margin kertas sesungguhnya di printer */
             }
         }
     </style>
@@ -356,7 +369,6 @@
             <div class="paper" id="surat-undangan">
                 <!-- Kop Surat -->
                 <div class="kop-surat-container">
-                    <!-- Ganti src dengan path file logo Anda yang sebenarnya -->
                     <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Lambang_Kota_Semarang.png/400px-Lambang_Kota_Semarang.png" alt="Logo Pemkot" class="kop-surat-logo">
                     
                     <div class="kop-surat-text">
@@ -435,7 +447,6 @@
                 <div class="tanda-tangan">
                     <p>Hormat kami, RT 04 RW XXVI</p>
                     
-                    <!-- Ganti src dengan file tanda tangan Anda yang sebenarnya -->
                     <img src="https://upload.wikimedia.org/wikipedia/commons/f/f6/Signature_of_John_Hancock.png" alt="Tanda Tangan" class="img-ttd">
                     
                     <div class="nama-ttd">GATOT ENDRO YUDO EDI WIBOWO</div>
@@ -445,7 +456,6 @@
     </div>
 
     <script>
-        // Fungsi untuk mengupdate teks di surat secara realtime
         function updateSurat() {
             document.getElementById('out-tgl-surat').innerText = document.getElementById('input-tgl-surat').value;
             document.getElementById('out-nomor').innerText = document.getElementById('input-nomor').value;
@@ -454,7 +464,6 @@
             document.getElementById('out-tempat').innerText = document.getElementById('input-tempat').value;
         }
 
-        // Fungsi print PDF
         function downloadPDF() {
             window.print();
         }
