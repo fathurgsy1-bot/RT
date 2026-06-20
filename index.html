@@ -225,13 +225,13 @@
             </div>
             <div class="flex flex-wrap justify-center gap-4 md:gap-6 font-medium text-sm">
                 <a href="#beranda" class="text-gray-600 hover:text-emerald-600 transition-colors">Beranda</a>
+                <a href="#jadwal-pertemuan" class="text-gray-600 hover:text-emerald-600 transition-colors">Pertemuan</a>
                 <a href="#data-warga" class="text-gray-600 hover:text-emerald-600 transition-colors">Data</a>
                 <a href="#rencana-bo-2026" class="text-gray-600 hover:text-emerald-600 transition-colors">BO 2026</a>
                 <a href="#kas-warga" class="text-gray-600 hover:text-emerald-600 transition-colors">Kas</a>
                 <a href="#tunggakan-warga" class="text-gray-600 hover:text-emerald-600 transition-colors">Tunggakan</a>
                 <a href="#iuran-bulan-ini" class="text-emerald-600 font-bold hover:text-emerald-700 transition-colors">Iuran</a>
                 <a href="#angsuran-warga" class="text-gray-600 hover:text-emerald-600 transition-colors">Angsuran</a>
-				<a href="undangan.html" class="text-gray-600 hover:text-emerald-600 transition-colors">Undangan</a>
             </div>
         </div>
     </nav>
@@ -253,7 +253,7 @@
         </div>
     </header>
 
-    <section class="max-w-6xl mx-auto px-6 -mt-16">
+    <section class="max-w-6xl mx-auto px-6 -mt-16 relative z-10">
         <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
             <div class="hover-card glass p-6 rounded-3xl shadow-xl flex flex-col justify-center gap-2">
                 <div class="flex items-center gap-3 mb-2">
@@ -319,6 +319,61 @@
                     <div id="bar-iuran" class="bg-blue-600 h-full w-[0%]"></div>
                 </div>
                 <p id="keterangan-iuran" class="text-[10px] text-gray-500 mt-1">Memuat data...</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="jadwal-pertemuan" class="pt-20 pb-8 bg-gray-50">
+        <div class="max-w-6xl mx-auto px-6">
+            <div class="flex items-center justify-between mb-6">
+                <div class="flex items-center gap-3">
+                    <div class="p-3 bg-emerald-100 text-emerald-600 rounded-xl"><i class="fas fa-handshake text-xl"></i></div>
+                    <h2 class="text-2xl md:text-3xl font-bold text-gray-900">Jadwal Pertemuan RT</h2>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="hover-card bg-white p-6 rounded-3xl border-2 border-emerald-500 shadow-lg relative overflow-hidden group">
+                    <div class="absolute top-0 right-0 bg-emerald-500 text-white text-xs font-bold px-4 py-1.5 rounded-bl-xl z-10 animate-pulse">
+                        Tuan Rumah Bulan Ini
+                    </div>
+                    <div class="absolute -right-4 -bottom-4 text-emerald-50 opacity-50 text-8xl z-0 transition-transform group-hover:scale-110"><i class="fas fa-home"></i></div>
+                    <div class="flex items-center gap-5 relative z-10">
+                        <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center text-white text-2xl font-bold shadow-md">
+                            <i class="fas fa-user-tie"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm text-emerald-600 font-bold mb-1 uppercase tracking-wider" id="label-bulan-ini">Memuat...</p>
+                            <h3 class="text-2xl font-black text-gray-800">Bapak Aris</h3>
+                            <div class="flex items-center gap-2 mt-2">
+                                <span class="bg-emerald-100 text-emerald-700 text-[10px] px-2 py-1 rounded font-bold flex items-center">
+                                    <i class="fas fa-circle text-[8px] mr-1 text-emerald-500"></i> Status: Sedang Berjalan
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="hover-card bg-white p-6 rounded-3xl border border-gray-200 shadow-sm relative overflow-hidden group opacity-90 hover:opacity-100 transition">
+                    <div class="absolute top-0 right-0 bg-gray-200 text-gray-600 text-xs font-bold px-4 py-1.5 rounded-bl-xl z-10">
+                        Persiapan Bulan Depan
+                    </div>
+                    <div class="absolute -right-4 -bottom-4 text-gray-50 opacity-50 text-8xl z-0 transition-transform group-hover:scale-110"><i class="fas fa-home"></i></div>
+                    <div class="flex items-center gap-5 relative z-10">
+                        <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-gray-300 to-gray-400 flex items-center justify-center text-white text-2xl font-bold shadow-md">
+                            <i class="fas fa-user-tie"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500 font-bold mb-1 uppercase tracking-wider" id="label-bulan-depan">Memuat...</p>
+                            <h3 class="text-2xl font-black text-gray-800">Bapak Exwin</h3>
+                            <div class="flex items-center gap-2 mt-2">
+                                <span class="bg-gray-100 text-gray-600 text-[10px] px-2 py-1 rounded font-bold flex items-center">
+                                    <i class="fas fa-clock text-[10px] mr-1"></i> Menunggu Giliran
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
@@ -1205,6 +1260,18 @@
             
             fetchIuranBulanIni();
             fetchAngsuran();
+            
+            // --- Script Tambahan Update Bulan Realtime Untuk Jadwal Pertemuan ---
+            const currentBulanIdx = new Date().getMonth();
+            const nextBulanIdx = (currentBulanIdx + 1) % 12;
+            const currentTahun = new Date().getFullYear();
+            const nextTahun = currentBulanIdx === 11 ? currentTahun + 1 : currentTahun;
+            
+            const labelBulanIni = document.getElementById('label-bulan-ini');
+            const labelBulanDepan = document.getElementById('label-bulan-depan');
+            
+            if(labelBulanIni) labelBulanIni.textContent = daftarBulan[currentBulanIdx] + " " + currentTahun;
+            if(labelBulanDepan) labelBulanDepan.textContent = daftarBulan[nextBulanIdx] + " " + nextTahun;
         });
     </script>
 </body>
