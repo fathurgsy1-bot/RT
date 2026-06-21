@@ -1199,7 +1199,6 @@
                         val = cell;
                     }
 
-                    // Jika notes dikirim dari array koordinat terpisah
                     if (notes.length > i && notes[i] && notes[i][j]) {
                         note = notes[i][j];
                     }
@@ -1215,7 +1214,7 @@
             return { headers, dataRows };
         }
 
-        // 10. Fungsi Fetch Data Iuran Bulan Ini
+        // 10. Fungsi Fetch Data Iuran Bulan Ini (Telah Diperbarui Keamanannya)
         async function fetchIuranBulanIni() {
             const container = document.getElementById('content-iuran-bulan');
             const summaryContainer = document.getElementById('summary-section');
@@ -1225,26 +1224,44 @@
 
             try {
                 const response = await fetch(appScriptUrl);
-                if (!response.ok) throw new Error("HTTP Error " + response.status);
+                const textData = await response.text();
                 
-                const result = await response.json();
+                let result;
+                try {
+                    result = JSON.parse(textData);
+                } catch(err) {
+                    throw new Error("Respons dari Apps Script BUKAN format JSON. Pastikan Web App Anda di-deploy dengan pengaturan 'Execute as: Me' dan 'Who has access: Anyone'.");
+                }
+
+                if (result.error) throw new Error(result.error);
+
                 const normalized = normalizeResponse(result);
-                
                 if (!normalized) throw new Error("Format response Apps Script tidak valid atau kosong.");
 
                 const { headers, dataRows } = normalized;
                 const tahunSekarang = now.getFullYear().toString();
-                const startColTahun = headers.indexOf(tahunSekarang);
+                
+                // Cari Index Tahun secara dinamis
+                let startColTahun = headers.findIndex(h => h.includes(tahunSekarang));
+                if (startColTahun === -1) startColTahun = 1; // Fallback ke kolom 1 jika tidak ketemu
+                
                 const kolomBulan = startColTahun + bulanIndex;
 
                 let totalTerbayar = 0;
                 let html = '';
 
-                if (startColTahun !== -1 && kolomBulan < headers.length) {
+                if (kolomBulan < headers.length || startColTahun !== -1) {
                     for (let i = 0; i < dataRows.length; i++) {
                         const row = dataRows[i];
-                        const nama = row[0].value; 
-                        const cell = row[kolomBulan];
+                        if (!row || !row[0]) continue; // Skip baris error
+                        
+                        const nama = row[0].value || ""; 
+                        
+                        // Melewati baris jika isinya kosong atau merupakan duplikasi Header berjudul "Nama"
+                        if (!nama || nama.trim() === "" || nama.toLowerCase().includes("nama")) continue;
+
+                        // Amankan pembacaan cell jika kolomnya terpotong
+                        const cell = row[kolomBulan] || { value: "" };
                         const nilai = parseAngka(cell.value);
                         
                         if (nilai > 0) {
@@ -1252,7 +1269,7 @@
                             html += `
                             <div class="group bg-white p-4 rounded-xl border border-gray-100 shadow-sm hover:shadow-md hover:border-emerald-200 transition-all duration-300">
                                 <div class="flex justify-between items-center mb-2">
-                                    <span class="font-bold text-gray-800 truncate pr-2 text-sm">${nama}</span>
+                                    <span class="font-bold text-gray-800 truncate pr-2 text-sm">${escapeHtml(nama)}</span>
                                     <i class="fas fa-check-circle text-emerald-500 text-xl" title="Lunas"></i>
                                 </div>
                                 <p class="text-lg font-black text-gray-900">${formatRupiah(nilai)}</p>
@@ -1277,11 +1294,13 @@
                 
             } catch (e) { 
                 console.error("Error pada fetchIuranBulanIni:", e);
-                container.innerHTML = `<p class='col-span-full text-center text-red-500 py-10'>Gagal memuat data Iuran Bulan Ini.<br><span class="text-xs text-gray-400">Pastikan Apps Script di-deploy kembali sebagai Web App & diatur 'Anyone'. Cek Console Log (F12).</span></p>`; 
+                container.innerHTML = `<p class='col-span-full text-center text-red-500 py-10'>
+                    <b>Gagal memuat Iuran Bulan Ini:</b><br/> ${e.message}
+                </p>`; 
             }
         }
 
-        // 11. Fungsi Fetch Data Angsuran
+        // 11. Fungsi Fetch Data Angsuran (Telah Diperbarui Keamanannya)
         async function fetchAngsuran() {
             const container = document.getElementById('content-angsuran');
             const now = new Date();
@@ -1290,21 +1309,33 @@
             
             try {
                 const response = await fetch(appScriptUrl);
-                if (!response.ok) throw new Error("HTTP Error " + response.status);
+                const textData = await response.text();
                 
-                const result = await response.json();
+                let result;
+                try {
+                    result = JSON.parse(textData);
+                } catch(err) {
+                    throw new Error("Respons dari Apps Script BUKAN format JSON. Pastikan Web App Anda di-deploy dengan pengaturan 'Execute as: Me' dan 'Who has access: Anyone'.");
+                }
+                
+                if (result.error) throw new Error(result.error);
+                
                 const normalized = normalizeResponse(result);
-                
                 if (!normalized) throw new Error("Format response Apps Script tidak valid atau kosong.");
 
                 const { headers, dataRows } = normalized;
-                const tahunList = [...new Set(headers.filter(h => /^\d{4}$/.test(h)))];
+                let tahunList = [...new Set(headers.filter(h => /\d{4}/.test(h)))];
+                if (tahunList.length === 0) tahunList = [currentYear.toString()]; // Fallback jika regex gagal mencari tahun
                 
                 let listWarga = [];
                 for(let i = 0; i < dataRows.length; i++) {
                     const row = dataRows[i];
-                    const nama = row[0].value;
-                    if (nama && nama.trim() !== "") {
+                    if (!row || !row[0]) continue;
+                    
+                    const nama = row[0].value || "";
+                    
+                    // Filter baris kosong dan filter Header "Nama" yang terikut masuk ke dalam loop
+                    if (nama && nama.trim() !== "" && !nama.toLowerCase().includes("nama")) {
                         listWarga.push({ rowData: row, nama: nama.trim() });
                     }
                 }
@@ -1323,12 +1354,14 @@
                     htmlOutput += `
                     <div class="angsuran-item bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden h-max" data-name="${nama.toLowerCase()}">
                         <button onclick="toggle('${idNama}')" class="w-full p-3 flex justify-between items-center bg-gray-50 font-semibold text-gray-700 hover:bg-emerald-50 transition text-sm">
-                            <span class="flex items-center gap-2"><i class="fas fa-user-circle text-gray-400"></i> ${nama}</span>
+                            <span class="flex items-center gap-2"><i class="fas fa-user-circle text-gray-400"></i> ${safeNama}</span>
                             <i class="fas fa-chevron-down text-xs text-gray-400"></i>
                         </button>
                         <div id="${idNama}" class="p-3 space-y-3 hidden bg-white border-t border-gray-100">
                             ${tahunList.map((tahun) => {
-                                const startCol = headers.indexOf(tahun);
+                                let startCol = headers.indexOf(tahun);
+                                if (startCol === -1) startCol = 1; // Fallback jika Index tahun tidak ditemukan
+                                
                                 return `
                                 <div class="border border-gray-100 rounded-md overflow-hidden">
                                     <div class="p-2 bg-emerald-50/50 text-emerald-800 font-bold text-xs border-b border-gray-100">Tahun ${tahun}</div>
@@ -1336,6 +1369,7 @@
                                         ${daftarBulan.map((bln, blnIdx) => {
                                             const kolomIndex = startCol + blnIdx;
                                             
+                                            // Amankan pembacaan cell jika kolom terpotong
                                             let cell = row[kolomIndex] || { value: "", note: "" };
                                             const nilaiRaw = cell.value || "";
                                             const cellNote = cell.note || "";
@@ -1398,7 +1432,9 @@
                 container.innerHTML = htmlOutput;
             } catch(e) {
                 console.error("Error pada fetchAngsuran:", e);
-                container.innerHTML = "<p class='text-red-500 text-center col-span-full py-10'>Gagal memuat data dari App Script.<br><span class='text-xs text-gray-400'>Silakan buka Console Log (F12) untuk melihat pesan detail error.</span></p>";
+                container.innerHTML = `<p class='text-red-500 text-center col-span-full py-10'>
+                    <b>Gagal memuat Rekap Angsuran:</b><br/> ${e.message}
+                </p>`;
             }
         }
 
