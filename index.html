@@ -574,7 +574,7 @@
         </div>
     </div>
 
-    <footer class="bg-gray-900 text-gray-400 py-6 md:py-8 border-t border-gray-800 text-center text-xs md:text-sm">
+    <div id="rekap-bo-2026" class="hidden"></div> <footer class="bg-gray-900 text-gray-400 py-6 md:py-8 border-t border-gray-800 text-center text-xs md:text-sm">
         <p>&copy; 2026 RT 04 RW 26 Meteseh, Tembalang, Kota Semarang.</p>
     </footer>
 
@@ -613,7 +613,6 @@
 
         function showNote(nama, bulan, tahun, catatan) {
             document.getElementById('note-subtitle').textContent = `${nama} - ${bulan} ${tahun}`;
-            // Render text with HTML safely, replacing newlines with <br> if needed
             document.getElementById('note-content').innerHTML = catatan;
             
             const modal = document.getElementById('note-modal');
@@ -622,7 +621,6 @@
             modal.classList.remove('hidden');
             modal.classList.add('flex');
             
-            // Animasi masuk
             setTimeout(() => {
                 box.classList.remove('scale-95', 'opacity-0');
                 box.classList.add('scale-100', 'opacity-100');
@@ -633,7 +631,6 @@
             const modal = document.getElementById('note-modal');
             const box = document.getElementById('note-modal-box');
             
-            // Animasi keluar
             box.classList.remove('scale-100', 'opacity-100');
             box.classList.add('scale-95', 'opacity-0');
             
@@ -659,7 +656,6 @@
             return parseInt(str) || 0;
         }
 
-        // Fungsi Tambahan: Menghitung Grand Total
         function updateGrandTotal() {
             if (globalAsetKas !== undefined && globalTotalTunggakan !== undefined) {
                 const grandTotal = globalAsetKas + globalTotalTunggakan;
@@ -1133,7 +1129,93 @@
             }
         }
 
-        // 10. Fungsi Fetch Data Iuran Bulan Ini (Menggunakan App Script)
+        // ====================== UNIVERSAL PARSER FOR APPSCRIPT JSON VARIANTS ======================
+        function normalizeResponse(result) {
+            if (!result) return null;
+            let rows = [];
+            let notes = [];
+
+            // 1. Ekstrak baris data murni
+            if (result.data || result.values) {
+                rows = result.data || result.values;
+                notes = result.notes || [];
+            } else if (Array.isArray(result)) {
+                rows = result;
+            } else {
+                return null;
+            }
+
+            if (rows.length === 0) return null;
+
+            // Variasi A: Array of Objects [{ Nama: "Aris", "2026": 100000 }]
+            if (!Array.isArray(rows[0]) && typeof rows[0] === 'object') {
+                const headers = Object.keys(rows[0]);
+                const dataRows = [];
+                
+                for (let i = 0; i < rows.length; i++) {
+                    const obj = rows[i];
+                    const normalizedRow = [];
+                    headers.forEach(key => {
+                        let cellData = obj[key];
+                        let val = "";
+                        let note = "";
+                        
+                        if (cellData !== null && typeof cellData === 'object') {
+                            val = cellData.value !== undefined ? cellData.value : (cellData.v || "");
+                            note = cellData.note !== undefined ? cellData.note : (cellData.n || cellData.comment || "");
+                        } else {
+                            val = cellData;
+                            note = obj[key + "_note"] || obj[key + "Note"] || obj[key + "_comment"] || "";
+                        }
+                        normalizedRow.push({ value: String(val !== undefined && val !== null ? val : ""), note: String(note) });
+                    });
+                    dataRows.push(normalizedRow);
+                }
+                return { headers, dataRows };
+            }
+
+            // Variasi B: Standard 2D Matrix Array [[cell, cell], [cell, cell]]
+            const headers = rows[0].map(cell => {
+                if (cell !== null && typeof cell === 'object') {
+                    return String(cell.value !== undefined ? cell.value : (cell.v || '')).trim();
+                }
+                return String(cell || '').trim();
+            });
+
+            const dataRows = [];
+            for (let i = 1; i < rows.length; i++) {
+                const row = rows[i];
+                if (!row) continue;
+                const normalizedRow = [];
+                for (let j = 0; j < headers.length; j++) {
+                    let cell = row[j];
+                    let val = "";
+                    let note = "";
+
+                    if (cell !== null && typeof cell === 'object') {
+                        val = cell.value !== undefined ? cell.value : (cell.v || "");
+                        note = cell.note !== undefined ? cell.note : (cell.n || cell.comment || "");
+                    } else {
+                        val = cell;
+                    }
+
+                    // Jika notes dikirim dari array koordinat terpisah
+                    if (notes.length > i && notes[i] && notes[i][j]) {
+                        note = notes[i][j];
+                    }
+
+                    normalizedRow.push({
+                        value: String(val !== undefined && val !== null ? val : ""),
+                        note: String(note || "")
+                    });
+                }
+                dataRows.push(normalizedRow);
+            }
+
+            return { headers, dataRows };
+        }
+
+        // 10. Fungsi Fetch Data Iuran Bulan Ini
         async function fetchIuranBulanIni() {
             const container = document.getElementById('content-iuran-bulan');
             const summaryContainer = document.getElementById('summary-section');
@@ -1143,50 +1225,27 @@
 
             try {
                 const response = await fetch(appScriptUrl);
+                if (!response.ok) throw new Error("HTTP Error " + response.status);
+                
                 const result = await response.json();
+                const normalized = normalizeResponse(result);
                 
-                let rows = [];
-                if (Array.isArray(result)) {
-                    rows = result;
-                } else if (result.data) {
-                    rows = result.data;
-                }
+                if (!normalized) throw new Error("Format response Apps Script tidak valid atau kosong.");
 
-                if (rows.length === 0) throw new Error("Data kosong");
-
-                const header = rows[0].map(h => typeof h === 'object' ? (h.value || h.v || '') : String(h).trim());
-                
-                let dataWarga = [];
-                for(let i = 1; i < rows.length; i++) {
-                    const row = rows[i];
-                    const namaCell = typeof row[0] === 'object' ? (row[0].value || row[0].v || '') : String(row[0] || '');
-                    if (namaCell.trim() !== "") {
-                        dataWarga.push(row);
-                    }
-                }
-                
+                const { headers, dataRows } = normalized;
                 const tahunSekarang = now.getFullYear().toString();
-                const startColTahun = header.indexOf(tahunSekarang);
+                const startColTahun = headers.indexOf(tahunSekarang);
                 const kolomBulan = startColTahun + bulanIndex;
 
                 let totalTerbayar = 0;
                 let html = '';
 
-                if (startColTahun !== -1 && kolomBulan < header.length) {
-                    for (let i = 0; i < dataWarga.length; i++) {
-                        const row = dataWarga[i];
-                        const nama = typeof row[0] === 'object' ? (row[0].value || row[0].v || '') : String(row[0] || '');
-                        
-                        let cellData = row[kolomBulan];
-                        let nilaiRaw = "";
-                        
-                        if (cellData !== null && typeof cellData === 'object') {
-                            nilaiRaw = String(cellData.value !== undefined ? cellData.value : (cellData.v || ""));
-                        } else {
-                            nilaiRaw = String(cellData || "");
-                        }
-                        
-                        const nilai = parseAngka(nilaiRaw);
+                if (startColTahun !== -1 && kolomBulan < headers.length) {
+                    for (let i = 0; i < dataRows.length; i++) {
+                        const row = dataRows[i];
+                        const nama = row[0].value; 
+                        const cell = row[kolomBulan];
+                        const nilai = parseAngka(cell.value);
                         
                         if (nilai > 0) {
                             totalTerbayar += nilai;
@@ -1217,57 +1276,46 @@
                 container.innerHTML = html || '<p class="col-span-full text-center text-gray-500 py-10">Belum ada pembayaran masuk bulan ini.</p>';
                 
             } catch (e) { 
-                console.error(e);
-                container.innerHTML = "<p class='col-span-full text-center text-red-500 py-10'>Gagal memuat data Iuran Bulan Ini.</p>"; 
+                console.error("Error pada fetchIuranBulanIni:", e);
+                container.innerHTML = `<p class='col-span-full text-center text-red-500 py-10'>Gagal memuat data Iuran Bulan Ini.<br><span class="text-xs text-gray-400">Pastikan Apps Script di-deploy kembali sebagai Web App & diatur 'Anyone'. Cek Console Log (F12).</span></p>`; 
             }
         }
 
-        // 11. Fungsi Fetch Data Angsuran (Menggunakan App Script)
+        // 11. Fungsi Fetch Data Angsuran
         async function fetchAngsuran() {
             const container = document.getElementById('content-angsuran');
-            
             const now = new Date();
             const currentMonthIndex = now.getMonth();
             const currentYear = now.getFullYear();
             
             try {
                 const response = await fetch(appScriptUrl);
+                if (!response.ok) throw new Error("HTTP Error " + response.status);
+                
                 const result = await response.json();
+                const normalized = normalizeResponse(result);
                 
-                let rows = [];
-                let notesArray = [];
+                if (!normalized) throw new Error("Format response Apps Script tidak valid atau kosong.");
 
-                // Deteksi format JSON App Script
-                if (Array.isArray(result)) {
-                    rows = result;
-                } else if (result.data) {
-                    rows = result.data;
-                    if (result.notes) notesArray = result.notes;
-                }
-
-                if (rows.length === 0) throw new Error("Data kosong");
-
-                const header = rows[0].map(h => typeof h === 'object' ? (h.value || h.v || '') : String(h).trim());
-                const tahunList = [...new Set(header.filter(h => /^\d{4}$/.test(h)))];
+                const { headers, dataRows } = normalized;
+                const tahunList = [...new Set(headers.filter(h => /^\d{4}$/.test(h)))];
                 
-                let dataWarga = [];
-                for(let i = 1; i < rows.length; i++) {
-                    const row = rows[i];
-                    const namaCell = typeof row[0] === 'object' ? (row[0].value || row[0].v || '') : String(row[0] || '');
-                    if (namaCell.trim() !== "") {
-                        dataWarga.push({ rowData: row, originalIndex: i, nama: namaCell.trim() });
+                let listWarga = [];
+                for(let i = 0; i < dataRows.length; i++) {
+                    const row = dataRows[i];
+                    const nama = row[0].value;
+                    if (nama && nama.trim() !== "") {
+                        listWarga.push({ rowData: row, nama: nama.trim() });
                     }
                 }
                 
-                // Mengurutkan data berdasarkan nama warga (abjad A-Z)
-                dataWarga.sort((a, b) => a.nama.localeCompare(b.nama));
+                listWarga.sort((a, b) => a.nama.localeCompare(b.nama));
 
                 let htmlOutput = "";
 
-                for (let i = 0; i < dataWarga.length; i++) {
-                    const item = dataWarga[i];
+                for (let i = 0; i < listWarga.length; i++) {
+                    const item = listWarga[i];
                     const row = item.rowData;
-                    const rIdx = item.originalIndex;
                     const nama = item.nama;
                     const safeNama = escapeHtml(nama);
                     const idNama = 'user-' + i;
@@ -1280,7 +1328,7 @@
                         </button>
                         <div id="${idNama}" class="p-3 space-y-3 hidden bg-white border-t border-gray-100">
                             ${tahunList.map((tahun) => {
-                                const startCol = header.indexOf(tahun);
+                                const startCol = headers.indexOf(tahun);
                                 return `
                                 <div class="border border-gray-100 rounded-md overflow-hidden">
                                     <div class="p-2 bg-emerald-50/50 text-emerald-800 font-bold text-xs border-b border-gray-100">Tahun ${tahun}</div>
@@ -1288,22 +1336,9 @@
                                         ${daftarBulan.map((bln, blnIdx) => {
                                             const kolomIndex = startCol + blnIdx;
                                             
-                                            // Ekstraksi nilai dan catatan dari App Script Object/Arrays
-                                            let cellData = row[kolomIndex];
-                                            let nilaiRaw = "";
-                                            let cellNote = "";
-
-                                            if (cellData !== null && typeof cellData === 'object') {
-                                                nilaiRaw = String(cellData.value !== undefined ? cellData.value : (cellData.v || ""));
-                                                cellNote = String(cellData.note !== undefined ? cellData.note : (cellData.n || ""));
-                                            } else {
-                                                nilaiRaw = String(cellData || "");
-                                            }
-
-                                            // Jika disediakan array khusus notes terpisah oleh App Script
-                                            if (notesArray.length > rIdx && notesArray[rIdx][kolomIndex]) {
-                                                cellNote = String(notesArray[rIdx][kolomIndex]);
-                                            }
+                                            let cell = row[kolomIndex] || { value: "", note: "" };
+                                            const nilaiRaw = cell.value || "";
+                                            const cellNote = cell.note || "";
 
                                             const nilai = parseAngka(nilaiRaw);
                                             const hasTextNote = cellNote.trim().length > 0;
@@ -1311,7 +1346,6 @@
 
                                             const isPaid = nilai > 0;
                                             const isPast = (parseInt(tahun) < currentYear) || (parseInt(tahun) == currentYear && blnIdx < currentMonthIndex);
-                                            
                                             const isOverdue = isPast && !isPaid && !hasTextNote; 
                                             
                                             const formatBln = bln.substring(0, 3);
@@ -1363,8 +1397,8 @@
                 }
                 container.innerHTML = htmlOutput;
             } catch(e) {
-                console.error(e);
-                container.innerHTML = "<p class='text-red-500 text-center col-span-full'>Gagal memuat data dari App Script.</p>";
+                console.error("Error pada fetchAngsuran:", e);
+                container.innerHTML = "<p class='text-red-500 text-center col-span-full py-10'>Gagal memuat data dari App Script.<br><span class='text-xs text-gray-400'>Silakan buka Console Log (F12) untuk melihat pesan detail error.</span></p>";
             }
         }
 
