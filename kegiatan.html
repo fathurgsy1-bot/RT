@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Data Kegiatan</title>
+    <style>
+      body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 20px;
+        background-color: #f0f2f5;
+      }
+      .form-container {
+        max-width: 450px;
+        margin: 30px auto;
+        background: #ffffff;
+        padding: 25px;
+        border-radius: 10px;
+        box-shadow: 0px 4px 15px rgba(0,0,0,0.08);
+      }
+      h2 {
+        text-align: center;
+        color: #1a73e8;
+        margin-top: 0;
+        margin-bottom: 25px;
+      }
+      .form-group {
+        margin-bottom: 20px;
+      }
+      label {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: #4c4c4c;
+      }
+      input[type="text"], input[type="datetime-local"], input[type="file"] {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #dadce0;
+        border-radius: 6px;
+        box-sizing: border-box;
+        font-size: 14px;
+      }
+      input[type="text"]:focus, input[type="datetime-local"]:focus {
+        border-color: #1a73e8;
+        outline: none;
+      }
+      button {
+        width: 100%;
+        padding: 14px;
+        background-color: #1a73e8;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+      button:hover {
+        background-color: #1557b0;
+      }
+      button:disabled {
+        background-color: #ccc;
+        cursor: not-allowed;
+      }
+      #status {
+        margin-top: 20px;
+        padding: 12px;
+        text-align: center;
+        font-weight: bold;
+        display: none;
+        border-radius: 6px;
+        font-size: 14px;
+      }
+      .success {
+        background-color: #e6f4ea;
+        color: #137333;
+        border: 1px solid #c2e7cb;
+      }
+      .error {
+        background-color: #fce8e6;
+        color: #c5221f;
+        border: 1px solid #fad2cf;
+      }
+    </style>
+  </head>
+  <body>
+
+    <div class="form-container">
+      <h2>Input Data Kegiatan</h2>
+      <form id="kegiatanForm" onsubmit="handleFormSubmit(this); return false;">
+        
+        <div class="form-group">
+          <label for="nama_kegiatan">Nama Kegiatan</label>
+          <input type="text" id="nama_kegiatan" name="nama_kegiatan" placeholder="Contoh: Rapat Koordinasi Bulanan" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="tanggal_kegiatan">Tanggal & Jam Kegiatan</label>
+          <input type="datetime-local" id="tanggal_kegiatan" name="tanggal_kegiatan" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="foto">Upload Foto</label>
+          <input type="file" id="foto" name="foto" accept="image/*" required>
+        </div>
+        
+        <button type="submit" id="submitBtn">Kirim Data</button>
+      </form>
+      
+      <div id="status"></div>
+    </div>
+
+    <script>
+      function handleFormSubmit(formObject) {
+        var submitBtn = document.getElementById("submitBtn");
+        var statusDiv = document.getElementById("status");
+        
+        // Disable tombol agar user tidak klik dua kali
+        submitBtn.disabled = true;
+        submitBtn.innerText = "Sedang Mengirim...";
+        statusDiv.style.display = "none";
+        
+        // Memanggil fungsi backend di Apps Script
+        google.script.run
+          .withSuccessHandler(function(response) {
+            statusDiv.style.display = "block";
+            if (response.indexOf("Sukses") !== -1) {
+              statusDiv.className = "success";
+              formObject.reset(); // Reset form jika sukses
+            } else {
+              statusDiv.className = "error";
+            }
+            statusDiv.innerText = response;
+            submitBtn.disabled = false;
+            submitBtn.innerText = "Kirim Data";
+          })
+          .withFailureHandler(function(error) {
+            statusDiv.style.display = "block";
+            statusDiv.className = "error";
+            statusDiv.innerText = "Terjadi kesalahan sistem: " + error;
+            submitBtn.disabled = false;
+            submitBtn.innerText = "Kirim Data";
+          })
+          .processForm(formObject);
+      }
+    </script>
+  </body>
+</html>
