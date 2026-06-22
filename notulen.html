@@ -97,13 +97,14 @@
     <footer class="bg-gray-900 text-gray-400 py-6 md:py-8 border-t border-gray-800 text-center text-xs md:text-sm mt-auto">
         <p>&copy; 2026 RT 04 RW 26 Meteseh, Tembalang, Kota Semarang.</p>
     </footer>
+
     <script>
         // Google Doc ID
         const docId = '1-iCZxa5gO_akITHhmEBM7cBYrT4xQMuDZ7qe0saG5z4';
         const docUrl = `https://docs.google.com/document/d/${docId}/export?format=txt`;
         
-        // Kita gunakan AllOrigins mode JSON (bukan raw) untuk menghindari blokir CORS dari browser
-        const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(docUrl)}`;
+        // Perbaikan: Menggunakan corsproxy.io yang lebih stabil untuk raw text
+        const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(docUrl)}`;
 
         let allNotulen = [];
 
@@ -116,31 +117,19 @@
 
             try {
                 const response = await fetch(proxyUrl, { cache: "no-store" });
-                if (!response.ok) throw new Error("Gagal terhubung ke proxy");
+                if (!response.ok) throw new Error("Gagal mengambil data doc");
                 
-                // Ambil data dalam bentuk JSON
-                const data = await response.json();
-                
-                // Jika dokumen gagal dimuat oleh proxy, contents biasanya null atau HTML error
-                if (!data.contents) throw new Error("Data kosong dari proxy");
-                
-                const text = data.contents;
-                
-                // Validasi jika Google merespons dengan halaman login HTML (Dokumen tidak publik)
-                if (text.trim().toLowerCase().startsWith('<!doctype html>') || text.includes('<html')) {
-                    throw new Error("Akses ditolak oleh Google. Pastikan dokumen bersifat 'Siapa saja yang memiliki link'.");
-                }
-
+                const text = await response.text();
                 parseAndRenderNotulen(text);
                 
                 loader.style.display = 'none';
                 container.style.display = 'block';
             } catch (error) {
-                console.error('Error detail:', error);
+                console.error('Error fetching doc:', error);
                 loader.innerHTML = `
                     <div class="text-red-500 text-4xl mb-3"><i class="fas fa-exclamation-triangle"></i></div>
                     <p class="text-gray-700 font-bold">Gagal memuat notulen.</p>
-                    <p class="text-sm text-gray-500 text-center max-w-sm mt-2">Pesan Error: ${error.message}</p>
+                    <p class="text-sm text-gray-500 text-center max-w-sm mt-2">Pastikan pengaturan dokumen Google Doc diatur ke <strong>"Siapa saja yang memiliki link"</strong>.</p>
                     <button onclick="fetchNotulen()" class="mt-4 bg-emerald-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-emerald-700 transition">Coba Lagi</button>
                 `;
             }
@@ -184,6 +173,7 @@
         }
 
         function formatContent(rawContent) {
+            // Perbaikan: Memastikan karakter dipisah dengan '\n' (newline), bukan string '\\n'
             return rawContent.split('\n')
                 .map(line => line.trim())
                 .filter(line => line !== '')
@@ -268,6 +258,5 @@
 
         document.addEventListener('DOMContentLoaded', fetchNotulen);
     </script>
-
 </body>
 </html>
