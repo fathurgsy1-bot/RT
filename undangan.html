@@ -274,7 +274,7 @@
 
     <div class="header-title">
         <h1>Generator Undangan RT</h1>
-        <p>Silakan isi data di bawah ini, lalu klik tombol untuk mengunduh PDF</p>
+        <p>Silakan isi data di bawah ini, data otomatis tersimpan ke Spreadsheet saat mencetak</p>
     </div>
 
     <div class="container">
@@ -320,7 +320,6 @@
             <div class="paper" id="surat-undangan">
                 <div class="kop-surat-container">
                     <img id="out-logo" src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Lambang_Kota_Semarang.png/400px-Lambang_Kota_Semarang.png" alt="Logo Pemkot" class="kop-surat-logo">
-                    
                     <div class="kop-surat-text">
                         <div class="baris-1">PEMERINTAH KOTA SEMARANG</div>
                         <div class="baris-2">KEC. TEMBALANG KEL. METESEH</div>
@@ -390,9 +389,7 @@ Dinar Indah Meteseh di SEMARANG</div>
 
                 <div class="tanda-tangan">
                     <p>Hormat kami, RT 04 RW XXVI</p>
-                    
                     <img id="out-ttd" src="https://upload.wikimedia.org/wikipedia/commons/f/f6/Signature_of_John_Hancock.png" alt="Tanda Tangan" class="img-ttd">
-                    
                     <div class="nama-ttd">GATOT ENDRO YUDO EDI WIBOWO</div>
                 </div>
             </div>
@@ -408,8 +405,36 @@ Dinar Indah Meteseh di SEMARANG</div>
             document.getElementById('out-tempat').innerText = document.getElementById('input-tempat').value;
         }
 
+        function simpanKeSpreadsheet() {
+            // GANTI DENGAN URL WEB APP ANDA SETELAH MENGIKUTI LANGKAH BERIKUTNYA
+            const KODE_URL_WEB_APP = "TULIS_URL_WEB_APP_ANDA_DISINI"; 
+            
+            if(KODE_URL_WEB_APP === "TULIS_URL_WEB_APP_ANDA_DISINI") {
+                console.log("URL Spreadsheet Web App belum dikonfigurasi.");
+                return;
+            }
+
+            const dataData = {
+                tanggal_pembuatan: document.getElementById('input-tgl-surat').value,
+                nomor_surat: document.getElementById('input-nomor').value,
+                hari_tanggal: document.getElementById('input-hari-tgl').value,
+                waktu_acara: document.getElementById('input-waktu').value,
+                tempat_acara: document.getElementById('input-tempat').value
+            };
+
+            fetch(KODE_URL_WEB_APP, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(dataData)
+            })
+            .then(() => console.log('Data berhasil dicatat ke spreadsheet.'))
+            .catch(error => console.error('Gagal menyimpan:', error));
+        }
+
         function downloadPDF() {
             updateSurat();
+            simpanKeSpreadsheet(); // Otomatis mengirim data ke Spreadsheet saat tombol ditekan
             window.print();
         }
     </script>
