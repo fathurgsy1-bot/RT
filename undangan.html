@@ -405,15 +405,10 @@ Dinar Indah Meteseh di SEMARANG</div>
             document.getElementById('out-tempat').innerText = document.getElementById('input-tempat').value;
         }
 
-        function simpanKeSpreadsheet() {
-            // GANTI DENGAN URL WEB APP ANDA SETELAH MENGIKUTI LANGKAH BERIKUTNYA
+        async function simpanKeSpreadsheet() {
+            // URL Web App Google Apps Script Anda
             const KODE_URL_WEB_APP = "https://script.google.com/macros/s/AKfycbxXP4F2t_6k-fdgOFPkXBeOk1GW_n5iAc8q4-LVaZPbfo92pRDn-wTLnWfWX9mNn2o11A/exec"; 
             
-            if(KODE_URL_WEB_APP === "https://script.google.com/macros/s/AKfycbxXP4F2t_6k-fdgOFPkXBeOk1GW_n5iAc8q4-LVaZPbfo92pRDn-wTLnWfWX9mNn2o11A/exec") {
-                console.log("URL Spreadsheet Web App belum dikonfigurasi.");
-                return;
-            }
-
             const dataData = {
                 tanggal_pembuatan: document.getElementById('input-tgl-surat').value,
                 nomor_surat: document.getElementById('input-nomor').value,
@@ -422,21 +417,48 @@ Dinar Indah Meteseh di SEMARANG</div>
                 tempat_acara: document.getElementById('input-tempat').value
             };
 
-            fetch(KODE_URL_WEB_APP, {
+            // Menggunakan return fetch agar prosesnya bisa ditunggu (await)
+            return fetch(KODE_URL_WEB_APP, {
                 method: 'POST',
                 mode: 'no-cors',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(dataData)
-            })
-            .then(() => console.log('Data berhasil dicatat ke spreadsheet.'))
-            .catch(error => console.error('Gagal menyimpan:', error));
+            });
         }
 
-        function downloadPDF() {
-            updateSurat();
-            simpanKeSpreadsheet(); // Otomatis mengirim data ke Spreadsheet saat tombol ditekan
-            window.print();
+        async function downloadPDF() {
+            const btn = document.querySelector('.download-btn');
+            const originalText = btn.innerHTML;
+            
+            try {
+                // 1. Update teks di tampilan kertas
+                updateSurat();
+                
+                // 2. Beri indikator loading agar user tahu sedang menyimpan
+                btn.innerHTML = '⏳ Menyimpan ke Spreadsheet...';
+                btn.disabled = true;
+
+                // 3. Tunggu data dikirim ke spreadsheet
+                await simpanKeSpreadsheet(); 
+                console.log('Pengiriman ke spreadsheet selesai.');
+                
+                // 4. Kembalikan teks tombol
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+                
+                // 5. Buka jendela Print/Download PDF
+                window.print();
+                
+            } catch (error) {
+                console.error('Gagal memproses:', error);
+                alert('Terjadi kesalahan saat menyimpan data. Silakan coba lagi.');
+                
+                // Kembalikan tombol jika error
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
         }
     </script>
+
 </body>
 </html>
