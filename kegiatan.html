@@ -36,8 +36,8 @@
   </div>
 
   <script>
-    // ⚠️ GANTI STRING DI BAWAH INI DENGAN URL WEB APP DARI GOOGLE APPS SCRIPT ANDA
-    const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxKwWu0g7nOvFlMpNTc8VMoipGsI_77_fBu198JcqHhlauoNCFCbBsmVo9fRzIwlETp/exec,;
+    // ✅ Typo pada URL sudah diperbaiki dengan menambahkan tanda kutip penutup
+    const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxKwWu0g7nOvFlMpNTc8VMoipGsI_77_fBu198JcqHhlauoNCFCbBsmVo9fRzIwlETp/exec';
 
     function handleFormSubmit(event) {
       event.preventDefault();
@@ -86,7 +86,7 @@
           submitBtn.innerText = 'Kirim Data';
           statusDiv.classList.remove('bg-blue-100', 'text-blue-700');
           
-          // Memeriksa status dari Apps Script (mengacu pada kode doPost sebelumnya)
+          // Memeriksa status dari Apps Script
           if(data.status === "Sukses") {
             statusDiv.classList.add('bg-green-100', 'text-green-700');
             statusDiv.innerText = data.pesan;
