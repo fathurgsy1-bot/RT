@@ -51,7 +51,7 @@
             border-radius: 16px;
             box-shadow: 0 10px 25px rgba(16, 42, 67, 0.08);
             width: 100%;
-            max-width: 550px;
+            max-width: 500px;
             border: 1px solid #e1e8ef;
         }
 
@@ -65,15 +65,6 @@
             display: flex;
             align-items: center;
             gap: 10px;
-        }
-
-        .form-row {
-            display: flex;
-            gap: 15px;
-        }
-
-        .form-row .form-group {
-            flex: 1;
         }
 
         .form-group {
@@ -90,7 +81,7 @@
             letter-spacing: 0.5px;
         }
 
-        .form-group input, .form-group textarea {
+        .form-group input {
             width: 100%;
             padding: 14px 15px;
             border: 2px solid #d9e2ec;
@@ -102,30 +93,10 @@
             transition: all 0.2s ease;
         }
 
-        .form-group textarea {
-            resize: vertical;
-            min-height: 80px;
-        }
-
-        .form-group input:focus, .form-group textarea:focus {
+        .form-group input:focus {
             outline: none;
             border-color: #3e90ff;
             box-shadow: 0 0 0 3px rgba(62, 144, 255, 0.15);
-        }
-
-        .section-subtitle {
-            font-size: 0.95rem;
-            font-weight: 700;
-            color: #486581;
-            margin: 25px 0 15px 0;
-            padding-bottom: 5px;
-            border-bottom: 1px dashed #d9e2ec;
-        }
-
-        .divider {
-            height: 1px;
-            background-color: #d9e2ec;
-            margin: 30px 0;
         }
 
         button.download-btn {
@@ -144,7 +115,7 @@
             align-items: center;
             gap: 10px;
             box-shadow: 0 4px 10px rgba(38, 128, 235, 0.3);
-            margin-top: 10px;
+            margin-top: 15px;
         }
 
         button.download-btn:hover {
@@ -303,69 +274,36 @@
 
     <div class="header-title">
         <h1>Generator Undangan RT</h1>
-        <p>Sesuaikan data variabel di bawah ini, lalu klik tombol untuk mengunduh PDF</p>
+        <p>Silakan isi data di bawah ini, lalu klik tombol untuk mengunduh PDF</p>
     </div>
 
     <div class="container">
         <div class="controls">
-            <h2>⚙️ Data Variabel Surat</h2>
+            <h2>⚙️ Variabel Input</h2>
             
-            <div class="section-subtitle">1. Penomoran & Tanggal Surat</div>
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="input-tgl-surat">Tanggal Pembuatan</label>
-                    <input type="text" id="input-tgl-surat" value="Semarang, 3 Februari 2026" oninput="updateSurat()">
-                </div>
-                <div class="form-group">
-                    <label for="input-nomor">Nomor Surat</label>
-                    <input type="text" id="input-nomor" value="02/RT.04/XXVI/02/2026" oninput="updateSurat()">
-                </div>
-            </div>
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="input-lampiran">Lampiran</label>
-                    <input type="text" id="input-lampiran" value="-" oninput="updateSurat()">
-                </div>
-                <div class="form-group">
-                    <label for="input-hal">Hal / Perihal</label>
-                    <input type="text" id="input-hal" value="UNDANGAN" oninput="updateSurat()">
-                </div>
-            </div>
-
-            <div class="section-subtitle">2. Penerima / Tujuan</div>
             <div class="form-group">
-                <label for="input-tujuan">Kepada Yth.</label>
-                <textarea id="input-tujuan" oninput="updateSurat()">Kepada Yth.:
-Bapak-Bapak RT 04 RW 026 Cluster
-Dinar Indah Meteseh di SEMARANG</textarea>
+                <label for="input-tgl-surat">Tanggal Pembuatan</label>
+                <input type="text" id="input-tgl-surat" value="Semarang, 3 Februari 2026" oninput="updateSurat()">
             </div>
 
-            <div class="section-subtitle">3. Agenda Acara</div>
+            <div class="form-group">
+                <label for="input-nomor">Nomor Surat</label>
+                <input type="text" id="input-nomor" value="02/RT.04/XXVI/02/2026" oninput="updateSurat()">
+            </div>
+
             <div class="form-group">
                 <label for="input-hari-tgl">Hari / Tanggal</label>
                 <input type="text" id="input-hari-tgl" value="Sabtu, 7 Februari 2026" oninput="updateSurat()">
             </div>
+
             <div class="form-group">
-                <label for="input-waktu">Waktu</label>
+                <label for="input-waktu">Waktu Acara</label>
                 <input type="text" id="input-waktu" value="Pukul 19.30 – 21.00 WIB" oninput="updateSurat()">
             </div>
-            <div class="form-group">
-                <label for="input-tempat">Tempat</label>
-                <input type="text" id="input-tempat" value="Bapak Endy (4D No.4)" oninput="updateSurat()">
-            </div>
-            <div class="form-group">
-                <label for="input-acara">Acara</label>
-                <input type="text" id="input-acara" value="Pertemuan Rutin Warga RT 04 RW 026" oninput="updateSurat()">
-            </div>
 
-            <div class="section-subtitle">4. Penandatangan</div>
             <div class="form-group">
-                <label for="input-jabatan-ttd">Jabatan Pengirim</label>
-                <input type="text" id="input-jabatan-ttd" value="Hormat kami, RT 04 RW XXVI" oninput="updateSurat()">
-            </div>
-            <div class="form-group">
-                <label for="input-nama-ttd">Nama Lengkap</label>
-                <input type="text" id="input-nama-ttd" value="GATOT ENDRO YUDO EDI WIBOWO" oninput="updateSurat()">
+                <label for="input-tempat">Tempat Acara</label>
+                <input type="text" id="input-tempat" value="Bapak Endy (4D No.4)" oninput="updateSurat()">
             </div>
 
             <button class="download-btn" onclick="downloadPDF()">
@@ -402,12 +340,12 @@ Dinar Indah Meteseh di SEMARANG</textarea>
                             <tr>
                                 <td>Lamp.</td>
                                 <td>:</td>
-                                <td><span id="out-lampiran">-</span></td>
+                                <td>-</td>
                             </tr>
                             <tr>
                                 <td>Hal.</td>
                                 <td>:</td>
-                                <td><span id="out-hal">UNDANGAN</span></td>
+                                <td>UNDANGAN</td>
                             </tr>
                         </table>
                     </div>
@@ -443,7 +381,7 @@ Dinar Indah Meteseh di SEMARANG</div>
                         <tr>
                             <td>Acara</td>
                             <td>:</td>
-                            <td id="out-acara">Pertemuan Rutin Warga RT 04 RW 026</td>
+                            <td>Pertemuan Rutin Warga RT 04 RW 026</td>
                         </tr>
                     </table>
 
@@ -451,11 +389,11 @@ Dinar Indah Meteseh di SEMARANG</div>
                 </div>
 
                 <div class="tanda-tangan">
-                    <p id="out-jabatan-ttd">Hormat kami, RT 04 RW XXVI</p>
+                    <p>Hormat kami, RT 04 RW XXVI</p>
                     
                     <img id="out-ttd" src="https://upload.wikimedia.org/wikipedia/commons/f/f6/Signature_of_John_Hancock.png" alt="Tanda Tangan" class="img-ttd">
                     
-                    <div class="nama-ttd" id="out-nama-ttd">GATOT ENDRO YUDO EDI WIBOWO</div>
+                    <div class="nama-ttd">GATOT ENDRO YUDO EDI WIBOWO</div>
                 </div>
             </div>
         </div>
@@ -465,15 +403,9 @@ Dinar Indah Meteseh di SEMARANG</div>
         function updateSurat() {
             document.getElementById('out-tgl-surat').innerText = document.getElementById('input-tgl-surat').value;
             document.getElementById('out-nomor').innerText = document.getElementById('input-nomor').value;
-            document.getElementById('out-lampiran').innerText = document.getElementById('input-lampiran').value;
-            document.getElementById('out-hal').innerText = document.getElementById('input-hal').value;
-            document.getElementById('out-tujuan').innerText = document.getElementById('input-tujuan').value;
             document.getElementById('out-hari-tgl').innerText = document.getElementById('input-hari-tgl').value;
             document.getElementById('out-waktu').innerText = document.getElementById('input-waktu').value;
             document.getElementById('out-tempat').innerText = document.getElementById('input-tempat').value;
-            document.getElementById('out-acara').innerText = document.getElementById('input-acara').value;
-            document.getElementById('out-jabatan-ttd').innerText = document.getElementById('input-jabatan-ttd').value;
-            document.getElementById('out-nama-ttd').innerText = document.getElementById('input-nama-ttd').value;
         }
 
         function downloadPDF() {
