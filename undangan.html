@@ -51,7 +51,7 @@
             border-radius: 16px;
             box-shadow: 0 10px 25px rgba(16, 42, 67, 0.08);
             width: 100%;
-            max-width: 600px;
+            max-width: 550px;
             border: 1px solid #e1e8ef;
         }
 
@@ -107,11 +107,6 @@
             min-height: 80px;
         }
 
-        .form-group input[type="file"] {
-            padding: 10px;
-            font-size: 0.9rem;
-        }
-
         .form-group input:focus, .form-group textarea:focus {
             outline: none;
             border-color: #3e90ff;
@@ -119,7 +114,7 @@
         }
 
         .section-subtitle {
-            font-size: 1rem;
+            font-size: 0.95rem;
             font-weight: 700;
             color: #486581;
             margin: 25px 0 15px 0;
@@ -308,18 +303,14 @@
 
     <div class="header-title">
         <h1>Generator Undangan RT</h1>
-        <p>Sesuaikan seluruh komponen input di bawah ini, lalu klik Cetak untuk mengunduh PDF</p>
+        <p>Sesuaikan data variabel di bawah ini, lalu klik tombol untuk mengunduh PDF</p>
     </div>
 
     <div class="container">
         <div class="controls">
-            <h2>⚙️ Konfigurasi Surat Lengkap</h2>
+            <h2>⚙️ Data Variabel Surat</h2>
             
-            <div class="section-subtitle">1. Header & Identitas File</div>
-            <div class="form-group">
-                <label for="input-logo">Ganti Gambar Logo Kop</label>
-                <input type="file" id="input-logo" accept="image/*" onchange="updateImage(this, 'out-logo')">
-            </div>
+            <div class="section-subtitle">1. Penomoran & Tanggal Surat</div>
             <div class="form-row">
                 <div class="form-group">
                     <label for="input-tgl-surat">Tanggal Pembuatan</label>
@@ -341,7 +332,7 @@
                 </div>
             </div>
 
-            <div class="section-subtitle">2. Tujuan Surat</div>
+            <div class="section-subtitle">2. Penerima / Tujuan</div>
             <div class="form-group">
                 <label for="input-tujuan">Kepada Yth.</label>
                 <textarea id="input-tujuan" oninput="updateSurat()">Kepada Yth.:
@@ -349,7 +340,7 @@ Bapak-Bapak RT 04 RW 026 Cluster
 Dinar Indah Meteseh di SEMARANG</textarea>
             </div>
 
-            <div class="section-subtitle">3. Detail Pelaksanaan Acara</div>
+            <div class="section-subtitle">3. Agenda Acara</div>
             <div class="form-group">
                 <label for="input-hari-tgl">Hari / Tanggal</label>
                 <input type="text" id="input-hari-tgl" value="Sabtu, 7 Februari 2026" oninput="updateSurat()">
@@ -367,14 +358,10 @@ Dinar Indah Meteseh di SEMARANG</textarea>
                 <input type="text" id="input-acara" value="Pertemuan Rutin Warga RT 04 RW 026" oninput="updateSurat()">
             </div>
 
-            <div class="section-subtitle">4. Penandatangan (Kaki Surat)</div>
+            <div class="section-subtitle">4. Penandatangan</div>
             <div class="form-group">
-                <label for="input-jabatan-ttd">Jabatan / Bagian</label>
+                <label for="input-jabatan-ttd">Jabatan Pengirim</label>
                 <input type="text" id="input-jabatan-ttd" value="Hormat kami, RT 04 RW XXVI" oninput="updateSurat()">
-            </div>
-            <div class="form-group">
-                <label for="input-ttd">Ganti Gambar Tanda Tangan (TTD)</label>
-                <input type="file" id="input-ttd" accept="image/*" onchange="updateImage(this, 'out-ttd')">
             </div>
             <div class="form-group">
                 <label for="input-nama-ttd">Nama Lengkap</label>
@@ -487,17 +474,6 @@ Dinar Indah Meteseh di SEMARANG</div>
             document.getElementById('out-acara').innerText = document.getElementById('input-acara').value;
             document.getElementById('out-jabatan-ttd').innerText = document.getElementById('input-jabatan-ttd').value;
             document.getElementById('out-nama-ttd').innerText = document.getElementById('input-nama-ttd').value;
-        }
-
-        // Fungsi membaca file gambar lokal dan memasukkannya ke template cetak
-        function updateImage(input, targetId) {
-            if (input.files && input.files[0]) {
-                var reader = new FileReader();
-                reader.onload = function (e) {
-                    document.getElementById(targetId).src = e.target.result;
-                }
-                reader.readAsDataURL(input.files[0]);
-            }
         }
 
         function downloadPDF() {
