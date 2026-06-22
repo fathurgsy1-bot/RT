@@ -98,13 +98,13 @@
         <p>&copy; 2026 RT 04 RW 26 Meteseh, Tembalang, Kota Semarang.</p>
     </footer>
 
-    <script>
+       <script>
         // Google Doc ID
         const docId = '1-iCZxa5gO_akITHhmEBM7cBYrT4xQMuDZ7qe0saG5z4';
         const docUrl = `https://docs.google.com/document/d/${docId}/export?format=txt`;
         
-        // Perbaikan: Menggunakan corsproxy.io yang lebih stabil untuk raw text
-        const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(docUrl)}`;
+        // Perbaikan 1: Menggunakan AllOrigins yang umumnya lebih stabil daripada corsproxy.io
+        const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(docUrl)}`;
 
         let allNotulen = [];
 
@@ -120,6 +120,13 @@
                 if (!response.ok) throw new Error("Gagal mengambil data doc");
                 
                 const text = await response.text();
+                
+                // Perbaikan 2: Validasi pencegahan error jika dokumen disetel ke 'Private'
+                // Jika private, Google akan merespons dengan HTML halaman login, bukan teks notulen.
+                if (text.trim().toLowerCase().startsWith('<!doctype html>') || text.includes('<html')) {
+                    throw new Error("Akses ditolak. Dokumen tidak bersifat publik.");
+                }
+
                 parseAndRenderNotulen(text);
                 
                 loader.style.display = 'none';
@@ -173,7 +180,6 @@
         }
 
         function formatContent(rawContent) {
-            // Perbaikan: Memastikan karakter dipisah dengan '\n' (newline), bukan string '\\n'
             return rawContent.split('\n')
                 .map(line => line.trim())
                 .filter(line => line !== '')
