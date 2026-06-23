@@ -4,256 +4,72 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SI-WARGA 2026 | Notulen Pertemuan</title>
-
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
-    
     <style>
-        .glass { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.3); }
-        .hover-card { transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        .hover-card:hover { transform: translateY(-10px); }
-
-        :root {
-            --primary: #008585;
-            --bg-color: #f3f4f6;
-            --surface: #ffffff;
-            --text-main: #111827;
-            --text-muted: #6b7280;
-            --border-color: #e5e7eb;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Plus Jakarta Sans', sans-serif;
-        }
-
-        .custom-scroll::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        .custom-scroll::-webkit-scrollbar-thumb {
-            background-color: #cbd5e1;
-            border-radius: 4px;
-        }
-        .custom-scroll::-webkit-scrollbar-track {
-            background-color: #f1f5f9;
-        }
+        .custom-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scroll::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 4px; }
     </style>
 </head>
-
 <body class="bg-gray-50 text-gray-900 flex flex-col min-h-screen">
 
-    <nav class="fixed top-0 left-0 right-0 bg-white/90 backdrop-blur-md shadow-sm z-50 border-b border-gray-100 py-3 md:py-0">
-        <div class="max-w-6xl mx-auto px-4 min-h-[4rem] flex flex-col md:flex-row items-center justify-between gap-3 md:gap-0">
-            <div class="flex items-center gap-2">
-                <span class="text-xl font-bold text-emerald-600 tracking-tight">SI-WARGA</span>
-                <span class="bg-emerald-100 text-emerald-800 text-xs font-semibold px-2 py-0.5 rounded">RT. 04 - RW. 26</span>
-            </div>
-            <div class="flex flex-wrap justify-center gap-4 md:gap-6 font-medium text-sm">
-                <a href="index.html#beranda" class="text-gray-600 hover:text-emerald-600 transition-colors">Beranda</a>
-                <a href="index.html#jadwal-pertemuan" class="text-gray-600 hover:text-emerald-600 transition-colors">Pertemuan</a>
-                <a href="notulen.html" class="text-emerald-600 font-bold hover:text-emerald-700 transition-colors">Notulen</a>
-                <a href="index.html#data-warga" class="text-gray-600 hover:text-emerald-600 transition-colors">Data</a>
-                <a href="index.html#rencana-bo-2026" class="text-gray-600 hover:text-emerald-600 transition-colors">BO 2026</a>
-                <a href="index.html#kas-warga" class="text-gray-600 hover:text-emerald-600 transition-colors">Kas</a>
-                <a href="index.html#tunggakan-warga" class="text-gray-600 hover:text-emerald-600 transition-colors">Tunggakan</a>
-                <a href="index.html#iuran-bulan-ini" class="text-gray-600 hover:text-emerald-600 transition-colors">Iuran</a>
-            </div>
+    <nav class="fixed top-0 left-0 right-0 bg-white/90 backdrop-blur-md shadow-sm z-50 border-b border-gray-100 py-3">
+        <div class="max-w-6xl mx-auto px-4 flex items-center justify-between">
+            <span class="text-xl font-bold text-emerald-600">SI-WARGA</span>
         </div>
     </nav>
 
     <header class="pt-32 pb-16 bg-emerald-900 text-white rounded-b-[3rem]">
         <div class="max-w-6xl mx-auto px-6 text-center">
-            <div class="inline-block p-3 bg-emerald-800 rounded-2xl mb-4 text-emerald-300">
-                <i class="fas fa-book-open text-3xl"></i>
-            </div>
-            <h2 class="text-4xl md:text-5xl font-extrabold mb-4">Arsip Notulen Rapat</h2>
-            <p class="text-emerald-200 text-lg max-w-2xl mx-auto">Catatan hasil pertemuan dan keputusan warga yang diperbarui secara otomatis dari arsip Google Docs.</p>
+            <h2 class="text-4xl font-extrabold mb-4">Arsip Notulen Rapat</h2>
         </div>
     </header>
 
     <section class="max-w-4xl mx-auto px-6 -mt-8 relative z-10 pb-24 flex-1 w-full">
-        
-        <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 mb-8 flex items-center gap-3">
-            <i class="fas fa-search text-gray-400 pl-2"></i>
-            <input type="text" id="search-notulen" placeholder="Cari notulen berdasarkan bulan (misal: Juni)..." class="w-full bg-transparent border-none focus:outline-none text-sm" onkeyup="filterNotulen()">
-            <button onclick="fetchNotulen()" class="bg-emerald-100 text-emerald-600 px-4 py-2 rounded-lg text-xs font-bold hover:bg-emerald-200 transition whitespace-nowrap">
-                <i class="fas fa-sync-alt mr-1"></i> Refresh
-            </button>
-        </div>
-
         <div id="loader-notulen" class="flex flex-col items-center justify-center py-16 bg-white rounded-3xl shadow-xl border border-gray-100">
             <div class="w-12 h-12 border-4 border-gray-200 border-t-emerald-600 rounded-full animate-spin mb-4"></div>
-            <p class="text-gray-500 font-medium animate-pulse">Sinkronisasi data dari dokumen...</p>
+            <p class="text-gray-500 font-medium">Sinkronisasi data...</p>
         </div>
-
-        <div class="space-y-4" id="accordion-container" style="display: none;">
-        </div>
+        <div class="space-y-4" id="accordion-container" style="display: none;"></div>
     </section>
 
-    <footer class="bg-gray-900 text-gray-400 py-6 md:py-8 border-t border-gray-800 text-center text-xs md:text-sm mt-auto">
-        <p>&copy; 2026 RT 04 RW 26 Meteseh, Tembalang, Kota Semarang.</p>
-    </footer>
-
     <script>
-        // Google Doc ID
-        const docId = '1-iCZxa5gO_akITHhmEBM7cBYrT4xQMuDZ7qe0saG5z4';
-        const docUrl = `https://docs.google.com/document/d/${docId}/export?format=txt`;
-        
-        // Perbaikan: Menggunakan corsproxy.io yang lebih stabil untuk raw text
-        const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(docUrl)}`;
-
-        let allNotulen = [];
+        // MASUKKAN URL DARI LANGKAH 1 DI BAWAH INI
+        const webAppUrl = 'https://script.google.com/macros/s/AKfycbw0GQw-9388iJS_-X10BinXFyfVoT9F2ZTNcjAt1XORUKX3CRktRVpJE5DBZUuqZaHJ/exec'; 
 
         async function fetchNotulen() {
-            const loader = document.getElementById('loader-notulen');
-            const container = document.getElementById('accordion-container');
-            
-            loader.style.display = 'flex';
-            container.style.display = 'none';
-
             try {
-                const response = await fetch(proxyUrl, { cache: "no-store" });
-                if (!response.ok) throw new Error("Gagal mengambil data doc");
-                
+                const response = await fetch(webAppUrl);
                 const text = await response.text();
                 parseAndRenderNotulen(text);
-                
-                loader.style.display = 'none';
-                container.style.display = 'block';
+                document.getElementById('loader-notulen').style.display = 'none';
+                document.getElementById('accordion-container').style.display = 'block';
             } catch (error) {
-                console.error('Error fetching doc:', error);
-                loader.innerHTML = `
-                    <div class="text-red-500 text-4xl mb-3"><i class="fas fa-exclamation-triangle"></i></div>
-                    <p class="text-gray-700 font-bold">Gagal memuat notulen.</p>
-                    <p class="text-sm text-gray-500 text-center max-w-sm mt-2">Pastikan pengaturan dokumen Google Doc diatur ke <strong>"Siapa saja yang memiliki link"</strong>.</p>
-                    <button onclick="fetchNotulen()" class="mt-4 bg-emerald-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-emerald-700 transition">Coba Lagi</button>
-                `;
+                console.error('Error:', error);
+                document.getElementById('loader-notulen').innerHTML = '<p class="text-red-500">Gagal memuat data.</p>';
             }
         }
 
         function parseAndRenderNotulen(text) {
-            // Regex mencari pola awalan nomor dan bulan. (Contoh: "1.  Juni 2026")
+            // Logika parsing disesuaikan dengan format teks Anda
             const regex = /^(\d+)\.\s+(.+)$/gm;
-            
-            let match;
-            let sections = [];
-            let lastIndex = 0;
+            let match, sections = [], lastIndex = 0;
             
             while ((match = regex.exec(text)) !== null) {
-                if (sections.length > 0) {
-                    sections[sections.length - 1].content = text.substring(lastIndex, match.index).trim();
-                }
-                
-                sections.push({
-                    id: match[1],
-                    title: match[2].trim(),
-                    content: ''
-                });
+                if (sections.length > 0) sections[sections.length - 1].content = text.substring(lastIndex, match.index).trim();
+                sections.push({ id: match[1], title: match[2].trim(), content: '' });
                 lastIndex = regex.lastIndex;
             }
-            
-            if (sections.length > 0) {
-                 sections[sections.length - 1].content = text.substring(lastIndex).trim();
-            }
+            if (sections.length > 0) sections[sections.length - 1].content = text.substring(lastIndex).trim();
 
-            if (sections.length === 0) {
-                sections.push({
-                    id: "1",
-                    title: "Catatan Tunggal",
-                    content: text.trim() || "Dokumen belum memiliki catatan apa pun."
-                });
-            }
-
-            allNotulen = sections;
-            renderAccordion(sections);
-        }
-
-        function formatContent(rawContent) {
-            // Perbaikan: Memastikan karakter dipisah dengan '\n' (newline), bukan string '\\n'
-            return rawContent.split('\n')
-                .map(line => line.trim())
-                .filter(line => line !== '')
-                .map(line => {
-                    if (line.includes(':')) {
-                        const idx = line.indexOf(':');
-                        const prefix = line.substring(0, idx + 1);
-                        const suffix = line.substring(idx + 1);
-                        return `<p class="mb-3 text-gray-700 leading-relaxed"><strong class="text-gray-900">${prefix}</strong>${suffix}</p>`;
-                    }
-                    return `<p class="mb-3 text-gray-700 leading-relaxed">${line}</p>`;
-                })
-                .join('');
-        }
-
-        function renderAccordion(sections) {
             const container = document.getElementById('accordion-container');
-            
-            if (sections.length === 0) {
-                container.innerHTML = '<p class="text-center text-gray-500 py-10">Belum ada data notulen.</p>';
-                return;
-            }
-            
-            let html = '';
-            const sortedSections = [...sections].reverse(); 
-            
-            sortedSections.forEach((sec, index) => {
-                const isFirst = index === 0; 
-                const contentHtml = formatContent(sec.content);
-                
-                html += `
-                <div class="notulen-item bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden" data-title="${sec.title.toLowerCase()}">
-                    <button onclick="toggleNotulen('notulen-${sec.id}')" class="w-full p-5 flex justify-between items-center bg-gray-50 hover:bg-emerald-50 transition-colors text-left group">
-                        <div class="flex items-center gap-4">
-                            <div class="w-10 h-10 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold text-lg group-hover:scale-110 transition-transform">
-                                ${sec.id}
-                            </div>
-                            <span class="font-bold text-lg text-gray-800">${sec.title}</span>
-                        </div>
-                        <i id="icon-notulen-${sec.id}" class="fas fa-chevron-${isFirst ? 'up' : 'down'} text-gray-400 transition-transform duration-300"></i>
-                    </button>
-                    <div id="notulen-${sec.id}" class="p-6 border-t border-gray-100 ${isFirst ? '' : 'hidden'} bg-white">
-                        <div class="prose prose-emerald max-w-none text-sm md:text-base">
-                            ${contentHtml}
-                        </div>
-                    </div>
+            container.innerHTML = sections.map(sec => `
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                    <h3 class="font-bold text-lg text-emerald-700">${sec.title}</h3>
+                    <div class="mt-2 text-gray-600 whitespace-pre-line">${sec.content}</div>
                 </div>
-                `;
-            });
-            
-            container.innerHTML = html;
-        }
-
-        function toggleNotulen(id) {
-            const el = document.getElementById(id);
-            const icon = document.getElementById('icon-' + id.replace('notulen-', ''));
-            
-            if (el.classList.contains('hidden')) {
-                el.classList.remove('hidden');
-                icon.classList.remove('fa-chevron-down');
-                icon.classList.add('fa-chevron-up');
-            } else {
-                el.classList.add('hidden');
-                icon.classList.remove('fa-chevron-up');
-                icon.classList.add('fa-chevron-down');
-            }
-        }
-
-        function filterNotulen() {
-            const query = document.getElementById('search-notulen').value.toLowerCase();
-            const items = document.querySelectorAll('.notulen-item');
-            
-            items.forEach(item => {
-                const title = item.getAttribute('data-title');
-                if (title.includes(query)) {
-                    item.style.display = 'block';
-                } else {
-                    item.style.display = 'none';
-                }
-            });
+            `).join('');
         }
 
         document.addEventListener('DOMContentLoaded', fetchNotulen);
