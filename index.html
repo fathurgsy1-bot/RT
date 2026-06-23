@@ -652,14 +652,16 @@
             try {
                 const response = await fetch(url);
                 const csvText = await response.text();
-                const rows = csvText.split('\n').map(row => row.split(',').map(cell => cell.replace(/"/g, '').trim()));
+                
+                // PERBAIKAN: Split CSV yang kebal terhadap tanda koma di dalam tanda kutip
+                const rows = csvText.split('\n').map(row => {
+                    return row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(cell => cell.replace(/^"|"$/g, '').trim());
+                });
                 
                 if(rows.length > 1) {
-                    // Filter baris yang memiliki nilai pada kolom "Hari / Tanggal Acara"
                     const dataRows = rows.slice(1).filter(r => r[3]); 
                     
                     const parseIndoDate = (dateStr) => {
-                        // Optimasi super kuat dengan Regex untuk mengabaikan koma dan menangkap format angka/teks
                         const cleanStr = dateStr.toLowerCase();
                         const match = cleanStr.match(/(\d{1,2})\s+([a-z]+)\s+(\d{4})/);
                         if (match) {
@@ -686,7 +688,6 @@
                         };
                     }).filter(r => r.date !== null).sort((a, b) => a.date - b.date);
 
-                    // ATURAN BARU: Tampilkan jadwal selama sebulan saat berjalan
                     const currentMonthEvents = parsedData.filter(r => 
                         r.date.getMonth() === today.getMonth() && 
                         r.date.getFullYear() === today.getFullYear()
@@ -705,7 +706,6 @@
                                 nextEvent = upcoming[1];
                             }
                         } else {
-                            // Jika semua jadwal bulan ini sudah lewat
                             currentEvent = past[past.length - 1]; 
                         }
                     }
@@ -899,7 +899,9 @@
             try {
                 const response = await fetch(url);
                 const csvText = await response.text();
-                const cleanRows = csvText.split('\n').map(row => row.split(',').map(cell => cell.replace(/"/g, '').trim()));
+                
+                // PERBAIKAN: Split CSV yang kebal terhadap koma
+                const cleanRows = csvText.split('\n').map(row => row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(cell => cell.replace(/^"|"$/g, '').trim()));
                       
                 document.getElementById('total-warga-display').textContent = cleanRows.length - 1;
 
@@ -940,7 +942,9 @@
             try {
                 const response = await fetch(url);
                 const csvText = await response.text();
-                const rows = csvText.split('\n').map(row => row.split(',').map(cell => cell.replace(/"/g, '').trim()));
+                
+                // PERBAIKAN: Split CSV yang kebal terhadap koma
+                const rows = csvText.split('\n').map(row => row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(cell => cell.replace(/^"|"$/g, '').trim()));
                 const dataRows = rows.filter(row => row.length >= 6 && row[2] !== "");
                 
                 if (dataRows.length > 0) {
@@ -986,7 +990,9 @@
             try {
                 const response = await fetch(url);
                 const csvText = await response.text();
-                const rows = csvText.split('\n').map(row => row.split(',').map(cell => cell.replace(/"/g, '').trim()));
+                
+                // PERBAIKAN: Split CSV yang kebal terhadap koma
+                const rows = csvText.split('\n').map(row => row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(cell => cell.replace(/^"|"$/g, '').trim()));
                 allData = rows.filter(row => row.length >= 6 && row[2] !== "");
                 renderRekap();
             } catch (err) {
@@ -1053,7 +1059,9 @@
             try {
                 const response = await fetch(url);
                 const csvText = await response.text();
-                const rows = csvText.split('\n').map(row => row.split(',').map(cell => cell.replace(/"/g, '').trim()));
+                
+                // PERBAIKAN: Split CSV yang kebal terhadap koma
+                const rows = csvText.split('\n').map(row => row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(cell => cell.replace(/^"|"$/g, '').trim()));
 
                 if (rows.length < 1 || rows[0].length === 0) {
                     container.innerHTML = '<p class="text-gray-400 py-6 text-center">Data kosong atau gagal dimuat.</p>';
@@ -1135,7 +1143,9 @@
             try {
                 const response = await fetch(url);
                 const csvText = await response.text();
-                const rows = csvText.split('\n').map(row => row.split(',').map(cell => cell.replace(/"/g, '').trim()));
+                
+                // PERBAIKAN: Split CSV yang kebal terhadap koma
+                const rows = csvText.split('\n').map(row => row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(cell => cell.replace(/^"|"$/g, '').trim()));
                 
                 if(rows.length > 0) {
                     const headers = rows[0].map(h => h.toLowerCase());
@@ -1252,7 +1262,9 @@
             try {
                 const response = await fetch(url);
                 const csvText = await response.text();
-                const rows = csvText.split('\n').map(row => row.split(',').map(cell => cell.replace(/"/g, '').trim()));
+                
+                // PERBAIKAN: Split CSV yang kebal terhadap koma
+                const rows = csvText.split('\n').map(row => row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(cell => cell.replace(/^"|"$/g, '').trim()));
                 
                 if (rows.length <= 1) return;
 
