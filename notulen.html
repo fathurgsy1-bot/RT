@@ -1,78 +1,50 @@
 <!DOCTYPE html>
-<html lang="id" class="scroll-smooth">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SI-WARGA 2026 | Notulen Pertemuan</title>
+    <title>SI-WARGA 2026</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
-    <style>
-        .custom-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
-        .custom-scroll::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 4px; }
-    </style>
 </head>
-<body class="bg-gray-50 text-gray-900 flex flex-col min-h-screen">
-
-    <nav class="fixed top-0 left-0 right-0 bg-white/90 backdrop-blur-md shadow-sm z-50 border-b border-gray-100 py-3">
-        <div class="max-w-6xl mx-auto px-4 flex items-center justify-between">
-            <span class="text-xl font-bold text-emerald-600">SI-WARGA</span>
-        </div>
-    </nav>
-
-    <header class="pt-32 pb-16 bg-emerald-900 text-white rounded-b-[3rem]">
-        <div class="max-w-6xl mx-auto px-6 text-center">
-            <h2 class="text-4xl font-extrabold mb-4">Arsip Notulen Rapat</h2>
-        </div>
-    </header>
-
-    <section class="max-w-4xl mx-auto px-6 -mt-8 relative z-10 pb-24 flex-1 w-full">
-        <div id="loader-notulen" class="flex flex-col items-center justify-center py-16 bg-white rounded-3xl shadow-xl border border-gray-100">
-            <div class="w-12 h-12 border-4 border-gray-200 border-t-emerald-600 rounded-full animate-spin mb-4"></div>
-            <p class="text-gray-500 font-medium">Sinkronisasi data...</p>
-        </div>
-        <div class="space-y-4" id="accordion-container" style="display: none;"></div>
-    </section>
+<body class="bg-gray-50 p-6">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-2xl font-bold mb-6">Arsip Notulen</h1>
+        
+        <div id="loader" class="text-center py-10">Memuat data...</div>
+        
+        <div id="data-container" class="space-y-4"></div>
+    </div>
 
     <script>
-        // MASUKKAN URL DARI LANGKAH 1 DI BAWAH INI
-        const webAppUrl = 'https://script.google.com/macros/s/AKfycbw0GQw-9388iJS_-X10BinXFyfVoT9F2ZTNcjAt1XORUKX3CRktRVpJE5DBZUuqZaHJ/exec'; 
+        // GANTI DENGAN URL WEB APP ANDA
+        const WEB_APP_URL = 'PASTE_URL_WEB_APP_ANDA_DISINI';
 
-        async function fetchNotulen() {
+        async function loadData() {
             try {
-                const response = await fetch(webAppUrl);
+                const response = await fetch(WEB_APP_URL);
+                if (!response.ok) throw new Error('Gagal akses server');
                 const text = await response.text();
-                parseAndRenderNotulen(text);
-                document.getElementById('loader-notulen').style.display = 'none';
-                document.getElementById('accordion-container').style.display = 'block';
-            } catch (error) {
-                console.error('Error:', error);
-                document.getElementById('loader-notulen').innerHTML = '<p class="text-red-500">Gagal memuat data.</p>';
+                
+                renderData(text);
+                document.getElementById('loader').style.display = 'none';
+            } catch (err) {
+                document.getElementById('loader').innerHTML = 'Gagal memuat. Pastikan URL Web App benar.';
+                console.error(err);
             }
         }
 
-        function parseAndRenderNotulen(text) {
-            // Logika parsing disesuaikan dengan format teks Anda
-            const regex = /^(\d+)\.\s+(.+)$/gm;
-            let match, sections = [], lastIndex = 0;
+        function renderData(text) {
+            const container = document.getElementById('data-container');
+            // Logika dasar memecah teks berdasarkan baris baru
+            const lines = text.split('\n').filter(line => line.trim() !== '');
             
-            while ((match = regex.exec(text)) !== null) {
-                if (sections.length > 0) sections[sections.length - 1].content = text.substring(lastIndex, match.index).trim();
-                sections.push({ id: match[1], title: match[2].trim(), content: '' });
-                lastIndex = regex.lastIndex;
-            }
-            if (sections.length > 0) sections[sections.length - 1].content = text.substring(lastIndex).trim();
-
-            const container = document.getElementById('accordion-container');
-            container.innerHTML = sections.map(sec => `
-                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                    <h3 class="font-bold text-lg text-emerald-700">${sec.title}</h3>
-                    <div class="mt-2 text-gray-600 whitespace-pre-line">${sec.content}</div>
+            container.innerHTML = lines.map(line => `
+                <div class="bg-white p-4 rounded shadow border border-gray-100">
+                    <p class="text-gray-800">${line}</p>
                 </div>
             `).join('');
         }
 
-        document.addEventListener('DOMContentLoaded', fetchNotulen);
+        loadData();
     </script>
 </body>
 </html>
