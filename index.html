@@ -334,47 +334,10 @@
                 </div>
             </div>
             
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="hover-card bg-white p-6 rounded-3xl border-2 border-emerald-500 shadow-lg relative overflow-hidden group">
-                    <div class="absolute top-0 right-0 bg-emerald-500 text-white text-xs font-bold px-4 py-1.5 rounded-bl-xl z-10 animate-pulse">
-                        Tuan Rumah Bulan Ini
-                    </div>
-                    <div class="absolute -right-4 -bottom-4 text-emerald-50 opacity-50 text-8xl z-0 transition-transform group-hover:scale-110"><i class="fas fa-home"></i></div>
-                    <div class="flex items-center gap-5 relative z-10">
-                        <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center text-white text-2xl font-bold shadow-md">
-                            <i class="fas fa-user-tie"></i>
-                        </div>
-                        <div>
-                            <p class="text-sm text-emerald-600 font-bold mb-1 uppercase tracking-wider" id="label-bulan-ini">Memuat...</p>
-                            <h3 class="text-2xl font-black text-gray-800">Bapak Aris</h3>
-                            <div class="flex items-center gap-2 mt-2">
-                                <span class="bg-emerald-100 text-emerald-700 text-[10px] px-2 py-1 rounded font-bold flex items-center">
-                                    <i class="fas fa-circle text-[8px] mr-1 text-emerald-500"></i> Status: Sedang Berjalan
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="hover-card bg-white p-6 rounded-3xl border border-gray-200 shadow-sm relative overflow-hidden group opacity-90 hover:opacity-100 transition">
-                    <div class="absolute top-0 right-0 bg-gray-200 text-gray-600 text-xs font-bold px-4 py-1.5 rounded-bl-xl z-10">
-                        Persiapan Bulan Depan
-                    </div>
-                    <div class="absolute -right-4 -bottom-4 text-gray-50 opacity-50 text-8xl z-0 transition-transform group-hover:scale-110"><i class="fas fa-home"></i></div>
-                    <div class="flex items-center gap-5 relative z-10">
-                        <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-gray-300 to-gray-400 flex items-center justify-center text-white text-2xl font-bold shadow-md">
-                            <i class="fas fa-user-tie"></i>
-                        </div>
-                        <div>
-                            <p class="text-sm text-gray-500 font-bold mb-1 uppercase tracking-wider" id="label-bulan-depan">Memuat...</p>
-                            <h3 class="text-2xl font-black text-gray-800">Bapak Exwin</h3>
-                            <div class="flex items-center gap-2 mt-2">
-                                <span class="bg-gray-100 text-gray-600 text-[10px] px-2 py-1 rounded font-bold flex items-center">
-                                    <i class="fas fa-clock text-[10px] mr-1"></i> Menunggu Giliran
-                                </span>
-                            </div>
-                        </div>
-                    </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="container-jadwal">
+                <div class="col-span-full text-center text-gray-500 py-10">
+                    <i class="fas fa-circle-notch fa-spin text-2xl mb-2 text-emerald-500"></i><br/>
+                    Memuat jadwal pertemuan...
                 </div>
             </div>
         </div>
@@ -470,7 +433,7 @@
             </div>
         </div>
     </section>
-	
+    
     <section id="rekap-bo-2026" class="py-20 md:py-24 bg-white">
         <div class="max-w-6xl mx-auto px-4">
             <div class="mb-8 md:mb-12 text-center md:text-left">
@@ -576,7 +539,7 @@
         </div>
     </div>
 
-    <div id="rekap-bo-2026" class="hidden"></div> <footer class="bg-gray-900 text-gray-400 py-6 md:py-8 border-t border-gray-800 text-center text-xs md:text-sm">
+    <footer class="bg-gray-900 text-gray-400 py-6 md:py-8 border-t border-gray-800 text-center text-xs md:text-sm">
         <p>&copy; 2026 RT 04 RW 26 Meteseh, Tembalang, Kota Semarang.</p>
     </footer>
 
@@ -587,6 +550,7 @@
         const sheetIdR = '1wyr3VF5ossx6sx5MxcTu7Z6NF2T8uOph';
         const sheetIdKas = '1ogf6El0XtFyYLtPxbmVoh8CbFvUClQQBm9pIhRtlaNQ';
         const sheetIdAngsuran = '1XDTK0Gsc8cWeZtE4DroRw_-jLcozCIf-hmsYmZ3TWSU'; 
+        const sheetIdJadwal = '1-KVPBS8vv7vX1PoNssalBIbCiCO7C8qJQlA7BvTSGP8'; 
         const appScriptUrl = 'https://script.google.com/macros/s/AKfycbyhrn8PJMetrlDwOB6H4t6mXgMiVHBjRPxfZOqqu63cCgW1jYpN2cClsnzGjDFiaH98/exec';
         
         const totalPagu = 25000000; 
@@ -682,7 +646,169 @@
             el.classList.add('active');
         }
 
-        // 3. Fungsi Universal Fetch untuk Budget
+        // 3. Fungsi Fetch Jadwal Pertemuan Real-time dari Spreadsheet
+        async function fetchJadwalPertemuan() {
+            const url = `https://docs.google.com/spreadsheets/d/${sheetIdJadwal}/gviz/tq?tqx=out:csv&sheet=Sheet1`;
+            try {
+                const response = await fetch(url);
+                const csvText = await response.text();
+                const rows = csvText.split('\n').map(row => row.split(',').map(cell => cell.replace(/"/g, '').trim()));
+                
+                if(rows.length > 1) {
+                    // Filter baris yang memiliki nilai pada kolom "Hari / Tanggal Acara"
+                    const dataRows = rows.slice(1).filter(r => r[3]); 
+                    
+                    const parseIndoDate = (dateStr) => {
+                        // Optimasi regex untuk mencegah error karena spasi berlebih
+                        const cleanStr = dateStr.replace(/\s+/g, ' ').trim();
+                        const parts = cleanStr.split(',');
+                        if (parts.length < 2) return null;
+                        
+                        const dateParts = parts[1].trim().split(' '); 
+                        if (dateParts.length < 3) return null;
+                        
+                        const day = parseInt(dateParts[0]);
+                        const monthStr = dateParts[1].toLowerCase();
+                        const year = parseInt(dateParts[2]);
+                        
+                        const months = ["januari", "februari", "maret", "april", "mei", "juni", "juli", "agustus", "september", "oktober", "november", "desember"];
+                        const month = months.indexOf(monthStr);
+                        
+                        if(month === -1) return null;
+                        return new Date(year, month, day);
+                    };
+
+                    const now = new Date();
+                    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+                    let parsedData = dataRows.map(r => {
+                        return {
+                            hariTanggal: r[3],
+                            waktu: r[4],
+                            tempat: r[5],
+                            date: parseIndoDate(r[3])
+                        };
+                    }).filter(r => r.date !== null).sort((a, b) => a.date - b.date);
+
+                    let currentEvent = null;
+                    let nextEvent = null;
+
+                    // Mencari acara bulan berjalan
+                    const currentMonthEvents = parsedData.filter(r => r.date.getMonth() === today.getMonth() && r.date.getFullYear() === today.getFullYear());
+                    
+                    if (currentMonthEvents.length > 0) {
+                        currentEvent = currentMonthEvents[currentMonthEvents.length - 1]; // Ambil jadwal terakhir pada bulan ini
+                    } else {
+                        currentEvent = parsedData.find(r => r.date >= today) || parsedData[parsedData.length - 1];
+                    }
+
+                    // Tentukan row selanjutnya sebagai persiapan bulan depan
+                    if (currentEvent) {
+                        const currentIndex = parsedData.findIndex(r => r === currentEvent);
+                        if (currentIndex + 1 < parsedData.length) {
+                            nextEvent = parsedData[currentIndex + 1];
+                        }
+                    }
+
+                    let html = '';
+                    if (currentEvent) {
+                        const eventDate = currentEvent.date;
+                        let statusColor, statusText, statusIcon, statusBg, borderPulse;
+
+                        // Pengecekan Status Waktu
+                        if (eventDate < today) {
+                            statusColor = 'text-red-700';
+                            statusBg = 'bg-red-100';
+                            statusIcon = 'text-red-500';
+                            statusText = 'Sudah Terlewat';
+                            borderPulse = 'border-red-500';
+                        } else if (eventDate.getTime() === today.getTime()) {
+                            statusColor = 'text-emerald-700';
+                            statusBg = 'bg-emerald-100';
+                            statusIcon = 'text-emerald-500';
+                            statusText = 'Sedang Berjalan';
+                            borderPulse = 'border-emerald-500';
+                        } else {
+                            statusColor = 'text-amber-700';
+                            statusBg = 'bg-amber-100';
+                            statusIcon = 'text-amber-500';
+                            statusText = 'Mendekati Waktu';
+                            borderPulse = 'border-amber-500';
+                        }
+
+                        html += `
+                        <div class="hover-card bg-white p-6 rounded-3xl border-2 ${borderPulse} shadow-lg relative overflow-hidden group">
+                            <div class="absolute top-0 right-0 bg-gray-800 text-white text-xs font-bold px-4 py-1.5 rounded-bl-xl z-10">
+                                Jadwal Saat Ini
+                            </div>
+                            <div class="absolute -right-4 -bottom-4 text-emerald-50 opacity-50 text-8xl z-0 transition-transform group-hover:scale-110"><i class="fas fa-home"></i></div>
+                            <div class="flex items-center gap-5 relative z-10">
+                                <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center text-white text-2xl font-bold shadow-md shrink-0">
+                                    <i class="fas fa-user-tie"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-emerald-600 font-bold mb-1 tracking-wider">${currentEvent.hariTanggal}</p>
+                                    <h3 class="text-xl md:text-2xl font-black text-gray-800">${currentEvent.tempat}</h3>
+                                    <div class="flex flex-wrap items-center gap-2 mt-2">
+                                        <span class="${statusBg} ${statusColor} text-[10px] px-2 py-1 rounded font-bold flex items-center">
+                                            <i class="fas fa-circle text-[8px] mr-1 ${statusIcon}"></i> Status: ${statusText}
+                                        </span>
+                                        <span class="bg-gray-100 text-gray-600 text-[10px] px-2 py-1 rounded font-bold flex items-center">
+                                            <i class="fas fa-clock text-[10px] mr-1"></i> ${currentEvent.waktu}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>`;
+                    }
+
+                    if (nextEvent) {
+                        html += `
+                        <div class="hover-card bg-white p-6 rounded-3xl border border-gray-200 shadow-sm relative overflow-hidden group opacity-90 hover:opacity-100 transition">
+                            <div class="absolute top-0 right-0 bg-gray-200 text-gray-600 text-xs font-bold px-4 py-1.5 rounded-bl-xl z-10">
+                                Persiapan Selanjutnya
+                            </div>
+                            <div class="absolute -right-4 -bottom-4 text-gray-50 opacity-50 text-8xl z-0 transition-transform group-hover:scale-110"><i class="fas fa-home"></i></div>
+                            <div class="flex items-center gap-5 relative z-10">
+                                <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-gray-300 to-gray-400 flex items-center justify-center text-white text-2xl font-bold shadow-md shrink-0">
+                                    <i class="fas fa-user-tie"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-500 font-bold mb-1 tracking-wider">${nextEvent.hariTanggal}</p>
+                                    <h3 class="text-xl md:text-2xl font-black text-gray-800">${nextEvent.tempat}</h3>
+                                    <div class="flex flex-wrap items-center gap-2 mt-2">
+                                        <span class="bg-gray-100 text-gray-600 text-[10px] px-2 py-1 rounded font-bold flex items-center">
+                                            <i class="fas fa-hourglass-half text-[10px] mr-1"></i> Menunggu Giliran
+                                        </span>
+                                        <span class="bg-gray-100 text-gray-600 text-[10px] px-2 py-1 rounded font-bold flex items-center">
+                                            <i class="fas fa-clock text-[10px] mr-1"></i> ${nextEvent.waktu}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>`;
+                    } else if (currentEvent) {
+                         html += `
+                        <div class="hover-card bg-white p-6 rounded-3xl border border-gray-200 shadow-sm relative overflow-hidden flex items-center justify-center opacity-70">
+                            <p class="text-gray-400 font-medium italic">Belum ada persiapan jadwal selanjutnya.</p>
+                        </div>`;
+                    }
+
+                    if(!currentEvent && !nextEvent) {
+                        html = '<p class="col-span-full text-center text-gray-500">Belum ada jadwal pertemuan di spreadsheet.</p>';
+                    }
+
+                    document.getElementById('container-jadwal').innerHTML = html;
+                } else {
+                    document.getElementById('container-jadwal').innerHTML = '<p class="col-span-full text-center text-gray-500">Data jadwal pertemuan kosong.</p>';
+                }
+            } catch (error) {
+                console.error("Gagal memuat jadwal:", error);
+                document.getElementById('container-jadwal').innerHTML = '<p class="text-red-500 col-span-full text-center">Gagal memuat jadwal pertemuan.</p>';
+            }
+        }
+
+        // 4. Fungsi Universal Fetch untuk Budget
         async function updateBudget(range, displayElement, loadingElement, indicatorId) {
             const displayEl = document.getElementById(displayElement);
             const loadingEl = loadingElement ? document.getElementById(loadingElement) : null;
@@ -732,7 +858,7 @@
             });
         }
 
-        // 4. Fungsi Fetch Data Warga
+        // 5. Fungsi Fetch Data Warga
         async function fetchWargaData() {
             const url = `https://docs.google.com/spreadsheets/d/${sheetIdWarga}/gviz/tq?tqx=out:csv`;
             try {
@@ -773,7 +899,7 @@
             }
         }
 
-        // 5. Fungsi Rekap Keuangan
+        // 6. Fungsi Rekap Keuangan
         async function loadRekapKeuangan() {
             const url = `https://docs.google.com/spreadsheets/d/${sheetIdR}/gviz/tq?tqx=out:csv&sheet=Laporan Keuangan&range=A7:G200`;
             try {
@@ -819,7 +945,7 @@
             }
         }
 
-        // 6. Fungsi Tabel Rekap Data BO
+        // 7. Fungsi Tabel Rekap Data BO
         async function fetchDataRekap() {
             const url = `https://docs.google.com/spreadsheets/d/${sheetIdR}/gviz/tq?tqx=out:csv&sheet=Laporan Keuangan&range=A7:G200`;
             try {
@@ -884,7 +1010,7 @@
             `;
         }
 
-        // 7. Fungsi Fetch Tunggakan
+        // 8. Fungsi Fetch Tunggakan
         async function fetchKasTunggakan(sheetName, containerId) {
             const container = document.getElementById(containerId);
             const url = `https://docs.google.com/spreadsheets/d/${sheetIdKas}/gviz/tq?tqx=out:csv&sheet=${sheetName}`;
@@ -968,7 +1094,7 @@
             }
         }
         
-        // 7.B Fungsi Rekap Kas 2 Tab
+        // 9. Fungsi Rekap Kas 2 Tab
         async function fetchDataKas() {
             const url = `https://docs.google.com/spreadsheets/d/${sheetIdKas}/gviz/tq?tqx=out:csv&sheet=Kas`;
             try {
@@ -1050,7 +1176,7 @@
             `;
         }
 
-        // 8. Update Aset Kas
+        // 10. Update Aset Kas
         async function updateKas() {
             const el = document.getElementById('total-aset-kas');
             const url = `https://docs.google.com/spreadsheets/d/${sheetIdKas}/gviz/tq?tqx=out:csv&sheet=Kas&range=F:F`;
@@ -1084,7 +1210,7 @@
             }
         }
 
-        // 9. Update Iuran Kas (Tunggakan & Persentase)
+        // 11. Update Iuran Kas (Tunggakan & Persentase)
         async function updateIuranKas() {
             const url = `https://docs.google.com/spreadsheets/d/${sheetIdKas}/gviz/tq?tqx=out:csv&sheet=Tunggakan`;
             
@@ -1149,7 +1275,7 @@
 
             if (rows.length === 0) return null;
 
-            // Variasi A: Array of Objects [{ Nama: "Aris", "2026": 100000 }]
+            // Variasi A: Array of Objects
             if (!Array.isArray(rows[0]) && typeof rows[0] === 'object') {
                 const headers = Object.keys(rows[0]);
                 const dataRows = [];
@@ -1176,7 +1302,7 @@
                 return { headers, dataRows };
             }
 
-            // Variasi B: Standard 2D Matrix Array [[cell, cell], [cell, cell]]
+            // Variasi B: Standard 2D Matrix Array
             const headers = rows[0].map(cell => {
                 if (cell !== null && typeof cell === 'object') {
                     return String(cell.value !== undefined ? cell.value : (cell.v || '')).trim();
@@ -1216,7 +1342,7 @@
             return { headers, dataRows };
         }
 
-        // 10. Fungsi Fetch Data Iuran Bulan Ini (Telah Diperbarui Keamanannya)
+        // 12. Fungsi Fetch Data Iuran Bulan Ini
         async function fetchIuranBulanIni() {
             const container = document.getElementById('content-iuran-bulan');
             const summaryContainer = document.getElementById('summary-section');
@@ -1243,9 +1369,8 @@
                 const { headers, dataRows } = normalized;
                 const tahunSekarang = now.getFullYear().toString();
                 
-                // Cari Index Tahun secara dinamis
                 let startColTahun = headers.findIndex(h => h.includes(tahunSekarang));
-                if (startColTahun === -1) startColTahun = 1; // Fallback ke kolom 1 jika tidak ketemu
+                if (startColTahun === -1) startColTahun = 1; 
                 
                 const kolomBulan = startColTahun + bulanIndex;
 
@@ -1255,14 +1380,12 @@
                 if (kolomBulan < headers.length || startColTahun !== -1) {
                     for (let i = 0; i < dataRows.length; i++) {
                         const row = dataRows[i];
-                        if (!row || !row[0]) continue; // Skip baris error
+                        if (!row || !row[0]) continue; 
                         
                         const nama = row[0].value || ""; 
                         
-                        // Melewati baris jika isinya kosong atau merupakan duplikasi Header berjudul "Nama"
                         if (!nama || nama.trim() === "" || nama.toLowerCase().includes("nama")) continue;
 
-                        // Amankan pembacaan cell jika kolomnya terpotong
                         const cell = row[kolomBulan] || { value: "" };
                         const nilai = parseAngka(cell.value);
                         
@@ -1302,7 +1425,7 @@
             }
         }
 
-        // 11. Fungsi Fetch Data Angsuran (Telah Diperbarui Keamanannya)
+        // 13. Fungsi Fetch Data Angsuran
         async function fetchAngsuran() {
             const container = document.getElementById('content-angsuran');
             const now = new Date();
@@ -1327,7 +1450,7 @@
 
                 const { headers, dataRows } = normalized;
                 let tahunList = [...new Set(headers.filter(h => /\d{4}/.test(h)))];
-                if (tahunList.length === 0) tahunList = [currentYear.toString()]; // Fallback jika regex gagal mencari tahun
+                if (tahunList.length === 0) tahunList = [currentYear.toString()]; 
                 
                 let listWarga = [];
                 for(let i = 0; i < dataRows.length; i++) {
@@ -1336,7 +1459,6 @@
                     
                     const nama = row[0].value || "";
                     
-                    // Filter baris kosong dan filter Header "Nama" yang terikut masuk ke dalam loop
                     if (nama && nama.trim() !== "" && !nama.toLowerCase().includes("nama")) {
                         listWarga.push({ rowData: row, nama: nama.trim() });
                     }
@@ -1362,7 +1484,7 @@
                         <div id="${idNama}" class="p-3 space-y-3 hidden bg-white border-t border-gray-100">
                             ${tahunList.map((tahun) => {
                                 let startCol = headers.indexOf(tahun);
-                                if (startCol === -1) startCol = 1; // Fallback jika Index tahun tidak ditemukan
+                                if (startCol === -1) startCol = 1; 
                                 
                                 return `
                                 <div class="border border-gray-100 rounded-md overflow-hidden">
@@ -1371,7 +1493,6 @@
                                         ${daftarBulan.map((bln, blnIdx) => {
                                             const kolomIndex = startCol + blnIdx;
                                             
-                                            // Amankan pembacaan cell jika kolom terpotong
                                             let cell = row[kolomIndex] || { value: "", note: "" };
                                             const nilaiRaw = cell.value || "";
                                             const cellNote = cell.note || "";
@@ -1488,17 +1609,9 @@
             
             fetchIuranBulanIni();
             fetchAngsuran();
-            
-            const currentBulanIdx = new Date().getMonth();
-            const nextBulanIdx = (currentBulanIdx + 1) % 12;
-            const currentTahun = new Date().getFullYear();
-            const nextTahun = currentBulanIdx === 11 ? currentTahun + 1 : currentTahun;
-            
-            const labelBulanIni = document.getElementById('label-bulan-ini');
-            const labelBulanDepan = document.getElementById('label-bulan-depan');
-            
-            if(labelBulanIni) labelBulanIni.textContent = daftarBulan[currentBulanIdx] + " " + currentTahun;
-            if(labelBulanDepan) labelBulanDepan.textContent = daftarBulan[nextBulanIdx] + " " + nextTahun;
+
+            // Panggil Fungsi Fetch Jadwal Pertemuan
+            fetchJadwalPertemuan();
         });
     </script>
 </body>
