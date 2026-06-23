@@ -330,7 +330,7 @@
             <div class="flex items-center justify-between mb-6">
                 <div class="flex items-center gap-3">
                     <div class="p-3 bg-emerald-100 text-emerald-600 rounded-xl"><i class="fas fa-handshake text-xl"></i></div>
-                    <h2 class="text-2xl md:text-3xl font-bold text-gray-900">Jadwal Pertemuan RT</h2>
+                    <h2 class="text-2xl md:text-3xl font-bold text-gray-900">Jadwal Pertemuan Bulan Ini</h2>
                 </div>
             </div>
             
@@ -659,23 +659,19 @@
                     const dataRows = rows.slice(1).filter(r => r[3]); 
                     
                     const parseIndoDate = (dateStr) => {
-                        // Optimasi regex untuk mencegah error karena spasi berlebih
-                        const cleanStr = dateStr.replace(/\s+/g, ' ').trim();
-                        const parts = cleanStr.split(',');
-                        if (parts.length < 2) return null;
-                        
-                        const dateParts = parts[1].trim().split(' '); 
-                        if (dateParts.length < 3) return null;
-                        
-                        const day = parseInt(dateParts[0]);
-                        const monthStr = dateParts[1].toLowerCase();
-                        const year = parseInt(dateParts[2]);
-                        
-                        const months = ["januari", "februari", "maret", "april", "mei", "juni", "juli", "agustus", "september", "oktober", "november", "desember"];
-                        const month = months.indexOf(monthStr);
-                        
-                        if(month === -1) return null;
-                        return new Date(year, month, day);
+                        // Optimasi super kuat dengan Regex untuk mengabaikan koma dan menangkap format angka/teks
+                        const cleanStr = dateStr.toLowerCase();
+                        const match = cleanStr.match(/(\d{1,2})\s+([a-z]+)\s+(\d{4})/);
+                        if (match) {
+                            const day = parseInt(match[1]);
+                            const monthStr = match[2];
+                            const year = parseInt(match[3]);
+                            const months = ["januari", "februari", "maret", "april", "mei", "juni", "juli", "agustus", "september", "oktober", "november", "desember"];
+                            const month = months.indexOf(monthStr);
+                            
+                            if(month !== -1) return new Date(year, month, day);
+                        }
+                        return null;
                     };
 
                     const now = new Date();
@@ -690,32 +686,37 @@
                         };
                     }).filter(r => r.date !== null).sort((a, b) => a.date - b.date);
 
+                    // ATURAN BARU: Tampilkan jadwal selama sebulan saat berjalan
+                    const currentMonthEvents = parsedData.filter(r => 
+                        r.date.getMonth() === today.getMonth() && 
+                        r.date.getFullYear() === today.getFullYear()
+                    );
+
                     let currentEvent = null;
                     let nextEvent = null;
 
-                    // Mencari acara bulan berjalan
-                    const currentMonthEvents = parsedData.filter(r => r.date.getMonth() === today.getMonth() && r.date.getFullYear() === today.getFullYear());
-                    
                     if (currentMonthEvents.length > 0) {
-                        currentEvent = currentMonthEvents[currentMonthEvents.length - 1]; // Ambil jadwal terakhir pada bulan ini
-                    } else {
-                        currentEvent = parsedData.find(r => r.date >= today) || parsedData[parsedData.length - 1];
-                    }
+                        let upcoming = currentMonthEvents.filter(r => r.date >= today);
+                        let past = currentMonthEvents.filter(r => r.date < today);
 
-                    // Tentukan row selanjutnya sebagai persiapan bulan depan
-                    if (currentEvent) {
-                        const currentIndex = parsedData.findIndex(r => r === currentEvent);
-                        if (currentIndex + 1 < parsedData.length) {
-                            nextEvent = parsedData[currentIndex + 1];
+                        if (upcoming.length > 0) {
+                            currentEvent = upcoming[0];
+                            if (upcoming.length > 1) {
+                                nextEvent = upcoming[1];
+                            }
+                        } else {
+                            // Jika semua jadwal bulan ini sudah lewat
+                            currentEvent = past[past.length - 1]; 
                         }
                     }
 
                     let html = '';
+                    
+                    // Render currentEvent (Atau strip '-' jika kosong)
                     if (currentEvent) {
                         const eventDate = currentEvent.date;
                         let statusColor, statusText, statusIcon, statusBg, borderPulse;
 
-                        // Pengecekan Status Waktu
                         if (eventDate < today) {
                             statusColor = 'text-red-700';
                             statusBg = 'bg-red-100';
@@ -760,8 +761,30 @@
                                 </div>
                             </div>
                         </div>`;
+                    } else {
+                        html += `
+                        <div class="hover-card bg-white p-6 rounded-3xl border border-gray-100 shadow-sm relative overflow-hidden group opacity-80 transition">
+                            <div class="absolute top-0 right-0 bg-gray-200 text-gray-600 text-xs font-bold px-4 py-1.5 rounded-bl-xl z-10">
+                                Jadwal Saat Ini
+                            </div>
+                            <div class="flex items-center gap-5 relative z-10">
+                                <div class="w-16 h-16 rounded-2xl bg-gray-100 flex items-center justify-center text-gray-400 text-2xl font-bold shadow-sm shrink-0">
+                                    <i class="fas fa-calendar-times"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-400 font-bold mb-1 tracking-wider">-</p>
+                                    <h3 class="text-xl md:text-2xl font-black text-gray-400">-</h3>
+                                    <div class="flex flex-wrap items-center gap-2 mt-2">
+                                        <span class="bg-gray-100 text-gray-500 text-[10px] px-2 py-1 rounded font-bold flex items-center">
+                                            Tidak ada jadwal di bulan ini
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>`;
                     }
 
+                    // Render nextEvent (Atau strip '-' jika kosong)
                     if (nextEvent) {
                         html += `
                         <div class="hover-card bg-white p-6 rounded-3xl border border-gray-200 shadow-sm relative overflow-hidden group opacity-90 hover:opacity-100 transition">
@@ -787,15 +810,27 @@
                                 </div>
                             </div>
                         </div>`;
-                    } else if (currentEvent) {
-                         html += `
-                        <div class="hover-card bg-white p-6 rounded-3xl border border-gray-200 shadow-sm relative overflow-hidden flex items-center justify-center opacity-70">
-                            <p class="text-gray-400 font-medium italic">Belum ada persiapan jadwal selanjutnya.</p>
+                    } else {
+                        html += `
+                        <div class="hover-card bg-white p-6 rounded-3xl border border-gray-100 shadow-sm relative overflow-hidden group opacity-80 transition">
+                            <div class="absolute top-0 right-0 bg-gray-200 text-gray-600 text-xs font-bold px-4 py-1.5 rounded-bl-xl z-10">
+                                Persiapan Selanjutnya
+                            </div>
+                            <div class="flex items-center gap-5 relative z-10">
+                                <div class="w-16 h-16 rounded-2xl bg-gray-100 flex items-center justify-center text-gray-400 text-2xl font-bold shadow-sm shrink-0">
+                                    <i class="fas fa-calendar-minus"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-400 font-bold mb-1 tracking-wider">-</p>
+                                    <h3 class="text-xl md:text-2xl font-black text-gray-400">-</h3>
+                                    <div class="flex flex-wrap items-center gap-2 mt-2">
+                                        <span class="bg-gray-100 text-gray-500 text-[10px] px-2 py-1 rounded font-bold flex items-center">
+                                            Tidak ada persiapan selanjutnya
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>`;
-                    }
-
-                    if(!currentEvent && !nextEvent) {
-                        html = '<p class="col-span-full text-center text-gray-500">Belum ada jadwal pertemuan di spreadsheet.</p>';
                     }
 
                     document.getElementById('container-jadwal').innerHTML = html;
