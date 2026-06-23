@@ -1438,13 +1438,14 @@
                         
                         if (nilai > 0) {
                             totalTerbayar += nilai;
+                            //<p class="text-lg font-black text-gray-900">${formatRupiah(nilai)}</p>
                             html += `
                             <div class="group bg-white p-4 rounded-xl border border-gray-100 shadow-sm hover:shadow-md hover:border-emerald-200 transition-all duration-300">
                                 <div class="flex justify-between items-center mb-2">
                                     <span class="font-bold text-gray-800 truncate pr-2 text-sm">${escapeHtml(nama)}</span>
                                     <i class="fas fa-check-circle text-emerald-500 text-xl" title="Lunas"></i>
                                 </div>
-                                //<p class="text-lg font-black text-gray-900">${formatRupiah(nilai)}</p>
+                                
                             </div>`;
                         }
                     }
