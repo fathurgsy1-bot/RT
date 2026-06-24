@@ -36,7 +36,6 @@
   </div>
 
   <script>
-    // ✅ Typo pada URL sudah diperbaiki dengan menambahkan tanda kutip penutup
     const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxKwWu0g7nOvFlMpNTc8VMoipGsI_77_fBu198JcqHhlauoNCFCbBsmVo9fRzIwlETp/exec';
 
     function handleFormSubmit(event) {
@@ -52,57 +51,94 @@
         return;
       }
       
-      // Mengunci tombol agar tidak diklik dua kali
       submitBtn.disabled = true;
-      submitBtn.innerText = 'Mengirim Data...';
+      submitBtn.innerText = 'Memproses Gambar...';
       
       statusDiv.classList.remove('hidden', 'bg-green-100', 'text-green-700', 'bg-red-100', 'text-red-700');
       statusDiv.classList.add('bg-blue-100', 'text-blue-700');
-      statusDiv.innerText = 'Sedang mengunggah foto dan menyimpan data ke Spreadsheet...';
+      statusDiv.innerText = 'Sedang mengompres gambar...';
       
-      // Membaca file gambar menjadi format Base64 agar bisa dikirim
       const reader = new FileReader();
+      
+      // Proses setelah file dibaca
       reader.onload = function(e) {
-        const payload = {
-          namaKegiatan: document.getElementById('namaKegiatan').value,
-          tanggal: document.getElementById('tanggal').value,
-          fileName: file.name,
-          fileData: e.target.result
-        };
+        const img = new Image();
+        img.src = e.target.result;
         
-        // Memanggil endpoint Web App menggunakan Fetch API
-        fetch(WEB_APP_URL, {
-          method: 'POST',
-          // Header text/plain penting untuk menghindari blokir CORS
-          headers: {
-            'Content-Type': 'text/plain;charset=utf-8',
-          },
-          body: JSON.stringify(payload)
-        })
-        .then(response => response.json())
-        .then(data => {
-          // Mengembalikan tombol ke keadaan semula
-          submitBtn.disabled = false;
-          submitBtn.innerText = 'Kirim Data';
-          statusDiv.classList.remove('bg-blue-100', 'text-blue-700');
+        // Proses setelah objek Image selesai dimuat
+        img.onload = function() {
+          const canvas = document.createElement('canvas');
           
-          // Memeriksa status dari Apps Script
-          if(data.status === "Sukses") {
-            statusDiv.classList.add('bg-green-100', 'text-green-700');
-            statusDiv.innerText = data.pesan;
-            document.getElementById('uploadForm').reset();
+          // --- PENGATURAN KOMPRESI & RESIZE ---
+          const MAX_WIDTH = 800;  // Batas maksimal lebar
+          const MAX_HEIGHT = 800; // Batas maksimal tinggi
+          let width = img.width;
+          let height = img.height;
+          
+          // Kalkulasi proporsi jika gambar lebih besar dari batas maksimal
+          if (width > height) {
+            if (width > MAX_WIDTH) {
+              height *= MAX_WIDTH / width;
+              width = MAX_WIDTH;
+            }
           } else {
-            statusDiv.classList.add('bg-red-100', 'text-red-700');
-            statusDiv.innerText = "Error: " + data.pesan;
+            if (height > MAX_HEIGHT) {
+              width *= MAX_HEIGHT / height;
+              height = MAX_HEIGHT;
+            }
           }
-        })
-        .catch(error => {
-          submitBtn.disabled = false;
-          submitBtn.innerText = 'Kirim Data';
-          statusDiv.classList.remove('bg-blue-100', 'text-blue-700');
-          statusDiv.classList.add('bg-red-100', 'text-red-700');
-          statusDiv.innerText = 'Terjadi kesalahan sistem: ' + error.message;
-        });
+          
+          canvas.width = width;
+          canvas.height = height;
+          
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+          
+          // Mengubah canvas kembali menjadi Base64 (Format JPEG, Kualitas 0.7 atau 70%)
+          // Angka 0.7 bisa Anda naik-turunkan (0.1 hingga 1.0)
+          const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.7);
+          
+          // Melanjutkan proses pengiriman dengan gambar yang sudah terkompresi
+          statusDiv.innerText = 'Mengunggah data ke Spreadsheet...';
+          submitBtn.innerText = 'Mengirim Data...';
+          
+          const payload = {
+            namaKegiatan: document.getElementById('namaKegiatan').value,
+            tanggal: document.getElementById('tanggal').value,
+            fileName: file.name,
+            fileData: compressedDataUrl // Menggunakan data hasil kompresi
+          };
+          
+          fetch(WEB_APP_URL, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'text/plain;charset=utf-8',
+            },
+            body: JSON.stringify(payload)
+          })
+          .then(response => response.json())
+          .then(data => {
+            submitBtn.disabled = false;
+            submitBtn.innerText = 'Kirim Data';
+            statusDiv.classList.remove('bg-blue-100', 'text-blue-700');
+            
+            if(data.status === "Sukses") {
+              statusDiv.classList.add('bg-green-100', 'text-green-700');
+              statusDiv.innerText = data.pesan;
+              document.getElementById('uploadForm').reset();
+            } else {
+              statusDiv.classList.add('bg-red-100', 'text-red-700');
+              statusDiv.innerText = "Error: " + data.pesan;
+            }
+          })
+          .catch(error => {
+            submitBtn.disabled = false;
+            submitBtn.innerText = 'Kirim Data';
+            statusDiv.classList.remove('bg-blue-100', 'text-blue-700');
+            statusDiv.classList.add('bg-red-100', 'text-red-700');
+            statusDiv.innerText = 'Terjadi kesalahan sistem: ' + error.message;
+          });
+        };
       };
       
       reader.readAsDataURL(file);
