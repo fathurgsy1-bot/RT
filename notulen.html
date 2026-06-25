@@ -40,64 +40,42 @@
         }
     </style>
 </head>
-<body class="antialiased selection:bg-purple-500 selection:text-white">
-<nav class="fixed top-0 left-0 right-0 bg-white/80 backdrop-blur-xl shadow-sm z-50 border-b border-gray-100 py-3 md:py-0">
-    <div class="max-w-6xl mx-auto px-4 min-h-[4rem] flex flex-col md:flex-row items-center justify-between gap-3 md:gap-0">
-        <!-- Logo & Identitas -->
-        <div class="flex items-center gap-2">
-            <span class="text-xl font-bold text-emerald-600 tracking-tight">SI-WARGA</span>
-            <span class="bg-emerald-50 text-emerald-700 text-[10px] font-bold px-2 py-0.5 rounded-full border border-emerald-100">RT. 04 - RW. 26</span>
-        </div>
+<body class="bg-gray-50 text-gray-900">
 
-        <!-- Menu Navigasi -->
-        <div class="flex flex-wrap justify-center gap-1 md:gap-2 font-medium text-sm">
-            <!-- Link Sederhana -->
-            <a href="#beranda" class="px-4 py-2 text-gray-600 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all duration-300">Beranda</a>
-            <a href="#data-warga" class="px-4 py-2 text-gray-600 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all duration-300">Data</a>
-            <a href="#rencana-bo-2026" class="px-4 py-2 text-gray-600 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all duration-300">BO 2026</a>
-            
-            <!-- Dropdown Keuangan -->
-            <div class="relative group">
-                <button class="flex items-center gap-1 px-4 py-2 text-gray-600 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all duration-300">
-                    Keuangan <i class="fas fa-chevron-down text-[9px] group-hover:rotate-180 transition-transform duration-300"></i>
-                </button>
-                
-                <div class="absolute left-0 top-full mt-2 w-56 bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 z-50 overflow-hidden">
-                    <div class="p-2">
-                        <a href="#kas-warga" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-emerald-50 text-gray-700 hover:text-emerald-700 transition-all duration-200">
-                            <i class="fas fa-wallet text-sm w-5 text-center"></i> <span class="font-semibold text-sm">Kas Warga</span>
-                        </a>
-                        <a href="#tunggakan-warga" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-red-50 text-gray-700 hover:text-red-700 transition-all duration-200">
-                            <i class="fas fa-exclamation-circle text-sm w-5 text-center"></i> <span class="font-semibold text-sm">Tunggakan</span>
-                        </a>
-                        <a href="#iuran-bulan-ini" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-blue-50 text-gray-700 hover:text-blue-700 transition-all duration-200">
-                            <i class="fas fa-receipt text-sm w-5 text-center"></i> <span class="font-semibold text-sm">Iuran Bulanan</span>
-                        </a>
-                        <a href="#angsuran-warga" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-amber-50 text-gray-700 hover:text-amber-700 transition-all duration-200">
-                            <i class="fas fa-file-invoice-dollar text-sm w-5 text-center"></i> <span class="font-semibold text-sm">Angsuran</span>
-                        </a>
+    <nav class="fixed top-0 left-0 right-0 bg-white/90 backdrop-blur-md shadow-sm z-50 border-b border-gray-100">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="flex justify-between items-center h-20">
+                <div class="flex items-center gap-2">
+                    <span class="text-xl font-bold text-emerald-600 tracking-tight">SI-WARGA</span>
+                    <span class="bg-emerald-50 text-emerald-700 text-[10px] font-bold px-2 py-0.5 rounded-full border border-emerald-100">RT. 04 - RW. 26</span>
+                </div>
+
+                <div class="hidden md:flex items-center gap-1">
+                    <a href="#beranda" class="px-3 py-2 text-gray-600 hover:text-emerald-600 rounded-lg transition">Beranda</a>
+                    <a href="#data-warga" class="px-3 py-2 text-gray-600 hover:text-emerald-600 rounded-lg transition">Data</a>
+                    
+                    <div class="relative group">
+                        <button class="flex items-center gap-1 px-3 py-2 text-gray-600 hover:text-emerald-600 rounded-lg">
+                            Keuangan <i class="fas fa-chevron-down text-[10px] transition-transform group-hover:rotate-180"></i>
+                        </button>
+                        <div class="absolute left-0 mt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+                            <a href="#kas-warga" class="block px-4 py-3 text-sm hover:bg-emerald-50">Kas Warga</a>
+                            <a href="#tunggakan" class="block px-4 py-3 text-sm hover:bg-red-50">Tunggakan</a>
+                        </div>
                     </div>
-                    <div class="bg-gray-50/80 px-4 py-2 border-t border-gray-100 text-center">
-                        <p class="text-[10px] text-gray-400 uppercase tracking-widest font-bold">Laporan Finansial</p>
-                    </div>
+                    <a href="notulen.html" class="px-3 py-2 text-gray-600 hover:text-emerald-600 rounded-lg transition">Notulen</a>
                 </div>
             </div>
-
-            <!-- Link Lainnya -->
-            <a href="notulen.html" class="px-4 py-2 text-gray-600 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all duration-300">Notulen</a>
-            <a href="https://script.google.com/macros/s/AKfycbxKwWu0g7nOvFlMpNTc8VMoipGsI_77_fBu198JcqHhlauoNCFCbBsmVo9fRzIwlETp/exec" class="px-4 py-2 text-gray-600 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all duration-300">Kegiatan</a>
         </div>
-    </div>
-</nav>
-    <header class="sticky top-0 z-50 bg-[#0B0E14]/80 backdrop-blur-lg border-b border-gray-800/60">
-        <div class="max-w-4xl mx-auto px-4 md:px-8">
-            <div class="flex justify-between items-center h-20">
-                <div class="flex items-center space-x-3 cursor-pointer group">
-                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-xl shadow-[0_0_15px_rgba(139,92,246,0.5)] group-hover:shadow-[0_0_25px_rgba(139,92,246,0.7)] transition-all">
-                        W
-                    </div>
-                    <span class="font-bold text-2xl text-white tracking-tight">SI-WARGA<span class="text-purple-500">.</span></span>
-                </div>
+    </nav>
+
+    <header id="beranda" class="pt-32 pb-20 bg-emerald-900 text-white rounded-b-[2.5rem]">
+        <div class="max-w-4xl mx-auto px-6 text-center">
+            <h1 class="text-4xl md:text-6xl font-extrabold mb-6">Informasi Warga 2026</h1>
+            <p class="text-emerald-200 text-lg mb-8">Kelola data kependudukan dan transparansi anggaran dengan sistem digital yang akuntabel.</p>
+            <div class="flex flex-col sm:flex-row justify-center gap-4">
+                <a href="#data-warga" class="bg-emerald-500 hover:bg-emerald-400 text-white px-8 py-3 rounded-xl font-medium transition">Lihat Data</a>
+                <a href="#iuran" class="bg-white/10 hover:bg-white/20 text-white px-8 py-3 rounded-xl font-medium transition backdrop-blur-sm">Cek Iuran</a>
             </div>
         </div>
     </header>
