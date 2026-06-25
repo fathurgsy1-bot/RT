@@ -216,49 +216,54 @@
 </head>
 
 <body class="bg-gray-50 text-gray-900">
-
-    <nav class="fixed top-0 left-0 right-0 bg-white/90 backdrop-blur-md shadow-sm z-50 border-b border-gray-100 py-3 md:py-0">
-        <div class="max-w-6xl mx-auto px-4 min-h-[4rem] flex flex-col md:flex-row items-center justify-between gap-3 md:gap-0">
-            <div class="flex items-center gap-2">
-                <span class="text-xl font-bold text-emerald-600 tracking-tight">SI-WARGA</span>
-                <span class="bg-emerald-100 text-emerald-800 text-xs font-semibold px-2 py-0.5 rounded">RT. 04 - RW. 26</span>
-            </div>
-            <div class="flex flex-wrap justify-center gap-4 md:gap-6 font-medium text-sm">
-                <a href="#beranda" class="text-gray-600 hover:text-emerald-600 transition-colors">Beranda</a>
-                <a href="#data-warga" class="text-gray-600 hover:text-emerald-600 transition-colors">Data</a>
-                <a href="#rencana-bo-2026" class="text-gray-600 hover:text-emerald-600 transition-colors">BO 2026</a>
-               <div class="relative group">
-    <!-- Tombol Dropdown -->
-    <button class="flex items-center gap-1 text-gray-600 hover:text-emerald-600 transition-all duration-300 font-medium py-2">
-        Keuangan <i class="fas fa-chevron-down text-[10px] group-hover:rotate-180 transition-transform duration-300"></i>
-    </button>
-    
-    <!-- Dropdown Container dengan Glassmorphism -->
-    <div class="absolute left-0 top-full mt-2 w-56 bg-white/90 backdrop-blur-md rounded-2xl shadow-2xl border border-white/50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 z-50 overflow-hidden">
-        <div class="p-2">
-            <a href="#kas-warga" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-emerald-50 text-gray-700 hover:text-emerald-700 transition-all duration-200">
-                <i class="fas fa-wallet text-sm"></i> <span class="font-semibold text-sm">Kas Warga</span>
-            </a>
-            <a href="#tunggakan-warga" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-red-50 text-gray-700 hover:text-red-700 transition-all duration-200">
-                <i class="fas fa-exclamation-circle text-sm"></i> <span class="font-semibold text-sm">Tunggakan</span>
-            </a>
-            <a href="#iuran-bulan-ini" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-blue-50 text-gray-700 hover:text-blue-700 transition-all duration-200">
-                <i class="fas fa-receipt text-sm"></i> <span class="font-semibold text-sm">Iuran Bulanan</span>
-            </a>
-            <a href="#angsuran-warga" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-amber-50 text-gray-700 hover:text-amber-700 transition-all duration-200">
-                <i class="fas fa-file-invoice-dollar text-sm"></i> <span class="font-semibold text-sm">Angsuran</span>
-            </a>
+<nav class="fixed top-0 left-0 right-0 bg-white/80 backdrop-blur-xl shadow-sm z-50 border-b border-gray-100 py-3 md:py-0">
+    <div class="max-w-6xl mx-auto px-4 min-h-[4rem] flex flex-col md:flex-row items-center justify-between gap-3 md:gap-0">
+        <!-- Logo & Identitas -->
+        <div class="flex items-center gap-2">
+            <span class="text-xl font-bold text-emerald-600 tracking-tight">SI-WARGA</span>
+            <span class="bg-emerald-50 text-emerald-700 text-[10px] font-bold px-2 py-0.5 rounded-full border border-emerald-100">RT. 04 - RW. 26</span>
         </div>
-        <div class="bg-gray-50 px-4 py-2 border-t border-gray-100">
-            <p class="text-[10px] text-gray-400 uppercase tracking-widest font-bold">Menu Finansial</p>
+
+        <!-- Menu Navigasi -->
+        <div class="flex flex-wrap justify-center gap-1 md:gap-2 font-medium text-sm">
+            <!-- Link Sederhana -->
+            <a href="#beranda" class="px-4 py-2 text-gray-600 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all duration-300">Beranda</a>
+            <a href="#data-warga" class="px-4 py-2 text-gray-600 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all duration-300">Data</a>
+            <a href="#rencana-bo-2026" class="px-4 py-2 text-gray-600 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all duration-300">BO 2026</a>
+            
+            <!-- Dropdown Keuangan -->
+            <div class="relative group">
+                <button class="flex items-center gap-1 px-4 py-2 text-gray-600 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all duration-300">
+                    Keuangan <i class="fas fa-chevron-down text-[9px] group-hover:rotate-180 transition-transform duration-300"></i>
+                </button>
+                
+                <div class="absolute left-0 top-full mt-2 w-56 bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 z-50 overflow-hidden">
+                    <div class="p-2">
+                        <a href="#kas-warga" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-emerald-50 text-gray-700 hover:text-emerald-700 transition-all duration-200">
+                            <i class="fas fa-wallet text-sm w-5 text-center"></i> <span class="font-semibold text-sm">Kas Warga</span>
+                        </a>
+                        <a href="#tunggakan-warga" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-red-50 text-gray-700 hover:text-red-700 transition-all duration-200">
+                            <i class="fas fa-exclamation-circle text-sm w-5 text-center"></i> <span class="font-semibold text-sm">Tunggakan</span>
+                        </a>
+                        <a href="#iuran-bulan-ini" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-blue-50 text-gray-700 hover:text-blue-700 transition-all duration-200">
+                            <i class="fas fa-receipt text-sm w-5 text-center"></i> <span class="font-semibold text-sm">Iuran Bulanan</span>
+                        </a>
+                        <a href="#angsuran-warga" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-amber-50 text-gray-700 hover:text-amber-700 transition-all duration-200">
+                            <i class="fas fa-file-invoice-dollar text-sm w-5 text-center"></i> <span class="font-semibold text-sm">Angsuran</span>
+                        </a>
+                    </div>
+                    <div class="bg-gray-50/80 px-4 py-2 border-t border-gray-100 text-center">
+                        <p class="text-[10px] text-gray-400 uppercase tracking-widest font-bold">Laporan Finansial</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Link Lainnya -->
+            <a href="notulen.html" class="px-4 py-2 text-gray-600 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all duration-300">Notulen</a>
+            <a href="https://script.google.com/macros/s/AKfycbxKwWu0g7nOvFlMpNTc8VMoipGsI_77_fBu198JcqHhlauoNCFCbBsmVo9fRzIwlETp/exec" class="px-4 py-2 text-gray-600 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all duration-300">Kegiatan</a>
         </div>
     </div>
-</div>
-                <a href="notulen.html" class="text-gray-600 hover:text-emerald-600 transition-colors">Notulen</a>
-                 <a href="https://script.google.com/macros/s/AKfycbxKwWu0g7nOvFlMpNTc8VMoipGsI_77_fBu198JcqHhlauoNCFCbBsmVo9fRzIwlETp/exec" class="text-gray-600 hover:text-emerald-600 transition-colors">Kegiatan</a>
-               </div>
-        </div>
-    </nav>
+</nav>
 
     <header id="beranda" class="pt-32 pb-20 bg-emerald-900 text-white rounded-b-[3rem]">
         <div class="max-w-6xl mx-auto px-6 text-center">
