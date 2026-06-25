@@ -1139,19 +1139,13 @@
         
        // 9. Fungsi Rekap Kas 2 Tab
 async function fetchDataKas() {
-    // Gunakan reqId di dalam parameter tqx sebagai cache-buster yang direkomendasikan Google
+    // Tambahkan timestamp sebagai parameter URL murni (&t=...) untuk mem-bypass cache
     const timestamp = new Date().getTime();
-    const url = `https://docs.google.com/spreadsheets/d/${sheetIdKas}/gviz/tq?tqx=out:csv;reqId=${timestamp}&sheet=Kas`;
+    const url = `https://docs.google.com/spreadsheets/d/${sheetIdKas}/gviz/tq?tqx=out:csv&sheet=Kas&t=${timestamp}`;
     
     try {
-        // Tambahkan objek konfigurasi { cache: 'no-store' }
-        const response = await fetch(url, { 
-            cache: 'no-store',
-            headers: {
-                'Cache-Control': 'no-cache',
-                'Pragma': 'no-cache'
-            }
-        });
+        // Hapus konfigurasi 'headers' agar tidak terkena blokir CORS dari Google
+        const response = await fetch(url, { cache: 'no-store' });
         const csvText = await response.text();
         
         const rows = csvText.split('\n').map(row => row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(cell => cell.replace(/^"|"$/g, '').trim()));
@@ -1173,9 +1167,9 @@ async function fetchDataKas() {
         }
     } catch (err) {
         document.getElementById('kas-list-container').innerHTML = '<p class="text-red-500 text-center">Gagal memuat data Kas.</p>';
+        console.error(err);
     }
 }
-
 
         function switchTabKas(tab) {
             currentTabKas = tab;
@@ -1230,23 +1224,17 @@ async function fetchDataKas() {
                 </div>
             `;
         }
-
 // 10. Update Aset Kas
 async function updateKas() {
     const el = document.getElementById('total-aset-kas');
     
+    // Tambahkan timestamp sebagai parameter URL murni (&t=...)
     const timestamp = new Date().getTime();
-    const url = `https://docs.google.com/spreadsheets/d/${sheetIdKas}/gviz/tq?tqx=out:csv;reqId=${timestamp}&sheet=Kas&range=F:F`;
+    const url = `https://docs.google.com/spreadsheets/d/${sheetIdKas}/gviz/tq?tqx=out:csv&sheet=Kas&range=F:F&t=${timestamp}`;
     
     try {
-        // Tambahkan opsi cache: 'no-store' di sini juga
-        const response = await fetch(url, { 
-            cache: 'no-store',
-            headers: {
-                'Cache-Control': 'no-cache',
-                'Pragma': 'no-cache'
-            }
-        });
+        // Hapus konfigurasi 'headers' agar tidak terkena blokir CORS dari Google
+        const response = await fetch(url, { cache: 'no-store' });
         const text = await response.text();
         const rows = text.split('\n');
         
