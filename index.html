@@ -1139,12 +1139,19 @@
         
        // 9. Fungsi Rekap Kas 2 Tab
 async function fetchDataKas() {
-    // PERBAIKAN 1: Tambahkan timestamp agar data selalu fresh (bypass cache)
+    // Gunakan reqId di dalam parameter tqx sebagai cache-buster yang direkomendasikan Google
     const timestamp = new Date().getTime();
-    const url = `https://docs.google.com/spreadsheets/d/${sheetIdKas}/gviz/tq?tqx=out:csv&sheet=Kas&t=${timestamp}`;
+    const url = `https://docs.google.com/spreadsheets/d/${sheetIdKas}/gviz/tq?tqx=out:csv;reqId=${timestamp}&sheet=Kas`;
     
     try {
-        const response = await fetch(url);
+        // Tambahkan objek konfigurasi { cache: 'no-store' }
+        const response = await fetch(url, { 
+            cache: 'no-store',
+            headers: {
+                'Cache-Control': 'no-cache',
+                'Pragma': 'no-cache'
+            }
+        });
         const csvText = await response.text();
         
         const rows = csvText.split('\n').map(row => row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(cell => cell.replace(/^"|"$/g, '').trim()));
@@ -1161,9 +1168,6 @@ async function fetchDataKas() {
             if(kasBulanIdx === -1) kasBulanIdx = 0; 
             if(kasKetIdx === -1) kasKetIdx = 2; 
             
-            // PERBAIKAN 2: Ubah logika filter.
-            // Gunakan kasKetIdx (Keterangan) sebagai acuan validasi baris, bukan row[0].
-            // Ini mencegah data hilang jika kolom pertama di Excel/Spreadsheet tidak sengaja dikosongkan.
             allKasData = rows.slice(1).filter(row => row[kasKetIdx] !== undefined && row[kasKetIdx].trim() !== "");
             renderKas();
         }
@@ -1171,6 +1175,7 @@ async function fetchDataKas() {
         document.getElementById('kas-list-container').innerHTML = '<p class="text-red-500 text-center">Gagal memuat data Kas.</p>';
     }
 }
+
 
         function switchTabKas(tab) {
             currentTabKas = tab;
@@ -1226,16 +1231,22 @@ async function fetchDataKas() {
             `;
         }
 
-        // 10. Update Aset Kas
+// 10. Update Aset Kas
 async function updateKas() {
     const el = document.getElementById('total-aset-kas');
     
-    // PERBAIKAN: Tambahkan timestamp agar total uang selalu up-to-date
     const timestamp = new Date().getTime();
-    const url = `https://docs.google.com/spreadsheets/d/${sheetIdKas}/gviz/tq?tqx=out:csv&sheet=Kas&range=F:F&t=${timestamp}`;
+    const url = `https://docs.google.com/spreadsheets/d/${sheetIdKas}/gviz/tq?tqx=out:csv;reqId=${timestamp}&sheet=Kas&range=F:F`;
     
     try {
-        const response = await fetch(url);
+        // Tambahkan opsi cache: 'no-store' di sini juga
+        const response = await fetch(url, { 
+            cache: 'no-store',
+            headers: {
+                'Cache-Control': 'no-cache',
+                'Pragma': 'no-cache'
+            }
+        });
         const text = await response.text();
         const rows = text.split('\n');
         
