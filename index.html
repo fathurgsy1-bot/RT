@@ -1137,35 +1137,40 @@
             }
         }
         
-        // 9. Fungsi Rekap Kas 2 Tab
-        async function fetchDataKas() {
-            const url = `https://docs.google.com/spreadsheets/d/${sheetIdKas}/gviz/tq?tqx=out:csv&sheet=Kas`;
-            try {
-                const response = await fetch(url);
-                const csvText = await response.text();
-                
-                // PERBAIKAN: Split CSV yang kebal terhadap koma
-                const rows = csvText.split('\n').map(row => row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(cell => cell.replace(/^"|"$/g, '').trim()));
-                
-                if(rows.length > 0) {
-                    const headers = rows[0].map(h => h.toLowerCase());
-                    kasDebitIdx = headers.findIndex(h => h.includes('debit') || h.includes('masuk'));
-                    kasKreditIdx = headers.findIndex(h => h.includes('kredit') || h.includes('keluar') || h.includes('pengeluaran'));
-                    kasBulanIdx = headers.findIndex(h => h === 'bulan' || h.includes('bulan'));
-                    kasKetIdx = headers.findIndex(h => h === 'keterangan' || h.includes('keterangan'));
+       // 9. Fungsi Rekap Kas 2 Tab
+async function fetchDataKas() {
+    // PERBAIKAN 1: Tambahkan timestamp agar data selalu fresh (bypass cache)
+    const timestamp = new Date().getTime();
+    const url = `https://docs.google.com/spreadsheets/d/${sheetIdKas}/gviz/tq?tqx=out:csv&sheet=Kas&t=${timestamp}`;
+    
+    try {
+        const response = await fetch(url);
+        const csvText = await response.text();
+        
+        const rows = csvText.split('\n').map(row => row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(cell => cell.replace(/^"|"$/g, '').trim()));
+        
+        if(rows.length > 0) {
+            const headers = rows[0].map(h => h.toLowerCase());
+            kasDebitIdx = headers.findIndex(h => h.includes('debit') || h.includes('masuk'));
+            kasKreditIdx = headers.findIndex(h => h.includes('kredit') || h.includes('keluar') || h.includes('pengeluaran'));
+            kasBulanIdx = headers.findIndex(h => h === 'bulan' || h.includes('bulan'));
+            kasKetIdx = headers.findIndex(h => h === 'keterangan' || h.includes('keterangan'));
 
-                    if(kasDebitIdx === -1) kasDebitIdx = 3;
-                    if(kasKreditIdx === -1) kasKreditIdx = 4;
-                    if(kasBulanIdx === -1) kasBulanIdx = 0; 
-                    if(kasKetIdx === -1) kasKetIdx = 2; 
-                    
-                    allKasData = rows.slice(1).filter(row => row[0] !== "");
-                    renderKas();
-                }
-            } catch (err) {
-                document.getElementById('kas-list-container').innerHTML = '<p class="text-red-500 text-center">Gagal memuat data Kas.</p>';
-            }
+            if(kasDebitIdx === -1) kasDebitIdx = 3;
+            if(kasKreditIdx === -1) kasKreditIdx = 4;
+            if(kasBulanIdx === -1) kasBulanIdx = 0; 
+            if(kasKetIdx === -1) kasKetIdx = 2; 
+            
+            // PERBAIKAN 2: Ubah logika filter.
+            // Gunakan kasKetIdx (Keterangan) sebagai acuan validasi baris, bukan row[0].
+            // Ini mencegah data hilang jika kolom pertama di Excel/Spreadsheet tidak sengaja dikosongkan.
+            allKasData = rows.slice(1).filter(row => row[kasKetIdx] !== undefined && row[kasKetIdx].trim() !== "");
+            renderKas();
         }
+    } catch (err) {
+        document.getElementById('kas-list-container').innerHTML = '<p class="text-red-500 text-center">Gagal memuat data Kas.</p>';
+    }
+}
 
         function switchTabKas(tab) {
             currentTabKas = tab;
@@ -1222,39 +1227,41 @@
         }
 
         // 10. Update Aset Kas
-        async function updateKas() {
-            const el = document.getElementById('total-aset-kas');
-            const url = `https://docs.google.com/spreadsheets/d/${sheetIdKas}/gviz/tq?tqx=out:csv&sheet=Kas&range=F:F`;
+async function updateKas() {
+    const el = document.getElementById('total-aset-kas');
+    
+    // PERBAIKAN: Tambahkan timestamp agar total uang selalu up-to-date
+    const timestamp = new Date().getTime();
+    const url = `https://docs.google.com/spreadsheets/d/${sheetIdKas}/gviz/tq?tqx=out:csv&sheet=Kas&range=F:F&t=${timestamp}`;
+    
+    try {
+        const response = await fetch(url);
+        const text = await response.text();
+        const rows = text.split('\n');
+        
+        let angkaTerakhir = 0;
+        for (let i = rows.length - 1; i >= 0; i--) {
+            let val = rows[i].replace(/"/g, '').trim();
+            let cleanVal = val.replace(/[^0-9]/g, ''); 
+            let parsed = parseInt(cleanVal, 10);
             
-            try {
-                const response = await fetch(url);
-                const text = await response.text();
-                const rows = text.split('\n');
-                
-                let angkaTerakhir = 0;
-                for (let i = rows.length - 1; i >= 0; i--) {
-                    let val = rows[i].replace(/"/g, '').trim();
-                    let cleanVal = val.replace(/[^0-9]/g, ''); 
-                    let parsed = parseInt(cleanVal, 10);
-                    
-                    if (!isNaN(parsed) && parsed > 0) {
-                        angkaTerakhir = parsed;
-                        break; 
-                    }
-                }
-
-                el.textContent = formatRupiah(angkaTerakhir);
-                el.classList.remove('opacity-0');
-                globalAsetKas = angkaTerakhir;
-                updateGrandTotal();
-
-            } catch (error) {
-                console.error("Gagal memuat Kas:", error);
-                el.textContent = "Error";
-                el.classList.remove('opacity-0');
+            if (!isNaN(parsed) && parsed > 0) {
+                angkaTerakhir = parsed;
+                break; 
             }
         }
 
+        el.textContent = formatRupiah(angkaTerakhir);
+        el.classList.remove('opacity-0');
+        globalAsetKas = angkaTerakhir;
+        updateGrandTotal();
+
+    } catch (error) {
+        console.error("Gagal memuat Kas:", error);
+        el.textContent = "Error";
+        el.classList.remove('opacity-0');
+    }
+}
         // 11. Update Iuran Kas (Tunggakan & Persentase)
         async function updateIuranKas() {
             const url = `https://docs.google.com/spreadsheets/d/${sheetIdKas}/gviz/tq?tqx=out:csv&sheet=Tunggakan`;
