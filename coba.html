@@ -831,11 +831,11 @@
                 
                 let tbody = dataRows.map(row => {
                     // Mendapatkan angka dari Sheet Tunggakan
-                    let nilaiTunggakan = parseAngka(row[tunggakanIdx]);
+                    let nilaiTunggakan = parseAngka(tunggakanIdx);
                     let namaAsli = row[namaIdx] || "";
                     
                     // Mendapatkan data bulan yang kosong di sheet Angsuran sesuai dengan nama yang telah di-trim
-                    let angsuran = window.dataAngsuranWarga[namaAsli.toLowerCase().trim()] || { unpaidMonths: [], detectedNominal: 50000 };
+                    let angsuran = window.dataAngsuranWarga[namaAsli.toLowerCase().trim()] || { unpaidMonths: [], detectedNominal: 35000 };
                     
                     // Menjumlahkan nilaiTunggakan dengan akumulasi bulan kosong pada Angsuran
                     let tambahanTunggakan = angsuran.unpaidMonths.length * angsuran.detectedNominal;
