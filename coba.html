@@ -831,7 +831,7 @@
                 
                 let tbody = dataRows.map(row => {
                     // Mendapatkan angka dari Sheet Tunggakan
-                    let nilaiTunggakan = parseAngka(tunggakanIdx >= 0 ? row[tunggakanIdx] : row[3]);
+                    let nilaiTunggakan = parseAngka(row[tunggakanIdx]);
                     let namaAsli = row[namaIdx] || "";
                     
                     // Mendapatkan data bulan yang kosong di sheet Angsuran sesuai dengan nama yang telah di-trim
