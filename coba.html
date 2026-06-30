@@ -763,17 +763,22 @@
                     
                     let bodyHtml = tahunList.map(tahun => {
                         let startCol = headers.indexOf(tahun); if (startCol < 0) startCol = 1;
-                        for (let j=0; j<12; j++) { let v = parseAngka(item.rowData[startCol + j]?.value); if (v > 0) { detectedNominal = v; break; } }
+                        
+                        // Deteksi nominal bayar khusus per user
+                        if (detectedNominal === 0) {
+                            for (let j=0; j<12; j++) { let v = parseAngka(item.rowData[startCol + j]?.value); if (v > 0) { detectedNominal = v; break; } }
+                        }
                         
                         let blnHtml = daftarBulan.map((bln, blnIdx) => {
                             let cell = item.rowData[startCol + blnIdx] || { value: "", note: "" };
                             let nilai = parseAngka(cell.value), isPaid = nilai > 0, hasNote = cell.note.trim().length > 0;
                             
-                            let isPast = (tahun < currentYear) || (tahun == currentYear && blnIdx < currentMonthIndex) || 
-                                         (tahun == currentYear && blnIdx === currentMonthIndex && tglPertemuanBulanIni && today > tglPertemuanBulanIni);
+                            // Mendeteksi bulan yang kosong/belum dibayar untuk ditambahkan ke tunggakan
+                            let isPast = (tahun < currentYear) || (tahun == currentYear && blnIdx <= currentMonthIndex);
                             let isOverdue = isPast && !isPaid && !hasNote;
                             
-                            if (isOverdue && tahun == currentYear) unpaidMonths.push(bln);
+                            // Masukkan ke array tunggakan agar dapat dihitung akumulasinya
+                            if (isOverdue) unpaidMonths.push(bln.substring(0,3) + (tahun != currentYear ? ' '+tahun : ''));
                             
                             let bg = isPaid ? 'bg-green-50' : isOverdue ? 'bg-red-50' : hasNote ? 'bg-amber-50 cursor-pointer' : 'bg-gray-50';
                             let txt = isPaid ? 'text-green-600' : isOverdue ? 'text-red-500 font-bold' : hasNote ? 'text-amber-600' : 'text-gray-600';
@@ -789,7 +794,8 @@
                         return `<div class="border border-gray-100 rounded-md overflow-hidden mb-3"><div class="p-2 bg-emerald-50 text-emerald-800 font-bold text-xs">Tahun ${tahun}</div><div class="p-2 grid grid-cols-4 gap-1.5 relative">${blnHtml}</div></div>`;
                     }).join('');
 
-                    window.dataAngsuranWarga[item.nama.toLowerCase()] = { unpaidMonths, detectedNominal }; 
+                    // Simpan data angsuran per nama ke data window dengan metode TRIM
+                    window.dataAngsuranWarga[item.nama.toLowerCase()] = { unpaidMonths, detectedNominal: detectedNominal || 50000 }; 
 
                     return `<div class="angsuran-item bg-white rounded-lg shadow-sm border overflow-hidden h-max" data-name="${item.nama.toLowerCase()}">
                         <button onclick="toggle('${idNama}')" class="w-full p-3 flex justify-between items-center bg-gray-50 font-semibold text-gray-700 text-sm hover:bg-emerald-50"><span class="flex items-center gap-2"><i class="fas fa-user-circle"></i> ${safeNama}</span><i class="fas fa-chevron-down text-xs"></i></button>
@@ -824,12 +830,17 @@
                 let globalTunggakanSum = 0; let sudahBayarCount = 0;
                 
                 let tbody = dataRows.map(row => {
+                    // Mendapatkan angka dari Sheet Tunggakan
                     let nilaiTunggakan = parseAngka(tunggakanIdx >= 0 ? row[tunggakanIdx] : row[3]);
                     let namaAsli = row[namaIdx] || "";
-                    let angsuran = window.dataAngsuranWarga[namaAsli.toLowerCase()] || { unpaidMonths: [], detectedNominal: 50000 };
                     
-                    let tambahanTunggakan = angsuran.unpaidMonths.length * (angsuran.detectedNominal || 50000);
+                    // Mendapatkan data bulan yang kosong di sheet Angsuran sesuai dengan nama yang telah di-trim
+                    let angsuran = window.dataAngsuranWarga[namaAsli.toLowerCase().trim()] || { unpaidMonths: [], detectedNominal: 50000 };
+                    
+                    // Menjumlahkan nilaiTunggakan dengan akumulasi bulan kosong pada Angsuran
+                    let tambahanTunggakan = angsuran.unpaidMonths.length * angsuran.detectedNominal;
                     let total = nilaiTunggakan + tambahanTunggakan;
+                    
                     globalTunggakanSum += total;
                     if(total === 0) sudahBayarCount++;
 
@@ -893,7 +904,6 @@
         // --- Main Execution (Parallel Loading) ---
         document.addEventListener("DOMContentLoaded", async () => {
             // Jalankan widget/fetch yang TIDAK memiliki dependency secara paralel
-            // Menghapus updateBudget untuk Total dan Rencana agar mengikuti konversi 25 juta yang ditetepkan statis
             Promise.all([
                 fetchWargaData(),
                 fetchRekapKeuanganDanKas(),
@@ -903,8 +913,8 @@
             // Jalankan fetch berurutan HANYA jika ada dependency spesifik
             try {
                 await fetchJadwalPertemuan(); 
-                await fetchAngsuran();        
-                await fetchKasTunggakan('Tunggakan', 'content-tunggakan'); 
+                await fetchAngsuran();        // Menentukan bulan-bulan yang kosong (Tunggakan di Iuran Bulanan) per nama warga
+                await fetchKasTunggakan('Tunggakan', 'content-tunggakan'); // Menjumlahkan Base Tunggakan + Akumulasi Angsuran yang kosong
             } catch (err) {
                 console.error("Error pada muatan beruntun:", err);
             }
