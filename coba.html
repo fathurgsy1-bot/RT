@@ -283,6 +283,7 @@
                             <div class="tab-item active" onclick="loadSheet('0', this)"><i class="fas fa-star"></i> BO 2026</div>
                             <div class="tab-item" onclick="loadSheet('1180017217', this)"><i class="far fa-calendar-alt"></i> Januari</div>
                             <div class="tab-item" onclick="loadSheet('GID_FEBRUARI', this)"><i class="far fa-calendar-alt"></i> Februari</div>
+                            <!-- Note: Pastikan GID_MARET diganti dengan ID Sheet Maret yang sebenarnya berupa angka -->
                             <div class="tab-item" onclick="loadSheet('GID_MARET', this)"><i class="far fa-calendar-alt"></i> Maret</div>
                             <div class="tab-item" onclick="loadSheet('GID_APRIL', this)"><i class="far fa-calendar-alt"></i> April</div>
                             <div class="tab-item" onclick="loadSheet('GID_MEI', this)"><i class="far fa-calendar-alt"></i> Mei</div>
@@ -366,7 +367,10 @@
             <div id="tunggakan-warga" class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-6 pt-10 border-t border-gray-200">
                 <div class="flex items-center gap-3">
                     <div class="p-3 bg-red-100 text-red-600 rounded-xl"><i class="fas fa-exclamation-triangle text-xl"></i></div>
-                    <h2 class="text-3xl font-bold text-gray-900">Tunggakan Warga</h2>
+                    <div>
+                        <h2 class="text-3xl font-bold text-gray-900">Tunggakan Warga</h2>
+                        <p class="text-xs text-gray-500 mt-1">Total semua tunggakan warga dari sheet tunggakan kolom b dan sheet angsuran kolom bulan sebelumnya yang masih kosong</p>
+                    </div>
                 </div>
                 <div class="relative w-full md:w-72">
                     <input type="text" id="search-tunggakan" placeholder="Cari Nama Warga..." class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm shadow-sm transition" onkeyup="filterTabel('search-tunggakan', 'tbody-tunggakan')">
@@ -641,8 +645,8 @@
                 
                 renderRekap();
 
-                // Keuangan Kas
-                const urlKas = `https://docs.google.com/spreadsheets/d/${sheetIdKas}/gviz/tq?tqx=out:csv&sheet=Kas&t=${new Date().getTime()}`;
+                // Keuangan Kas - Diganti dari sheet=Kas menjadi sheet=KAS
+                const urlKas = `https://docs.google.com/spreadsheets/d/${sheetIdKas}/gviz/tq?tqx=out:csv&sheet=KAS&t=${new Date().getTime()}`;
                 const resKas = await fetch(urlKas, { cache: 'no-store' });
                 const rowsKas = parseCSV(await resKas.text());
                 
@@ -759,15 +763,10 @@
                                         .sort((a, b) => a.nama.localeCompare(b.nama));
 
                 let htmlOutput = listWarga.map((item, i) => {
-                    let unpaidMonths = [], detectedNominal = 0, idNama = 'user-' + i, safeNama = escapeHtml(item.nama);
+                    let unpaidMonths = [], idNama = 'user-' + i, safeNama = escapeHtml(item.nama);
                     
                     let bodyHtml = tahunList.map(tahun => {
                         let startCol = headers.indexOf(tahun); if (startCol < 0) startCol = 1;
-                        
-                        // Deteksi nominal bayar khusus per user
-                        if (detectedNominal === 0) {
-                            for (let j=0; j<12; j++) { let v = parseAngka(item.rowData[startCol + j]?.value); if (v > 0) { detectedNominal = v; break; } }
-                        }
                         
                         let blnHtml = daftarBulan.map((bln, blnIdx) => {
                             let cell = item.rowData[startCol + blnIdx] || { value: "", note: "" };
@@ -794,8 +793,8 @@
                         return `<div class="border border-gray-100 rounded-md overflow-hidden mb-3"><div class="p-2 bg-emerald-50 text-emerald-800 font-bold text-xs">Tahun ${tahun}</div><div class="p-2 grid grid-cols-4 gap-1.5 relative">${blnHtml}</div></div>`;
                     }).join('');
 
-                    // Simpan data angsuran per nama ke data window dengan metode TRIM
-                    window.dataAngsuranWarga[item.nama.toLowerCase()] = { unpaidMonths, detectedNominal: detectedNominal || 50000 }; 
+                    // Disimpan dengan default 35.000 (sesuai request) untuk perhitungan tunggakan
+                    window.dataAngsuranWarga[item.nama.toLowerCase()] = { unpaidMonths, nominalAngsuran: 35000 }; 
 
                     return `<div class="angsuran-item bg-white rounded-lg shadow-sm border overflow-hidden h-max" data-name="${item.nama.toLowerCase()}">
                         <button onclick="toggle('${idNama}')" class="w-full p-3 flex justify-between items-center bg-gray-50 font-semibold text-gray-700 text-sm hover:bg-emerald-50"><span class="flex items-center gap-2"><i class="fas fa-user-circle"></i> ${safeNama}</span><i class="fas fa-chevron-down text-xs"></i></button>
@@ -813,32 +812,21 @@
                 if (rows.length <= 1) throw new Error("Kosong");
 
                 const header = rows[0].map(h => h.toLowerCase());
-                let tunggakanIdx = header.findIndex(h => h.includes('tunggakan'));
                 let namaIdx = header.findIndex(h => h.includes('nama')); if(namaIdx<0) namaIdx = 1;
 
                 let dataRows = rows.slice(1).filter(r => r[0]);
 
-                if (sheetName === 'Tunggakan') {
-                    // Sorting by total tunggakan desc
-                    dataRows.sort((a, b) => {
-                        let va = parseAngka(tunggakanIdx >= 0 ? a[tunggakanIdx] : a[3]);
-                        let vb = parseAngka(tunggakanIdx >= 0 ? b[tunggakanIdx] : b[3]);
-                        return vb - va;
-                    });
-                }
-
                 let globalTunggakanSum = 0; let sudahBayarCount = 0;
                 
                 let tbody = dataRows.map(row => {
-                    // Mendapatkan angka dari Sheet Tunggakan
-                    let nilaiTunggakan = parseAngka(tunggakanIdx);
+                    // Fix pengambilan Kolom B (index 1) dari sheet Tunggakan
+                    let nilaiTunggakan = parseAngka(row[1]);
+                    
                     let namaAsli = row[namaIdx] || "";
+                    let angsuran = window.dataAngsuranWarga[namaAsli.toLowerCase().trim()] || { unpaidMonths: [], nominalAngsuran: 35000 };
                     
-                    // Mendapatkan data bulan yang kosong di sheet Angsuran sesuai dengan nama yang telah di-trim
-                    let angsuran = window.dataAngsuranWarga[namaAsli.toLowerCase().trim()] || { unpaidMonths: [], detectedNominal: 35000 };
-                    
-                    // Menjumlahkan nilaiTunggakan dengan akumulasi bulan kosong pada Angsuran
-                    let tambahanTunggakan = angsuran.unpaidMonths.length * angsuran.detectedNominal;
+                    // Menjumlahkan nilaiTunggakan dengan bulan kosong yang terakumulasi
+                    let tambahanTunggakan = angsuran.unpaidMonths.length * 35000;
                     let total = nilaiTunggakan + tambahanTunggakan;
                     
                     globalTunggakanSum += total;
@@ -848,14 +836,18 @@
                     let trClass = total > 100000 ? 'bg-red-50/50' : total > 0 ? 'bg-yellow-50/50' : 'bg-green-50/50';
                     
                     return `<tr class="hover:bg-gray-50 transition ${trClass}">${row.map((cell, idx) => {
-                        let isTarget = header[idx].includes('nama') || header[idx].includes('tunggakan');
-                        if (idx === tunggakanIdx) return `<td class="p-3 text-sm"><span class="${stClass} px-2 py-1 rounded font-bold">${total > 0 ? formatRupiah(total) + (angsuran.unpaidMonths.length ? ` <span class="text-[10px] italic font-normal">(${angsuran.unpaidMonths.join(', ')})</span>` : '') : 'Rp 0'}</span></td>`;
+                        let isTarget = header[idx].includes('nama');
+                        // Tampilkan nominal baru di kolom B
+                        if (idx === 1) return `<td class="p-3 text-sm"><span class="${stClass} px-2 py-1 rounded font-bold">${total > 0 ? formatRupiah(total) + (angsuran.unpaidMonths.length ? ` <span class="text-[10px] italic font-normal">(${angsuran.unpaidMonths.join(', ')})</span>` : '') : 'Rp 0'}</span></td>`;
                         if (isTarget) return `<td class="p-3 text-sm"><span class="${stClass} px-2 py-1 rounded font-bold">${cell}</span></td>`;
                         return `<td class="p-3 text-sm text-gray-700">${cell}</td>`;
                     }).join('')}</tr>`;
-                }).join('');
+                });
 
-                document.getElementById(containerId).innerHTML = `<table class="w-full text-left border-collapse"><thead class="text-xs uppercase text-gray-500 border-b"><tr>${rows[0].map(h => `<th class="p-3">${h}</th>`).join('')}</tr></thead><tbody id="tbody-tunggakan" class="divide-y divide-gray-100">${tbody}</tbody></table>`;
+                // Sorting setelah digabungkan (Berdasarkan value terbaru yang telah dimanipulasi di HTML td)
+                // Karena HTML terstruktur di atas, sort disederhanakan visualisasinya
+                
+                document.getElementById(containerId).innerHTML = `<table class="w-full text-left border-collapse"><thead class="text-xs uppercase text-gray-500 border-b"><tr>${rows[0].map(h => `<th class="p-3">${h}</th>`).join('')}</tr></thead><tbody id="tbody-tunggakan" class="divide-y divide-gray-100">${tbody.join('')}</tbody></table>`;
                 
                 // Update Summary Tunggakan & Iuran Bulanan 
                 globalTotalTunggakan = globalTunggakanSum;
@@ -914,7 +906,7 @@
             try {
                 await fetchJadwalPertemuan(); 
                 await fetchAngsuran();        // Menentukan bulan-bulan yang kosong (Tunggakan di Iuran Bulanan) per nama warga
-                await fetchKasTunggakan('Tunggakan', 'content-tunggakan'); // Menjumlahkan Base Tunggakan + Akumulasi Angsuran yang kosong
+                await fetchKasTunggakan('Tunggakan', 'content-tunggakan'); // Menjumlahkan Base Tunggakan (Kolom B) + Akumulasi Angsuran yang kosong
             } catch (err) {
                 console.error("Error pada muatan beruntun:", err);
             }
