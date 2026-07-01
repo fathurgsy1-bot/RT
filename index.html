@@ -573,7 +573,9 @@
                 if (rows.length <= 1) throw new Error("Data sheet kosong");
                 
                 const headers = rows[0].map(h => (h || "").toLowerCase().trim());
-                const fotoIndex = headers.findIndex(h => h.includes('foto'));
+                // Mengubah semua header jadi huruf kecil dan mencari kata 'foto'
+const fotoIndex = headers.findIndex(h => h.toLowerCase().includes('foto'));
+
                 
                 if (fotoIndex === -1) throw new Error("Kolom 'foto' tidak ditemukan di baris pertama sheet");
                 
