@@ -820,63 +820,73 @@
             } catch(e) { container.innerHTML = `<p class='col-span-full text-center text-red-500 py-10'>Gagal memuat Angsuran.</p>`; }
         }
 
-        async function fetchKasTunggakan(sheetName, containerId) {
+        async function fetchAngsuran() {
+            window.dataAngsuranWarga = {};
+            const container = document.getElementById('content-angsuran');
+            const now = new Date(), today = new Date(now.setHours(0,0,0,0)), currentYear = now.getFullYear(), currentMonthIndex = now.getMonth();
+
             try {
-                const res = await fetch(`https://docs.google.com/spreadsheets/d/${sheetIdKas}/gviz/tq?tqx=out:csv&sheet=${sheetName}`);
-                if (!res.ok) throw new Error("Gagal mengambil tunggakan");
-                const rows = parseCSV(await res.text());
-                if (rows.length <= 1) throw new Error("Kosong");
-
-                const header = rows[0].map(h => h.toLowerCase());
-                let namaIdx = header.findIndex(h => h.includes('nama')); if(namaIdx<0) namaIdx = 1;
-
-                let dataRows = rows.slice(1).filter(r => r[0]);
-
-                let globalTunggakanSum = 0; let sudahBayarCount = 0;
+                const response = await fetch(appScriptUrl);
+                if (!response.ok) throw new Error("Gagal mengambil Angsuran");
                 
-                let tbody = dataRows.map(row => {
-                    let nilaiTunggakan = parseAngka(row[1]);
-                    
-                    let namaAsli = row[namaIdx] || "";
-                    let angsuran = window.dataAngsuranWarga[namaAsli.toLowerCase().trim()] || { unpaidMonths: [], nominalAngsuran: 35000 };
-                    
-                    let tambahanTunggakan = angsuran.unpaidMonths.length * 35000;
-                    let total = nilaiTunggakan + tambahanTunggakan;
-                    
-                    globalTunggakanSum += total;
-                    if(total === 0) sudahBayarCount++;
+                const result = JSON.parse(await response.text());
+                if (result.error) throw new Error(result.error);
+                
+                const { headers, dataRows } = normalizeResponse(result);
+                let tahunList = [...new Set(headers.filter(h => /\d{4}/.test(h)))];
+                if (tahunList.length === 0) tahunList = [currentYear.toString()];
 
-                    let stClass = total > 100000 ? 'bg-red-100 text-red-700' : total > 0 ? 'bg-yellow-100 text-yellow-700' : 'bg-green-100 text-green-700';
-                    let trClass = total > 100000 ? 'bg-red-50/50' : total > 0 ? 'bg-yellow-50/50' : 'bg-green-50/50';
+                let listWarga = dataRows.filter(r => r[0]?.value && !r[0].value.toLowerCase().includes("nama"))
+                                        .map(r => ({ rowData: r, nama: r[0].value.trim() }))
+                                        .sort((a, b) => a.nama.localeCompare(b.nama));
+
+                let htmlOutput = listWarga.map((item, i) => {
+                    let unpaidMonths = [], idNama = 'user-' + i, safeNama = escapeHtml(item.nama);
                     
-                    return `<tr class="hover:bg-gray-50 transition ${trClass}">${row.map((cell, idx) => {
-                        let isTarget = header[idx].includes('nama');
+                    let bodyHtml = tahunList.map(tahun => {
+                        // Ambil angka tahunnya dengan aman
+                        let tahunAngka = parseInt(tahun.match(/\d{4}/)?.[0] || currentYear);
+                        let startCol = headers.indexOf(tahun); if (startCol < 0) startCol = 1;
                         
-                        // KODE YANG SUDAH DIPERBAIKI
-                        if (idx === 1) {
-                            const unpaidSpan = angsuran.unpaidMonths && angsuran.unpaidMonths.length > 0 
-                                ? ` <span class="text-[10px] italic font-normal">(${angsuran.unpaidMonths.join(', ')})</span>` 
-                                : '';
-                            return `<td class="p-3 text-sm"><span class="${stClass} px-2 py-1 rounded font-bold">${total > 0 ? formatRupiah(total) : 'Rp 0'}</span></td>`;
-                        }
+                        let blnHtml = daftarBulan.map((bln, blnIdx) => {
+                            let cell = item.rowData[startCol + blnIdx] || { value: "", note: "" };
+                            let cellText = (cell.value || "").toString().trim().toLowerCase();
+                            let nilai = parseAngka(cellText);
+                            
+                            // Mendeteksi lunas via angka ATAU teks ceklis/lunas (v, ok, dll)
+                            let isPaid = nilai > 0 || ['lunas', 'v', 'ok', 'ya', 'sudah', '✔️'].includes(cellText);
+                            let hasNote = cell.note && cell.note.trim().length > 0;
+                            
+                            // PERBAIKAN: Hanya hitung "bulan sebelumnya" di "tahun berjalan ini" 
+                            // agar tidak double-count dengan rekap lama di Sheet Tunggakan
+                            let isPast = (tahunAngka === currentYear && blnIdx < currentMonthIndex);
+                            let isOverdue = isPast && !isPaid && !hasNote;
+                            
+                            if (isOverdue) unpaidMonths.push(bln.substring(0,3));
+                            
+                            let bg = isPaid ? 'bg-green-50' : isOverdue ? 'bg-red-50' : hasNote ? 'bg-amber-50 cursor-pointer' : 'bg-gray-50';
+                            let txt = isPaid ? 'text-green-600' : isOverdue ? 'text-red-500 font-bold' : hasNote ? 'text-amber-600' : 'text-gray-600';
+                            let valStr = isPaid ? (nilai > 0 ? `Rp${nilai/1000}k` : '✔') : hasNote ? '📝' : isOverdue ? 'X' : '-';
+                            let click = hasNote ? `onclick="showNote('${safeNama}', '${bln}', '${tahunAngka}', '${escapeHtml(cell.note).replace(/\n/g, '<br>')}')"` : '';
+                            
+                            return `<div ${click} class="p-1.5 border rounded text-[10px] ${bg} flex flex-col items-center justify-center text-center">
+                                ${hasNote ? `<div class="absolute -top-1 -right-1 w-3.5 h-3.5 bg-amber-400 rounded-full flex items-center justify-center text-white"><i class="fas fa-info text-[6px]"></i></div>` : ''}
+                                <div class="font-bold mb-0.5">${bln.substring(0,3)}</div><div class="font-mono text-[9px] ${txt}">${valStr}</div>
+                            </div>`;
+                        }).join('');
 
-                        if (isTarget) return `<td class="p-3 text-sm"><span class="${stClass} px-2 py-1 rounded font-bold">${cell}</span></td>`;
-                        return `<td class="p-3 text-sm text-gray-700">${cell}</td>`;
-                    }).join('')}</tr>`;
-                });
+                        return `<div class="border border-gray-100 rounded-md overflow-hidden mb-3"><div class="p-2 bg-emerald-50 text-emerald-800 font-bold text-xs">Tahun ${tahunAngka}</div><div class="p-2 grid grid-cols-4 gap-1.5 relative">${blnHtml}</div></div>`;
+                    }).join('');
 
-                document.getElementById(containerId).innerHTML = `<table class="w-full text-left border-collapse"><thead class="text-xs uppercase text-gray-500 border-b"><tr>${rows[0].map(h => `<th class="p-3">${h}</th>`).join('')}</tr></thead><tbody id="tbody-tunggakan" class="divide-y divide-gray-100">${tbody.join('')}</tbody></table>`;
-                
-                globalTotalTunggakan = globalTunggakanSum;
-                if(document.getElementById('info-tunggakan')) document.getElementById('info-tunggakan').textContent = formatRupiah(globalTunggakanSum);
-                updateGrandTotal();
+                    window.dataAngsuranWarga[item.nama.toLowerCase()] = { unpaidMonths, nominalAngsuran: 35000 }; 
 
-                const pct = dataRows.length ? Math.round((sudahBayarCount / dataRows.length) * 100) : 0;
-                document.getElementById('persen-iuran').textContent = pct + "%";
-                document.getElementById('bar-iuran').style.width = pct + "%";
-                document.getElementById('keterangan-iuran').textContent = `${sudahBayarCount} dari ${dataRows.length} KK lunas`;
-
-            } catch(e) { document.getElementById(containerId).innerHTML = `<p class="text-center text-red-500 py-10">Gagal memuat tunggakan.</p>`; }
+                    return `<div class="angsuran-item bg-white rounded-lg shadow-sm border overflow-hidden h-max" data-name="${item.nama.toLowerCase()}">
+                        <button onclick="toggle('${idNama}')" class="w-full p-3 flex justify-between items-center bg-gray-50 font-semibold text-gray-700 text-sm hover:bg-emerald-50"><span class="flex items-center gap-2"><i class="fas fa-user-circle"></i> ${safeNama}</span><i class="fas fa-chevron-down text-xs"></i></button>
+                        <div id="${idNama}" class="p-3 hidden bg-white border-t">${bodyHtml}</div>
+                    </div>`;
+                }).join('');
+                container.innerHTML = htmlOutput;
+            } catch(e) { container.innerHTML = `<p class='col-span-full text-center text-red-500 py-10'>Gagal memuat Angsuran.</p>`; }
         }
 
         async function fetchIuranBulanIni() {
