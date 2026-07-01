@@ -459,7 +459,6 @@
         const parseAngka = (str) => parseInt((str || "").toString().toLowerCase().replace(/ribu/g, '000').replace(/jt/g, '000000').replace(/[^0-9]/g, '')) || 0;
         const escapeHtml = (text) => text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
         
-        // CSV Parser terpusat agar tidak duplikasi Regex yang berat
         const parseCSV = (csvText) => csvText.split('\n').map(row => row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(cell => cell.replace(/^"|"$/g, '').trim()));
         
         const updateGrandTotal = () => {
@@ -514,6 +513,7 @@
         async function fetchJadwalPertemuan() {
             try {
                 const response = await fetch(`https://docs.google.com/spreadsheets/d/${sheetIdJadwal}/gviz/tq?tqx=out:csv&sheet=Sheet1`);
+                if (!response.ok) throw new Error("Gagal mengambil jadwal");
                 const rows = parseCSV(await response.text());
                 
                 if (rows.length <= 1) throw new Error("Data Kosong");
@@ -599,6 +599,7 @@
         async function fetchWargaData() {
             try {
                 const response = await fetch(`https://docs.google.com/spreadsheets/d/${sheetIdWarga}/gviz/tq?tqx=out:csv`);
+                if (!response.ok) throw new Error("Gagal load warga");
                 const rows = parseCSV(await response.text());
                 
                 document.getElementById('total-warga-display').textContent = rows.length - 1;
@@ -621,12 +622,12 @@
 
         async function fetchRekapKeuanganDanKas() {
             try {
-                // Keuangan BO
                 const urlBO = `https://docs.google.com/spreadsheets/d/${sheetIdR}/gviz/tq?tqx=out:csv&sheet=Laporan Keuangan&range=A7:G200`;
                 const resBO = await fetch(urlBO);
+                if (!resBO.ok) throw new Error("Gagal load keuangan BO");
                 const rowsBO = parseCSV(await resBO.text()).filter(row => row.length >= 6 && row[2] !== "");
                 
-                allDataRekap = rowsBO; // Simpan cache
+                allDataRekap = rowsBO; 
                 
                 let debitBO = 0, kreditBO = 0;
                 rowsBO.forEach(r => {
@@ -645,9 +646,9 @@
                 
                 renderRekap();
 
-                // Keuangan Kas - Diganti dari sheet=Kas menjadi sheet=KAS
                 const urlKas = `https://docs.google.com/spreadsheets/d/${sheetIdKas}/gviz/tq?tqx=out:csv&sheet=KAS&t=${new Date().getTime()}`;
                 const resKas = await fetch(urlKas, { cache: 'no-store' });
+                if (!resKas.ok) throw new Error("Gagal load Kas");
                 const rowsKas = parseCSV(await resKas.text());
                 
                 if (rowsKas.length > 0) {
@@ -665,7 +666,6 @@
                     allKasData = rowsKas.slice(1).filter(r => r[kasKetIdx]);
                     renderKas();
                     
-                    // Ambil Total Aset Terakhir
                     const asetVals = rowsKas.map(r => parseAngka(r[5])).filter(v => !isNaN(v) && v > 0);
                     globalAsetKas = asetVals.length > 0 ? asetVals[asetVals.length - 1] : 0;
                     document.getElementById('total-aset-kas').textContent = formatRupiah(globalAsetKas);
@@ -678,8 +678,16 @@
         // 3. Render Helpers untuk Tab
         function switchTabRekap(tab) {
             currentTabRekap = tab;
-            document.getElementById('btn-pemasukan').className = tab === 'pemasukan' ? 'flex-1 py-2 text-sm font-bold rounded-lg bg-white shadow text-emerald-600 transition' : 'flex-1 py-2 text-sm font-bold rounded-lg text-gray-500 transition';
-            document.getElementById('btn-pengeluaran').className = tab === 'pengeluaran' ? 'flex-1 py-2 text-sm font-bold rounded-lg bg-white shadow text-red-600 transition' : 'flex-1 py-2 text-sm font-bold rounded-lg text-gray-500 transition';
+            const btnMasuk = document.getElementById('btn-pemasukan');
+            const btnKeluar = document.getElementById('btn-pengeluaran');
+            
+            if(tab === 'pemasukan') {
+                btnMasuk.className = 'flex-1 py-2 text-sm font-bold rounded-lg bg-white shadow text-emerald-600 transition';
+                btnKeluar.className = 'flex-1 py-2 text-sm font-bold rounded-lg text-gray-500 transition';
+            } else {
+                btnMasuk.className = 'flex-1 py-2 text-sm font-bold rounded-lg text-gray-500 transition';
+                btnKeluar.className = 'flex-1 py-2 text-sm font-bold rounded-lg bg-white shadow text-red-600 transition';
+            }
             renderRekap();
         }
 
@@ -695,8 +703,16 @@
 
         function switchTabKas(tab) {
             currentTabKas = tab;
-            document.getElementById('btn-kas-pemasukan').className = tab === 'pemasukan' ? 'flex-1 py-2 text-sm font-bold rounded-lg bg-white shadow text-emerald-600 transition' : 'flex-1 py-2 text-sm font-bold rounded-lg text-gray-500 transition';
-            document.getElementById('btn-kas-pengeluaran').className = tab === 'pengeluaran' ? 'flex-1 py-2 text-sm font-bold rounded-lg bg-white shadow text-red-600 transition' : 'flex-1 py-2 text-sm font-bold rounded-lg text-gray-500 transition';
+            const btnMasuk = document.getElementById('btn-kas-pemasukan');
+            const btnKeluar = document.getElementById('btn-kas-pengeluaran');
+            
+            if(tab === 'pemasukan') {
+                btnMasuk.className = 'flex-1 py-2 text-sm font-bold rounded-lg bg-white shadow text-emerald-600 transition';
+                btnKeluar.className = 'flex-1 py-2 text-sm font-bold rounded-lg text-gray-500 transition';
+            } else {
+                btnMasuk.className = 'flex-1 py-2 text-sm font-bold rounded-lg text-gray-500 transition';
+                btnKeluar.className = 'flex-1 py-2 text-sm font-bold rounded-lg bg-white shadow text-red-600 transition';
+            }
             renderKas();
         }
 
@@ -751,6 +767,8 @@
 
             try {
                 const response = await fetch(appScriptUrl);
+                if (!response.ok) throw new Error("Gagal mengambil Angsuran");
+                
                 const result = JSON.parse(await response.text());
                 if (result.error) throw new Error(result.error);
                 
@@ -772,11 +790,9 @@
                             let cell = item.rowData[startCol + blnIdx] || { value: "", note: "" };
                             let nilai = parseAngka(cell.value), isPaid = nilai > 0, hasNote = cell.note.trim().length > 0;
                             
-                            // Mendeteksi bulan yang kosong/belum dibayar untuk ditambahkan ke tunggakan
                             let isPast = (tahun < currentYear) || (tahun == currentYear && blnIdx <= currentMonthIndex);
                             let isOverdue = isPast && !isPaid && !hasNote;
                             
-                            // Masukkan ke array tunggakan agar dapat dihitung akumulasinya
                             if (isOverdue) unpaidMonths.push(bln.substring(0,3) + (tahun != currentYear ? ' '+tahun : ''));
                             
                             let bg = isPaid ? 'bg-green-50' : isOverdue ? 'bg-red-50' : hasNote ? 'bg-amber-50 cursor-pointer' : 'bg-gray-50';
@@ -793,7 +809,6 @@
                         return `<div class="border border-gray-100 rounded-md overflow-hidden mb-3"><div class="p-2 bg-emerald-50 text-emerald-800 font-bold text-xs">Tahun ${tahun}</div><div class="p-2 grid grid-cols-4 gap-1.5 relative">${blnHtml}</div></div>`;
                     }).join('');
 
-                    // Disimpan dengan default 35.000 (sesuai request) untuk perhitungan tunggakan
                     window.dataAngsuranWarga[item.nama.toLowerCase()] = { unpaidMonths, nominalAngsuran: 35000 }; 
 
                     return `<div class="angsuran-item bg-white rounded-lg shadow-sm border overflow-hidden h-max" data-name="${item.nama.toLowerCase()}">
@@ -808,6 +823,7 @@
         async function fetchKasTunggakan(sheetName, containerId) {
             try {
                 const res = await fetch(`https://docs.google.com/spreadsheets/d/${sheetIdKas}/gviz/tq?tqx=out:csv&sheet=${sheetName}`);
+                if (!res.ok) throw new Error("Gagal mengambil tunggakan");
                 const rows = parseCSV(await res.text());
                 if (rows.length <= 1) throw new Error("Kosong");
 
@@ -819,13 +835,11 @@
                 let globalTunggakanSum = 0; let sudahBayarCount = 0;
                 
                 let tbody = dataRows.map(row => {
-                    // Fix pengambilan Kolom B (index 1) dari sheet Tunggakan
                     let nilaiTunggakan = parseAngka(row[1]);
                     
                     let namaAsli = row[namaIdx] || "";
                     let angsuran = window.dataAngsuranWarga[namaAsli.toLowerCase().trim()] || { unpaidMonths: [], nominalAngsuran: 35000 };
                     
-                    // Menjumlahkan nilaiTunggakan dengan bulan kosong yang terakumulasi dikalikan 35.000
                     let tambahanTunggakan = angsuran.unpaidMonths.length * 35000;
                     let total = nilaiTunggakan + tambahanTunggakan;
                     
@@ -837,19 +851,16 @@
                     
                     return `<tr class="hover:bg-gray-50 transition ${trClass}">${row.map((cell, idx) => {
                         let isTarget = header[idx].includes('nama');
-                        // Tampilkan nominal baru di kolom B
-                        if (idx === 1) return `<td class="p-3 text-sm"><span class="${stClass} px-2 py-1 rounded font-bold">${formatRupiah(total) ` <span class="text-[10px] italic font-normal">(${angsuran.unpaidMonths.join(', ')})</span>` : '') : 'Rp 0'}</span></td>`;
+                        
+                        // FIX TERNARY ERROR HERE
+                        if (idx === 1) return `<td class="p-3 text-sm"><span class="${stClass} px-2 py-1 rounded font-bold">${total > 0 ? formatRupiah(total) + (angsuran.unpaidMonths.length ? ` <span class="text-[10px] italic font-normal">(${angsuran.unpaidMonths.join(', ')})</span>` : '') : 'Rp 0'}</span></td>`;
                         if (isTarget) return `<td class="p-3 text-sm"><span class="${stClass} px-2 py-1 rounded font-bold">${cell}</span></td>`;
                         return `<td class="p-3 text-sm text-gray-700">${cell}</td>`;
                     }).join('')}</tr>`;
                 });
 
-                // Sorting setelah digabungkan (Berdasarkan value terbaru yang telah dimanipulasi di HTML td)
-                // Karena HTML terstruktur di atas, sort disederhanakan visualisasinya
-                
                 document.getElementById(containerId).innerHTML = `<table class="w-full text-left border-collapse"><thead class="text-xs uppercase text-gray-500 border-b"><tr>${rows[0].map(h => `<th class="p-3">${h}</th>`).join('')}</tr></thead><tbody id="tbody-tunggakan" class="divide-y divide-gray-100">${tbody.join('')}</tbody></table>`;
                 
-                // Update Summary Tunggakan & Iuran Bulanan 
                 globalTotalTunggakan = globalTunggakanSum;
                 if(document.getElementById('info-tunggakan')) document.getElementById('info-tunggakan').textContent = formatRupiah(globalTunggakanSum);
                 updateGrandTotal();
@@ -870,6 +881,7 @@
 
             try {
                 const res = await fetch(appScriptUrl);
+                if (!res.ok) throw new Error("Gagal mengambil iuran bulanan");
                 const { headers, dataRows } = normalizeResponse(JSON.parse(await res.text()));
                 
                 let colIdx = headers.findIndex(h => h.includes(new Date().getFullYear().toString()));
@@ -905,8 +917,8 @@
             // Jalankan fetch berurutan HANYA jika ada dependency spesifik
             try {
                 await fetchJadwalPertemuan(); 
-                await fetchAngsuran();        // Menentukan bulan-bulan yang kosong (Tunggakan di Iuran Bulanan) per nama warga
-                await fetchKasTunggakan('Tunggakan', 'content-tunggakan'); // Menjumlahkan Base Tunggakan (Kolom B) + Akumulasi Angsuran yang kosong
+                await fetchAngsuran();
+                await fetchKasTunggakan('Tunggakan', 'content-tunggakan');
             } catch (err) {
                 console.error("Error pada muatan beruntun:", err);
             }
