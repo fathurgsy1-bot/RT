@@ -826,7 +826,7 @@
                     let angsuran = window.dataAngsuranWarga[namaAsli.toLowerCase().trim()] || { unpaidMonths: [], nominalAngsuran: 35000 };
                     
                     // Menjumlahkan nilaiTunggakan dengan bulan kosong yang terakumulasi
-                    let tambahanTunggakan = angsuran.unpaidMonths.length * 35000;
+                    let tambahanTunggakan = angsuran.unpaidMonths.length ;
                     let total = nilaiTunggakan + tambahanTunggakan;
                     
                     globalTunggakanSum += total;
