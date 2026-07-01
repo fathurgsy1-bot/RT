@@ -139,22 +139,52 @@
         </div>
     </nav>
 
-    <!-- Header -->
-    <header id="beranda" class="pt-32 pb-20 bg-emerald-900 text-white rounded-b-[3rem]">
-        <div class="max-w-6xl mx-auto px-6 text-center">
-            <h2 class="text-4xl md:text-5xl font-extrabold mb-6">Informasi Warga 2026</h2>
-            <p class="text-emerald-200 text-lg max-w-2xl mx-auto">Kelola data kependudukan dan transparansi anggaran RT 04 - RW 26 dengan sistem digital yang akuntabel.</p>
+    <!-- Header dengan Slider Background -->
+    <header id="beranda" class="relative flex flex-col items-center justify-center min-h-[600px] h-[80vh] max-h-[750px] overflow-hidden rounded-b-[3rem] pt-16">
+        
+        <!-- SLIDER BACKGROUND (Di Belakang Teks) -->
+        <div id="slider-container" class="absolute inset-0 w-full h-full z-0 group bg-emerald-900">
+            <!-- Loader untuk Slider -->
+            <div id="slider-loader" class="absolute inset-0 flex flex-col items-center justify-center z-20 bg-emerald-900">
+                <div class="loader-spinner mb-3 !border-white/20 !border-t-white"></div>
+                <p class="text-emerald-100 text-sm font-semibold">Memuat galeri kegiatan...</p>
+            </div>
+            
+            <!-- Track Gambar -->
+            <div id="slider-track" class="flex transition-transform duration-700 ease-in-out h-full w-full">
+                <!-- Gambar akan dimuat di sini oleh JS -->
+            </div>
+            
+            <!-- Overlay Gelap (Agar Teks Mudah Dibaca) -->
+            <div class="absolute inset-0 bg-emerald-900/70 z-10 pointer-events-none"></div>
+
+            <!-- Navigasi Kiri & Kanan -->
+            <button onclick="prevSlide()" class="absolute left-4 md:left-10 top-1/2 transform -translate-y-1/2 bg-white/20 hover:bg-white text-white hover:text-emerald-800 w-12 h-12 rounded-full shadow-lg flex items-center justify-center z-20 opacity-0 group-hover:opacity-100 transition-all duration-300">
+                <i class="fas fa-chevron-left text-xl"></i>
+            </button>
+            <button onclick="nextSlide()" class="absolute right-4 md:right-10 top-1/2 transform -translate-y-1/2 bg-white/20 hover:bg-white text-white hover:text-emerald-800 w-12 h-12 rounded-full shadow-lg flex items-center justify-center z-20 opacity-0 group-hover:opacity-100 transition-all duration-300">
+                <i class="fas fa-chevron-right text-xl"></i>
+            </button>
+
+            <!-- Navigasi Titik (Dots) - Diletakkan sedikit ke atas agar tidak tertutup Quick Stats -->
+            <div id="slider-dots" class="absolute bottom-24 left-1/2 transform -translate-x-1/2 flex gap-2 z-20">
+                <!-- Titik akan dimuat di sini oleh JS -->
+            </div>
         </div>
-        <div class="max-w-4xl mx-auto px-4 text-center mt-8">
-            <div class="flex flex-col sm:flex-row justify-center gap-4">
-                <a href="#data-warga" class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-6 py-3 rounded-lg shadow-sm transition-all text-center">Lihat Data Warga</a>
-                <a href="#iuran-bulan-ini" class="bg-white hover:bg-gray-50 text-gray-700 font-medium px-6 py-3 rounded-lg border border-gray-200 shadow-sm transition-all text-center">Cek Iuran Bulan Ini</a>
+
+        <!-- FLOATING CONTENT (Di Depan Slider) -->
+        <div class="relative z-30 max-w-6xl mx-auto px-6 text-center text-white pb-16">
+            <h2 class="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-6 drop-shadow-xl">Informasi Warga 2026</h2>
+            <p class="text-emerald-50 text-lg md:text-xl max-w-2xl mx-auto drop-shadow-md">Kelola data kependudukan dan transparansi anggaran RT 04 - RW 26 dengan sistem digital yang akuntabel.</p>
+            <div class="flex flex-col sm:flex-row justify-center gap-4 mt-10 w-full max-w-2xl mx-auto">
+                <a href="#data-warga" class="bg-emerald-600/90 hover:bg-emerald-500 backdrop-blur-md text-white font-bold px-8 py-3.5 rounded-xl shadow-[0_4px_14px_0_rgba(5,150,105,0.39)] transition-all border border-emerald-400/30 text-center">Lihat Data Warga</a>
+                <a href="#iuran-bulan-ini" class="bg-white/90 hover:bg-white backdrop-blur-md text-gray-900 font-bold px-8 py-3.5 rounded-xl shadow-[0_4px_14px_0_rgba(255,255,255,0.39)] transition-all border border-white/40 text-center">Cek Iuran Bulan Ini</a>
             </div>
         </div>
     </header>
 
     <!-- Quick Stats -->
-    <section class="max-w-6xl mx-auto px-6 -mt-16 relative z-10">
+    <section class="max-w-6xl mx-auto px-6 -mt-16 relative z-40">
         <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
             <div class="hover-card glass p-6 rounded-3xl shadow-xl flex flex-col justify-center gap-2">
                 <div class="flex items-center gap-3 mb-2">
@@ -206,43 +236,8 @@
         </div>
     </section>
 
-    <!-- Galeri Slider -->
-    <section id="galeri-slider" class="max-w-6xl mx-auto px-6 mt-8 relative z-10">
-        <div class="bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden p-1">
-            <div class="p-4 border-b border-gray-50 flex items-center gap-2">
-                <i class="fas fa-images text-emerald-500 text-lg"></i>
-                <h3 class="font-bold text-gray-800">Galeri Kegiatan</h3>
-            </div>
-            <div class="relative w-full h-[250px] md:h-[400px] overflow-hidden group bg-gray-900 rounded-b-2xl" id="slider-container">
-                <!-- Loader -->
-                <div id="slider-loader" class="absolute inset-0 bg-white flex flex-col items-center justify-center z-20">
-                    <div class="loader-spinner mb-3"></div>
-                    <p class="text-gray-500 text-sm font-semibold">Memuat galeri...</p>
-                </div>
-                
-                <!-- Track Gambar -->
-                <div id="slider-track" class="flex transition-transform duration-700 ease-in-out h-full w-full">
-                    <!-- Gambar akan dimuat di sini oleh JS -->
-                </div>
-                
-                <!-- Navigasi Kiri & Kanan -->
-                <button onclick="prevSlide()" class="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white text-emerald-700 w-10 h-10 rounded-full shadow-lg flex items-center justify-center z-10 opacity-0 group-hover:opacity-100 transition-all duration-300">
-                    <i class="fas fa-chevron-left"></i>
-                </button>
-                <button onclick="nextSlide()" class="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white text-emerald-700 w-10 h-10 rounded-full shadow-lg flex items-center justify-center z-10 opacity-0 group-hover:opacity-100 transition-all duration-300">
-                    <i class="fas fa-chevron-right"></i>
-                </button>
-
-                <!-- Navigasi Titik (Dots) -->
-                <div id="slider-dots" class="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2 z-10">
-                    <!-- Titik akan dimuat di sini oleh JS -->
-                </div>
-            </div>
-        </div>
-    </section>
-
     <!-- Jadwal Pertemuan -->
-    <section id="jadwal-pertemuan" class="pt-20 pb-8 bg-gray-50">
+    <section id="jadwal-pertemuan" class="pt-24 pb-8 bg-gray-50">
         <div class="max-w-6xl mx-auto px-6">
             <div class="flex items-center gap-3 mb-6">
                 <div class="p-3 bg-emerald-100 text-emerald-600 rounded-xl"><i class="fas fa-handshake text-xl"></i></div>
@@ -592,7 +587,7 @@
 
                 track.innerHTML = imageUrls.map(url => `
                     <div class="w-full h-full flex-shrink-0 relative">
-                        <img src="${url.trim()}" class="w-full h-full object-cover" alt="Galeri Warga" onerror="this.src='https://via.placeholder.com/800x400?text=Gambar+Gagal+Dimuat'">
+                        <img src="${url.trim()}" class="w-full h-full object-cover object-center" alt="Galeri Warga" onerror="this.src='https://via.placeholder.com/800x400?text=Gambar+Gagal+Dimuat'">
                     </div>
                 `).join('');
 
@@ -609,8 +604,8 @@
                 // Menampilkan Notifikasi Error yang jelas jika di private
                 loader.innerHTML = `
                     <i class="fas fa-exclamation-triangle text-amber-500 text-3xl mb-2"></i>
-                    <p class="text-gray-600 font-semibold text-sm">Gagal memuat slider.</p>
-                    <p class="text-[10px] text-gray-400 mt-1 max-w-[200px] text-center leading-tight">Pastikan pengaturan *Share* pada Google Sheet Galeri diubah ke <b>"Anyone with the link"</b>.</p>
+                    <p class="text-white font-semibold text-sm">Gagal memuat slider.</p>
+                    <p class="text-[10px] text-gray-300 mt-1 max-w-[250px] text-center leading-tight">Pastikan pengaturan *Share* pada Google Sheet Galeri diubah ke <b>"Anyone with the link"</b>.</p>
                 `;
             }
         }
@@ -624,10 +619,10 @@
             dots.forEach((dot, index) => {
                 if (index === currentSlide) {
                     dot.classList.replace('bg-white/50', 'bg-white');
-                    dot.classList.replace('w-2', 'w-6'); 
+                    dot.classList.replace('w-2', 'w-8'); 
                 } else {
                     dot.classList.replace('bg-white', 'bg-white/50');
-                    dot.classList.replace('w-6', 'w-2');
+                    dot.classList.replace('w-8', 'w-2');
                 }
             });
         }
@@ -951,7 +946,6 @@
             } catch(e) { container.innerHTML = `<p class='col-span-full text-center text-red-500 py-10'>Gagal memuat Angsuran.</p>`; }
         }
 
-        // TUNGGAKAN Warga Dirubah Menggunakan Style Card "Iuran Bulan Ini"
         async function fetchKasTunggakan(sheetName, containerId) {
             const container = document.getElementById(containerId);
             try {
@@ -999,7 +993,6 @@
                         totalWargaLunas++;
                     }
 
-                    // Push semua warga termasuk yang lunas (total: 0)
                     combinedData.push({
                         nama: key.replace(/\b\w/g, l => l.toUpperCase()),
                         total: totalTunggakan,
@@ -1024,7 +1017,6 @@
                     return;
                 }
 
-                // Urutkan nilai dari yang tertinggi, yang lunas (0) akan otomatis di bawah
                 combinedData.sort((a, b) => b.total - a.total); 
 
                 let html = ``;
@@ -1037,24 +1029,20 @@
                     let rightElement = "";
 
                     if (item.total === 0) {
-                        // Lunas (Hijau Ikon)
                         rightElement = `<i class="fas fa-check-circle text-emerald-500 text-xl"></i>`;
                     } else if (item.total > 200000) {
-                        // > 200rb (Merah)
                         bgClass = "bg-red-50";
                         borderClass = "border-red-200";
                         textClass = "text-red-800";
                         labelClass = "text-red-500";
                         rightElement = `<span class="font-black text-red-600">${formatRupiah(item.total)}</span>`;
                     } else if (item.total >= 1 && item.total <= 200000) {
-                        // 100rb - 200rb (Kuning)
                         bgClass = "bg-amber-50";
                         borderClass = "border-amber-200";
                         textClass = "text-amber-800";
                         labelClass = "text-amber-600";
                         rightElement = `<span class="font-black text-amber-600">${formatRupiah(item.total)}</span>`;
                     } else {
-                        // < 100rb (Standar Abu-abu)
                         rightElement = `<span class="font-bold text-gray-700">${formatRupiah(item.total)}</span>`;
                     }
 
