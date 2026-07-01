@@ -825,7 +825,7 @@
                     let namaAsli = row[namaIdx] || "";
                     let angsuran = window.dataAngsuranWarga[namaAsli.toLowerCase().trim()] || { unpaidMonths: [], nominalAngsuran: 35000 };
                     
-                    // Menjumlahkan nilaiTunggakan dengan bulan kosong yang terakumulasi
+                    // Menjumlahkan nilaiTunggakan dengan bulan kosong yang terakumulasi dikalikan 35.000
                     let tambahanTunggakan = angsuran.unpaidMonths.length * 35000;
                     let total = nilaiTunggakan + tambahanTunggakan;
                     
@@ -838,7 +838,7 @@
                     return `<tr class="hover:bg-gray-50 transition ${trClass}">${row.map((cell, idx) => {
                         let isTarget = header[idx].includes('nama');
                         // Tampilkan nominal baru di kolom B
-                        if (idx === 1) return `<td class="p-3 text-sm"><span class="${stClass} px-2 py-1 rounded font-bold">${total > 0 ? formatRupiah(total)  ? ` <span class="text-[10px] italic font-normal">(${angsuran.unpaidMonths.join(', ')})</span>` : '') : 'Rp 0'}</span></td>`;
+                        if (idx === 1) return `<td class="p-3 text-sm"><span class="${stClass} px-2 py-1 rounded font-bold">${total > 0 ? formatRupiah(total) + (angsuran.unpaidMonths.length ? ` <span class="text-[10px] italic font-normal">(${angsuran.unpaidMonths.join(', ')})</span>` : '') : 'Rp 0'}</span></td>`;
                         if (isTarget) return `<td class="p-3 text-sm"><span class="${stClass} px-2 py-1 rounded font-bold">${cell}</span></td>`;
                         return `<td class="p-3 text-sm text-gray-700">${cell}</td>`;
                     }).join('')}</tr>`;
