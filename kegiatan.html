@@ -102,11 +102,16 @@
           statusDiv.innerText = 'Mengunggah data ke Spreadsheet...';
           submitBtn.innerText = 'Mengirim Data...';
           
+                    // Memisahkan awalan 'data:image/jpeg;base64,' agar hanya tersisa teks Base64-nya saja
+          const base64String = compressedDataUrl.split(',')[1]; 
+
+          
           const payload = {
             namaKegiatan: document.getElementById('namaKegiatan').value,
             tanggal: document.getElementById('tanggal').value,
             fileName: file.name,
-            fileData: compressedDataUrl // Menggunakan data hasil kompresi
+            fileData: compressedDataUrl, // Menggunakan data hasil kompresi
+            base64Data: base64String
           };
           
           fetch(WEB_APP_URL, {
