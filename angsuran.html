@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Setor Cuan & Cek Utang</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <style>
+    body { 
+      font-family: 'Plus Jakarta Sans', sans-serif; 
+      background-color: #0f172a;
+      background-image: 
+        radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), 
+        radial-gradient(at 50% 0%, hsla(225,39%,30%,0.2) 0, transparent 50%), 
+        radial-gradient(at 100% 0%, hsla(339,49%,30%,0.2) 0, transparent 50%);
+      background-attachment: fixed;
+    }
+    .glass-card { 
+      background: rgba(30, 41, 59, 0.7); 
+      backdrop-filter: blur(16px); 
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.1); 
+    }
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: #1e293b; }
+    ::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #64748b; }
+  </style>
+</head>
+
+<!-- Layout Flex Column biar main content ngisi sisa layar -->
+<body class="antialiased selection:bg-purple-500 selection:text-white flex flex-col min-h-screen text-slate-200">
+
+  <!-- Header Navigasi -->
+  <header class="sticky top-0 z-50 bg-[#0B0E14]/80 backdrop-blur-lg border-b border-slate-700/60 shadow-md">
+    <div class="max-w-4xl mx-auto px-4 md:px-8">
+      <div class="flex justify-between items-center h-20">
+        
+        <!-- Logo -->
+        <div class="flex items-center space-x-3 cursor-pointer group">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-xl shadow-[0_0_15px_rgba(139,92,246,0.5)] group-hover:shadow-[0_0_25px_rgba(139,92,246,0.7)] transition-all">
+            W
+          </div>
+          <span class="font-bold text-2xl text-white tracking-tight">SI-WARGA<span class="text-purple-500">.</span></span>
+        </div>
+
+        <!-- Navigation Links -->
+        <div class="hidden md:flex items-center gap-1 font-medium text-sm">
+          <a href="https://rt04rw26.vercel.app/#beranda" class="px-3 py-2 text-slate-300 hover:text-purple-400 hover:bg-purple-500/10 rounded-lg transition-all">Beranda</a>
+          <a href="https://rt04rw26.vercel.app/#rencana-bo-2026" class="px-3 py-2 text-slate-300 hover:text-purple-400 hover:bg-purple-500/10 rounded-lg transition-all">BO 2026</a>
+          <a href="https://rt04rw26.vercel.app/#data-warga" class="px-3 py-2 text-slate-300 hover:text-purple-400 hover:bg-purple-500/10 rounded-lg transition-all">Data</a>
+          
+          <!-- Dropdown Keuangan Dark Mode -->
+          <div class="relative group">
+            <button class="flex items-center gap-1 px-3 py-2 text-slate-300 hover:text-purple-400 hover:bg-purple-500/10 rounded-lg transition-all">
+              Keuangan <i class="fas fa-chevron-down text-[10px] transition-transform group-hover:rotate-180"></i>
+            </button>
+            
+            <div class="absolute right-0 top-full mt-2 w-56 bg-slate-800/95 backdrop-blur-xl border border-slate-700 rounded-2xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 z-50 overflow-hidden">
+              <div class="p-2 space-y-1">
+                <a href="https://rt04rw26.vercel.app/#kas-warga" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-purple-500/20 text-slate-300 hover:text-purple-400 transition-colors">
+                  <i class="fas fa-wallet text-sm w-5 text-center"></i> 
+                  <span class="font-semibold text-sm">Kas Warga</span>
+                </a>
+                <a href="https://rt04rw26.vercel.app/#tunggakan-warga" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-rose-500/20 text-slate-300 hover:text-rose-400 transition-colors">
+                  <i class="fas fa-exclamation-circle text-sm w-5 text-center"></i> 
+                  <span class="font-semibold text-sm">Tunggakan</span>
+                </a>
+                <a href="https://rt04rw26.vercel.app/#iuran-bulan-ini" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-blue-500/20 text-slate-300 hover:text-blue-400 transition-colors">
+                  <i class="fas fa-receipt text-sm w-5 text-center"></i> 
+                  <span class="font-semibold text-sm">Iuran Bulanan</span>
+                </a>
+                <a href="https://rt04rw26.vercel.app/#angsuran-warga" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-amber-500/20 text-slate-300 hover:text-amber-400 transition-colors">
+                  <i class="fas fa-file-invoice-dollar text-sm w-5 text-center"></i> 
+                  <span class="font-semibold text-sm">Angsuran</span>
+                </a>
+              </div>
+              <div class="bg-slate-900/80 px-4 py-2.5 border-t border-slate-700 text-center">
+                <p class="text-[10px] text-slate-400 uppercase tracking-widest font-bold">Laporan Finansial</p>
+              </div>
+            </div>
+          </div>
+          
+          <a href="https://rt04rw26.vercel.app/notulen.html" class="px-3 py-2 text-slate-300 hover:text-purple-400 hover:bg-purple-500/10 rounded-lg transition-all">Notulen</a>
+          <a href="https://script.google.com/macros/s/AKfycbxKwWu0g7nOvFlMpNTc8VMoipGsI_77_fBu198JcqHhlauoNCFCbBsmVo9fRzIwlETp/exec" class="px-3 py-2 text-slate-300 hover:text-purple-400 hover:bg-purple-500/10 rounded-lg transition-all">Kegiatan</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Container Form (Ditambah tag <main> buat alignment ke tengah layar) -->
+  <main class="flex-grow flex items-center justify-center p-4">
+    <div class="w-full max-w-lg glass-card rounded-3xl shadow-[0_0_40px_rgba(139,92,246,0.15)] p-6 sm:p-8 transform transition-all">
+      
+      <div class="text-center mb-8">
+        <div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-tr from-violet-600 to-fuchsia-500 text-white rounded-2xl shadow-[0_0_20px_rgba(168,85,247,0.4)] mb-4 rotate-3 hover:rotate-0 transition-transform">
+          <i class="fa-solid fa-wallet text-3xl"></i>
+        </div>
+        <h1 class="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-fuchsia-400 tracking-tight drop-shadow-sm">Setor Cuan 💸</h1>
+        <p class="text-sm text-slate-400 mt-1 font-medium">Auto-cek utang biar hidup tenang ✨</p>
+      </div>
+
+      <form id="financeForm" onsubmit="handleFormSubmit(event)" class="space-y-5">
+        
+        <div>
+          <label class="block text-sm font-semibold text-slate-300 mb-1.5">
+            <i class="fa-solid fa-user-astronaut text-violet-400 mr-1"></i> Siapa nih yang mau bayar? 👀
+          </label>
+          <div class="relative">
+            <input 
+              type="text" id="inputNama" list="listNama" placeholder="Ketik nama di sini..." required autocomplete="off"
+              class="w-full px-4 py-3.5 rounded-xl border border-slate-600 focus:ring-2 focus:ring-fuchsia-500 focus:border-fuchsia-500 bg-slate-800/50 shadow-inner transition text-white font-medium placeholder-slate-500"
+            >
+            <datalist id="listNama"></datalist>
+            <div id="loadingNama" class="absolute right-4 top-4 text-xs text-fuchsia-400 font-medium">
+              <i class="fa-solid fa-circle-notch animate-spin"></i> Loading...
+            </div>
+          </div>
+
+          <div id="infoTunggakanBox" class="hidden mt-4 p-4 rounded-xl border transition-all duration-300">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-semibold text-slate-300 mb-1.5">
+              <i class="fa-solid fa-calendar-days text-violet-400 mr-1"></i> Bulan
+            </label>
+            <select id="selectBulan" required class="w-full px-4 py-3.5 rounded-xl border border-slate-600 focus:ring-2 focus:ring-fuchsia-500 focus:border-fuchsia-500 bg-slate-800/50 shadow-inner transition text-white [&>option]:bg-slate-800">
+              <option value="Januari">Januari</option><option value="Februari">Februari</option>
+              <option value="Maret">Maret</option><option value="April">April</option>
+              <option value="Mei">Mei</option><option value="Juni">Juni</option>
+              <option value="Juli">Juli</option><option value="Agustus">Agustus</option>
+              <option value="September">September</option><option value="Oktober">Oktober</option>
+              <option value="November">November</option><option value="Desember">Desember</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-sm font-semibold text-slate-300 mb-1.5">
+              <i class="fa-solid fa-clock text-violet-400 mr-1"></i> Tahun
+            </label>
+            <select id="selectTahun" required class="w-full px-4 py-3.5 rounded-xl border border-slate-600 focus:ring-2 focus:ring-fuchsia-500 focus:border-fuchsia-500 bg-slate-800/50 shadow-inner transition text-white [&>option]:bg-slate-800"></select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-semibold text-slate-300 mb-1.5">
+            <i class="fa-solid fa-money-bill-wave text-violet-400 mr-1"></i> Masukin Nominal (Rp) 💰
+          </label>
+          <div class="relative rounded-xl shadow-sm">
+            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+              <span class="text-slate-400 font-semibold">Rp</span>
+            </div>
+            <input 
+              type="number" id="inputJumlah" min="0" placeholder="0" required
+              class="w-full pl-12 pr-4 py-3.5 rounded-xl border border-slate-600 focus:ring-2 focus:ring-fuchsia-500 focus:border-fuchsia-500 bg-slate-800/50 shadow-inner transition text-lg font-bold text-white placeholder-slate-600"
+            >
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-semibold text-slate-300 mb-1.5">
+            <i class="fa-solid fa-comment-dots text-violet-400 mr-1"></i> Notes <span class="text-xs text-slate-500 font-normal">(Spill the tea di sini)</span>
+          </label>
+          <textarea id="inputKeterangan" rows="2" placeholder="Catatan tambahan (optional)..." class="w-full px-4 py-3 rounded-xl border border-slate-600 focus:ring-2 focus:ring-fuchsia-500 focus:border-fuchsia-500 bg-slate-800/50 shadow-inner transition resize-none text-white placeholder-slate-500"></textarea>
+        </div>
+
+        <button type="submit" id="btnSubmit" class="w-full bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-white font-bold py-4 px-4 rounded-xl shadow-[0_0_20px_rgba(168,85,247,0.3)] hover:shadow-[0_0_30px_rgba(168,85,247,0.5)] hover:-translate-y-1 transition-all duration-300 flex items-center justify-center space-x-2 text-lg uppercase tracking-wider">
+          <i class="fa-solid fa-rocket"></i>
+          <span>Gasss Bayar!</span>
+        </button>
+
+      </form>
+    </div>
+  </main>
+
+  <script>
+    // SweetAlert2 Dark Theme Mixin
+    const Toast = Swal.mixin({
+      background: '#1e293b',
+      color: '#f8fafc',
+      customClass: {
+        popup: 'border border-slate-700 rounded-2xl',
+        confirmButton: 'bg-violet-600 hover:bg-violet-700 text-white font-bold rounded-lg px-6 py-2'
+      }
+    });
+
+    const namaBulan = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+    let dataKlien = [];
+
+    window.addEventListener('DOMContentLoaded', () => {
+      initDateTimeDefaults();
+      loadInitialData();
+    });
+
+    // 1. Set Default Waktu Real-Time
+    function initDateTimeDefaults() {
+      const now = new Date();
+      document.getElementById('selectBulan').value = namaBulan[now.getMonth()];
+      
+      const currentYear = now.getFullYear();
+      const selectTahun = document.getElementById('selectTahun');
+      for (let i = 0; i <= 2; i++) {
+        const opt = document.createElement('option');
+        opt.value = currentYear - i; opt.innerHTML = currentYear - i;
+        selectTahun.appendChild(opt);
+      }
+      selectTahun.value = currentYear;
+    }
+
+    // 2. Ambil Data Nama & Tunggakan
+    function loadInitialData() {
+      if(typeof google === 'undefined') {
+          setTimeout(() => {
+              document.getElementById('loadingNama').classList.add('hidden');
+          }, 1000);
+          return;
+      }
+
+      google.script.run
+        .withSuccessHandler((data) => {
+          dataKlien = data;
+          const datalist = document.getElementById('listNama');
+          datalist.innerHTML = '';
+          
+          data.forEach(item => {
+            const opt = document.createElement('option');
+            opt.value = item.name;
+            datalist.appendChild(opt);
+          });
+          document.getElementById('loadingNama').classList.add('hidden');
+        })
+        .withFailureHandler((err) => {
+          Toast.fire('Waduh!', 'Gagal narik data dari sheet nih.', 'error');
+        })
+        .getInitialData();
+    }
+
+    // 3. Logika Menampilkan Tunggakan Saat Nama Dipilih
+    document.getElementById('inputNama').addEventListener('input', function(e) {
+      const selectedName = e.target.value.trim();
+      
+      const client = dataKlien.find(c => c.name === selectedName);
+      const boxInfo = document.getElementById('infoTunggakanBox');
+
+      if (client) {
+        boxInfo.classList.remove('hidden'); 
+        
+        if (client.tunggakan > 0) {
+          // Desain Box Merah (Ada Utang)
+          boxInfo.className = 'mt-4 p-4 rounded-xl border border-rose-500/50 bg-rose-500/10 transition-all duration-300 shadow-inner backdrop-blur-sm';
+          boxInfo.innerHTML = `
+            <div class="flex items-center justify-between mb-2">
+              <div class="flex items-center text-rose-400">
+                <i class="fa-solid fa-skull-crossbones mr-2 text-lg animate-pulse"></i>
+                <span class="font-extrabold text-xs tracking-widest uppercase">Waduh Ada Utang Bro</span>
+              </div>
+            </div>
+            <div class="text-3xl font-black text-rose-500 mb-1 tracking-tight drop-shadow-md">Rp ${client.tunggakan.toLocaleString('id-ID')}</div>
+            <p class="text-xs text-rose-300/80 leading-snug font-medium">
+              Duit lu yang diinput bakal otomatis dipotong buat nutupin utang ini ya. No debat! 🛑
+            </p>
+          `;
+        } else {
+          // Desain Box Hijau (Aman)
+          boxInfo.className = 'mt-4 p-4 rounded-xl border border-emerald-500/50 bg-emerald-500/10 transition-all duration-300 shadow-inner backdrop-blur-sm';
+          boxInfo.innerHTML = `
+            <div class="flex items-center text-emerald-400 mb-1">
+              <i class="fa-solid fa-shield-check mr-2 text-lg"></i>
+              <span class="font-extrabold text-xs uppercase tracking-widest">Status: Super Aman 🎉</span>
+            </div>
+            <p class="text-sm text-emerald-300 font-medium mt-1">
+              Slebew! Klien ini bersih dari utang <span class="font-bold text-emerald-400">(Rp 0)</span>.
+            </p>
+          `;
+        }
+      } else {
+        boxInfo.classList.add('hidden');
+      }
+    });
+
+    // 4. Proses Submit Form ke Google Sheet
+    function handleFormSubmit(event) {
+      event.preventDefault();
+
+      const btn = document.getElementById('btnSubmit');
+      const originalBtnContent = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = `<i class="fa-solid fa-circle-notch animate-spin mr-2"></i> Sabar Ngab...`;
+      btn.classList.add('opacity-75', 'cursor-not-allowed');
+
+      const payload = {
+        name: document.getElementById('inputNama').value,
+        month: document.getElementById('selectBulan').value,
+        year: document.getElementById('selectTahun').value,
+        amount: Number(document.getElementById('inputJumlah').value), 
+        note: document.getElementById('inputKeterangan').value
+      };
+
+      if(typeof google === 'undefined') {
+          // Fallback buat test tanpa GS
+          setTimeout(() => {
+            Toast.fire({ icon: 'success', title: 'Menyala Abangku! 🔥', text: 'Data udah masuk sirkel aman.' });
+            btn.disabled = false; btn.innerHTML = originalBtnContent; btn.classList.remove('opacity-75', 'cursor-not-allowed');
+          }, 1500);
+          return;
+      }
+
+      google.script.run
+        .withSuccessHandler((res) => {
+          btn.disabled = false;
+          btn.innerHTML = originalBtnContent;
+          btn.classList.remove('opacity-75', 'cursor-not-allowed');
+
+          if (res.success) {
+            Toast.fire({
+              icon: 'success',
+              title: 'Menyala Abangku! 🔥',
+              text: 'Data cuan lu udah aman tercatat di sistem.',
+            }).then(() => {
+              document.getElementById('inputJumlah').value = '';
+              document.getElementById('inputKeterangan').value = '';
+              document.getElementById('inputNama').value = '';
+              document.getElementById('infoTunggakanBox').classList.add('hidden');
+              
+              document.getElementById('loadingNama').classList.remove('hidden');
+              loadInitialData(); 
+            });
+          } else {
+            Toast.fire({ icon: 'error', title: 'Yahh Gagal 💀', text: res.message });
+          }
+        })
+        .withFailureHandler((err) => {
+          btn.disabled = false;
+          btn.innerHTML = originalBtnContent;
+          btn.classList.remove('opacity-75', 'cursor-not-allowed');
+          Toast.fire({ icon: 'error', title: 'Server Down Bro', text: err.toString() });
+        })
+        .submitData(payload);
+    }
+  </script>
+</body>
+</html>
