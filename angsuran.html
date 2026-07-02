@@ -202,10 +202,10 @@
         .then(response => response.json())
         .then(res => {
           if(res.status === 'success') {
-            dataWargaGlobal = res.data;
+            dataWargaGlobal = res.data || [];
             const dataList = document.getElementById('listNama');
             
-            res.data.forEach(item => {
+            dataWargaGlobal.forEach(item => {
               let option = document.createElement('option');
               option.value = item.name;
               dataList.appendChild(option);
@@ -214,7 +214,8 @@
             // Sembunyikan tulisan "Loading..."
             document.getElementById('loadingNama').style.display = 'none';
           } else {
-            document.getElementById('loadingNama').innerHTML = '<i class="fa-solid fa-triangle-exclamation text-rose-500"></i> Gagal';
+            document.getElementById('loadingNama').innerHTML = '<i class="fa-solid fa-triangle-exclamation text-rose-500"></i> Gagal Memuat Data';
+            console.error(res.message);
           }
         })
         .catch(err => {
@@ -255,7 +256,7 @@
       btn.disabled = true;
       btn.innerHTML = '<i class="fa-solid fa-circle-notch animate-spin text-xl"></i> <span>Memproses...</span>';
 
-      // Susun Payload (Sesuai parameter dari Script Google terbaru, tanpa email)
+      // Susun Payload
       const payload = {
         name: document.getElementById('inputNama').value,
         year: document.getElementById('selectTahun').value,
@@ -266,6 +267,10 @@
 
       fetch(WEB_APP_URL, {
         method: "POST",
+        headers: {
+          // INI BAGIAN PALING PENTING AGAR TIDAK KENA CORS ERROR DARI GOOGLE!
+          "Content-Type": "text/plain;charset=utf-8",
+        },
         body: JSON.stringify(payload)
       })
       .then(response => response.json())
@@ -306,11 +311,12 @@
          Swal.fire({
             icon: 'error',
             title: 'Oops! 📡',
-            text: 'Gagal terhubung ke server. Coba lagi ya.',
+            text: 'Gagal terhubung ke server. Coba cek console browser.',
             background: '#1e293b',
             color: '#f8fafc',
             confirmButtonColor: '#8b5cf6'
           });
+          console.error('Fetch Error:', error);
       })
       .finally(() => {
         // Kembalikan state tombol
