@@ -553,65 +553,63 @@
         let autoSlideInterval;
 
         async function fetchSliderImages() {
-            const track = document.getElementById('slider-track');
-            const dotsContainer = document.getElementById('slider-dots');
-            const loader = document.getElementById('slider-loader');
-            
-            try {
-                // Menggunakan endpoint /export format=csv yang lebih stabil jika sheet Publik.
-                const response = await fetch(`https://docs.google.com/spreadsheets/d/${sheetIdSlider}/export?format=csv`);
-                if (!response.ok) throw new Error("Gagal mengambil data slider");
-                
-                const text = await response.text();
-                
-                // Cek jika response adalah halaman Login Google (karena akses di-restricted)
-                if (text.trim().toLowerCase().startsWith("<!doctype html>")) {
-                    throw new Error("Akses ditolak. Sheet bersifat Private.");
-                }
-                
-                const rows = parseCSV(text);
-                if (rows.length <= 1) throw new Error("Data sheet kosong");
-                
-                const headers = rows[0].map(h => (h || "").toLowerCase().trim());
-                // Mengubah semua header jadi huruf kecil dan mencari kata 'foto'
-const fotoIndex = headers.findIndex(h => h.toLowerCase().includes('foto'));
-
-                
-                if (fotoIndex === -1) throw new Error("Kolom 'foto' tidak ditemukan di baris pertama sheet");
-                
-                const imageUrls = rows.slice(1)
-                    .map(row => row[fotoIndex])
-                    .filter(url => url && url.trim() !== '' && url.startsWith('http'));
-
-                if (imageUrls.length === 0) throw new Error("Tidak ada link gambar yang valid");
-                
-                slideCount = imageUrls.length;
-
-                track.innerHTML = imageUrls.map(url => `
-                    <div class="w-full h-full flex-shrink-0 relative">
-                        <img src="${url.trim()}" class="w-full h-full object-cover object-center" alt="Galeri Warga" onerror="this.src='https://via.placeholder.com/800x400?text=Gambar+Gagal+Dimuat'">
-                    </div>
-                `).join('');
-
-                dotsContainer.innerHTML = imageUrls.map((_, i) => `
-                    <button onclick="goToSlide(${i})" class="h-2 rounded-full bg-white/50 hover:bg-white transition-all duration-300 dot-indicator w-2"></button>
-                `).join('');
-
-                loader.style.display = 'none';
-                updateSliderUI();
-                startAutoSlide();
-
-            } catch (error) {
-                console.error(error);
-                // Menampilkan Notifikasi Error yang jelas jika di private
-                loader.innerHTML = `
-                    <i class="fas fa-exclamation-triangle text-amber-500 text-3xl mb-2"></i>
-                    <p class="text-white font-semibold text-sm">Gagal memuat slider.</p>
-                    <p class="text-[10px] text-gray-300 mt-1 max-w-[250px] text-center leading-tight">Pastikan pengaturan *Share* pada Google Sheet Galeri diubah ke <b>"Anyone with the link"</b>.</p>
-                `;
-            }
+    const track = document.getElementById('slider-track');
+    const dotsContainer = document.getElementById('slider-dots');
+    const loader = document.getElementById('slider-loader');
+    
+    try {
+        const response = await fetch(`https://docs.google.com/spreadsheets/d/${sheetIdSlider}/export?format=csv`);
+        if (!response.ok) throw new Error("Gagal mengambil data slider");
+        
+        const text = await response.text();
+        
+        // Cek jika response adalah halaman Login Google (karena akses di-restricted)
+        if (text.trim().toLowerCase().startsWith("<!doctype html>")) {
+            throw new Error("Akses ditolak. Sheet bersifat Private.");
         }
+        
+        const rows = parseCSV(text);
+        if (rows.length <= 1) throw new Error("Data sheet kosong");
+        
+        const headers = rows[0].map(h => (h || "").toLowerCase().trim());
+        
+        // Mengubah header pencarian menjadi 'base'
+        const baseIndex = headers.findIndex(h => h.toLowerCase().includes('base'));
+        
+        if (baseIndex === -1) throw new Error("Kolom 'Base' tidak ditemukan di baris pertama sheet");
+        
+        // Menghapus filter startsWith('http') agar bisa menerima string base64
+        const imageUrls = rows.slice(1)
+            .map(row => row[baseIndex])
+            .filter(baseStr => baseStr && baseStr.trim() !== '');
 
+        if (imageUrls.length === 0) throw new Error("Tidak ada data gambar base64 yang valid");
+        
+        slideCount = imageUrls.length;
+
+        track.innerHTML = imageUrls.map(url => `
+            <div class="w-full h-full flex-shrink-0 relative">
+                <img src="${url.trim()}" class="w-full h-full object-cover object-center" alt="Galeri Warga" onerror="this.src='https://via.placeholder.com/800x400?text=Gambar+Gagal+Dimuat'">
+            </div>
+        `).join('');
+
+        dotsContainer.innerHTML = imageUrls.map((_, i) => `
+            <button onclick="goToSlide(${i})" class="h-2 rounded-full bg-white/50 hover:bg-white transition-all duration-300 dot-indicator w-2"></button>
+        `).join('');
+
+        loader.style.display = 'none';
+        updateSliderUI();
+        startAutoSlide();
+
+    } catch (error) {
+        console.error(error);
+        loader.innerHTML = `
+            <i class="fas fa-exclamation-triangle text-amber-500 text-3xl mb-2"></i>
+            <p class="text-white font-semibold text-sm">Gagal memuat slider.</p>
+            <p class="text-[10px] text-gray-300 mt-1 max-w-[250px] text-center leading-tight">Pastikan pengaturan *Share* pada Google Sheet Galeri diubah ke <b>"Anyone with the link"</b> dan kolom 'Base' terisi.</p>
+        `;
+    }
+}
         function updateSliderUI() {
             if (slideCount === 0) return;
             const track = document.getElementById('slider-track');
