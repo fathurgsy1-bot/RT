@@ -1,0 +1,186 @@
+const SPREADSHEET_ID = '1XDTK0Gsc8cWeZtE4DroRw_-jLcozCIf-hmsYmZ3TWSU'; 
+const SHEET_ANGSURAN = 'Angsuran'; 
+const SHEET_TUNGGAKAN = 'Tunggakan'; 
+
+// Menangani permintaan GET (Untuk mengambil daftar nama klien saat HTML dimuat)
+function doGet(e) {
+  try {
+    const data = getInitialData();
+    return ContentService.createTextOutput(JSON.stringify({ status: 'success', data: data }))
+      .setMimeType(ContentService.MimeType.JSON);
+  } catch (error) {
+    return ContentService.createTextOutput(JSON.stringify({ status: 'error', message: error.message }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+// Menangani permintaan POST (Untuk menyimpan data angsuran dari form HTML)
+function doPost(e) {
+  try {
+    const payload = JSON.parse(e.postData.contents);
+    
+    // Langsung jalankan proses simpan data tanpa validasi email
+    const result = submitData(payload);
+    return ContentService.createTextOutput(JSON.stringify(result))
+      .setMimeType(ContentService.MimeType.JSON);
+      
+  } catch (error) {
+    return ContentService.createTextOutput(JSON.stringify({ success: false, message: error.toString() }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+// =========================================================
+// FUNGSI BAWAANMU (TIDAK ADA LOGIKA YANG DIUBAH)
+// =========================================================
+
+function getInitialData() {
+  const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+  const sheetAngsuran = ss.getSheetByName(SHEET_ANGSURAN);
+  const sheetTunggakan = ss.getSheetByName(SHEET_TUNGGAKAN);
+  
+  if (!sheetAngsuran) throw new Error(`Sheet "${SHEET_ANGSURAN}" tidak ditemukan!`);
+  if (!sheetTunggakan) throw new Error(`Sheet "${SHEET_TUNGGAKAN}" tidak ditemukan!`);
+
+  const lastRowA = sheetAngsuran.getLastRow();
+  let names = [];
+  if (lastRowA >= 3) {
+    names = sheetAngsuran.getRange(3, 1, lastRowA - 2, 1).getValues()
+               .map(r => r[0].toString().trim()).filter(String);
+  }
+  
+  let tunggakanMap = {};
+  const lastRowT = sheetTunggakan.getLastRow();
+  if (lastRowT >= 2) {
+    const dataTunggakan = sheetTunggakan.getRange(2, 1, lastRowT - 1, 2).getValues();
+    dataTunggakan.forEach(row => {
+      const namaT = row[0].toString().trim();
+      if (namaT) tunggakanMap[namaT] = Number(row[1]) || 0;
+    });
+  }
+  
+  return names.map(n => ({ name: n, tunggakan: tunggakanMap[n] || 0 }));
+}
+
+function submitData(payload) {
+  const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+  const sheetAngsuran = ss.getSheetByName(SHEET_ANGSURAN);
+  const sheetTunggakan = ss.getSheetByName(SHEET_TUNGGAKAN);
+
+  const dataAngsuran = sheetAngsuran.getDataRange().getValues();
+  const headers = dataAngsuran[1]; 
+  
+  const colNama = 0; 
+  const colTahun = headers.findIndex(h => h.toString().toLowerCase().includes('tahun'));
+  const colBulanTarget = headers.findIndex(h => h.toString().toLowerCase() === payload.month.toLowerCase());
+
+  if (colBulanTarget === -1) {
+    throw new Error(`Gagal: Kolom bulan "${payload.month}" tidak ditemukan di baris 2!`);
+  }
+
+  let targetRowIndex = -1;
+  for (let i = 2; i < dataAngsuran.length; i++) {
+    const namaCell = dataAngsuran[i][colNama]?.toString().trim();
+    const tahunCell = colTahun !== -1 ? dataAngsuran[i][colTahun]?.toString().trim() : payload.year;
+
+    if (namaCell === payload.name && tahunCell.toString() === payload.year.toString()) {
+      targetRowIndex = i;
+      break;
+    }
+  }
+
+  if (targetRowIndex === -1) {
+    throw new Error(`Gagal: Baris untuk nama "${payload.name}" tahun "${payload.year}" tidak ada di sheet!`);
+  }
+
+  const selBulanBerjalanKomentar = sheetAngsuran.getRange(targetRowIndex + 1, colBulanTarget + 1);
+
+  let sisaUang = Number(payload.amount) || 0;
+  const ANGSURAN_BULANAN = 35000;
+
+  // LOGIKA 1: BAYAR TUNGGAKAN
+  const lastRowT = sheetTunggakan.getLastRow();
+  if (lastRowT >= 2) {
+    const rangeTunggakan = sheetTunggakan.getRange(2, 1, lastRowT - 1, 2);
+    const dataTunggakan = rangeTunggakan.getValues();
+
+    for (let i = 0; i < dataTunggakan.length; i++) {
+      if (dataTunggakan[i][0].toString().trim() === payload.name) {
+        let hutang = Number(dataTunggakan[i][1]) || 0;
+        if (hutang > 0 && sisaUang > 0) {
+          if (sisaUang >= hutang) {
+            sisaUang -= hutang;
+            dataTunggakan[i][1] = 0;
+          } else {
+            dataTunggakan[i][1] = hutang - sisaUang;
+            sisaUang = 0;
+          }
+        }
+        break;
+      }
+    }
+    rangeTunggakan.setValues(dataTunggakan);
+  }
+
+  // LOGIKA 2: ISI BULAN SEBELUMNYA YANG KOSONG
+  const listSemuaBulan = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+  
+  listSemuaBulan.forEach(namaBln => {
+    if (sisaUang > 0) {
+      const colIdxBln = headers.findIndex(h => h.toString().toLowerCase() === namaBln.toLowerCase());
+      
+      if (colIdxBln !== -1 && colIdxBln < colBulanTarget) {
+        const cellSkrg = sheetAngsuran.getRange(targetRowIndex + 1, colIdxBln + 1);
+        const nilaiSkrg = Number(cellSkrg.getValue()) || 0;
+        
+        if (nilaiSkrg < ANGSURAN_BULANAN) {
+          let slotTersedia = ANGSURAN_BULANAN - nilaiSkrg;
+          let alokasiHutangBulan = Math.min(sisaUang, slotTersedia);
+          cellSkrg.setValue(nilaiSkrg + alokasiHutangBulan);
+          sisaUang -= alokasiHutangBulan;
+        }
+      }
+    }
+  });
+
+  // LOGIKA 3: ALOKASI KE BULAN BERJALAN & BERIKUTNYA
+  let indexBulanKerja = colBulanTarget;
+
+  while (sisaUang > 0 && indexBulanKerja < headers.length) {
+    const namaKolomSekrg = headers[indexBulanKerja]?.toString().trim();
+    const apakahBulanValid = listSemuaBulan.some(b => b.toLowerCase() === namaKolomSekrg.toLowerCase());
+    
+    if (apakahBulanValid) {
+      const cellBulan = sheetAngsuran.getRange(targetRowIndex + 1, indexBulanKerja + 1);
+      const nilaiBulanSkrg = Number(cellBulan.getValue()) || 0;
+      
+      let sisaMaksimalBulanIni = ANGSURAN_BULANAN - nilaiBulanSkrg;
+
+      if (sisaMaksimalBulanIni > 0) {
+        let bayarBulanIni = Math.min(sisaUang, sisaMaksimalBulanIni);
+        cellBulan.setValue(nilaiBulanSkrg + bayarBulanIni);
+        sisaUang -= bayarBulanIni;
+      }
+    }
+    indexBulanKerja++; 
+  }
+
+  if (sisaUang > 0) {
+    const nilaiAkhir = Number(selBulanBerjalanKomentar.getValue()) || 0;
+    selBulanBerjalanKomentar.setValue(nilaiAkhir + sisaUang);
+  }
+
+  // LOGIKA 4: SISIPKAN KOMENTAR SECARA PASTI
+  if (payload.note && payload.note.trim() !== "") {
+    let noteLama = selBulanBerjalanKomentar.getNote();
+    let noteBaru = payload.note.trim();
+    
+    if (noteLama) {
+      selBulanBerjalanKomentar.setNote(noteLama + "\n---\nTambahan: " + noteBaru);
+    } else {
+      selBulanBerjalanKomentar.setNote(noteBaru);
+    }
+  }
+
+  return { success: true, message: 'Pembayaran berhasil diproses dengan sistem alokasi otomatis!' };
+}
