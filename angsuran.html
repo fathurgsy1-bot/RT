@@ -180,169 +180,85 @@
     </div>
   </main>
 
-  <script>
-    // SweetAlert2 Dark Theme Mixin
-    const Toast = Swal.mixin({
-      background: '#1e293b',
-      color: '#f8fafc',
-      customClass: {
-        popup: 'border border-slate-700 rounded-2xl',
-        confirmButton: 'bg-violet-600 hover:bg-violet-700 text-white font-bold rounded-lg px-6 py-2'
-      }
-    });
+ <script>
+    // ==============================================================
+    // PERHATIAN: Masukkan URL Web App Google Script kamu di sini!
+    // ==============================================================
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxzUYkeR1hnW8Om5XCA2_eqYYwb603Kf1M0DMjhN5a13M4DDHKNnMHYHDbXXxZR2oll/exec"; 
 
-    const namaBulan = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
-    let dataKlien = [];
-
-    window.addEventListener('DOMContentLoaded', () => {
-      initDateTimeDefaults();
-      loadInitialData();
-    });
-
-    // 1. Set Default Waktu Real-Time
-    function initDateTimeDefaults() {
-      const now = new Date();
-      document.getElementById('selectBulan').value = namaBulan[now.getMonth()];
-      
-      const currentYear = now.getFullYear();
-      const selectTahun = document.getElementById('selectTahun');
-      for (let i = 0; i <= 2; i++) {
-        const opt = document.createElement('option');
-        opt.value = currentYear - i; opt.innerHTML = currentYear - i;
-        selectTahun.appendChild(opt);
-      }
-      selectTahun.value = currentYear;
-    }
-
-    // 2. Ambil Data Nama & Tunggakan
-    function loadInitialData() {
-      if(typeof google === 'undefined') {
-          setTimeout(() => {
-              document.getElementById('loadingNama').classList.add('hidden');
-          }, 1000);
-          return;
-      }
-
-      google.script.run
-        .withSuccessHandler((data) => {
-          dataKlien = data;
-          const datalist = document.getElementById('listNama');
-          datalist.innerHTML = '';
-          
-          data.forEach(item => {
-            const opt = document.createElement('option');
-            opt.value = item.name;
-            datalist.appendChild(opt);
-          });
-          document.getElementById('loadingNama').classList.add('hidden');
-        })
-        .withFailureHandler((err) => {
-          Toast.fire('Waduh!', 'Gagal narik data dari sheet nih.', 'error');
-        })
-        .getInitialData();
-    }
-
-    // 3. Logika Menampilkan Tunggakan Saat Nama Dipilih
-    document.getElementById('inputNama').addEventListener('input', function(e) {
-      const selectedName = e.target.value.trim();
-      
-      const client = dataKlien.find(c => c.name === selectedName);
-      const boxInfo = document.getElementById('infoTunggakanBox');
-
-      if (client) {
-        boxInfo.classList.remove('hidden'); 
-        
-        if (client.tunggakan > 0) {
-          // Desain Box Merah (Ada Utang)
-          boxInfo.className = 'mt-4 p-4 rounded-xl border border-rose-500/50 bg-rose-500/10 transition-all duration-300 shadow-inner backdrop-blur-sm';
-          boxInfo.innerHTML = `
-            <div class="flex items-center justify-between mb-2">
-              <div class="flex items-center text-rose-400">
-                <i class="fa-solid fa-skull-crossbones mr-2 text-lg animate-pulse"></i>
-                <span class="font-extrabold text-xs tracking-widest uppercase">Waduh Ada Utang Bro</span>
-              </div>
-            </div>
-            <div class="text-3xl font-black text-rose-500 mb-1 tracking-tight drop-shadow-md">Rp ${client.tunggakan.toLocaleString('id-ID')}</div>
-            <p class="text-xs text-rose-300/80 leading-snug font-medium">
-              Duit lu yang diinput bakal otomatis dipotong buat nutupin utang ini ya. No debat! 🛑
-            </p>
-          `;
-        } else {
-          // Desain Box Hijau (Aman)
-          boxInfo.className = 'mt-4 p-4 rounded-xl border border-emerald-500/50 bg-emerald-500/10 transition-all duration-300 shadow-inner backdrop-blur-sm';
-          boxInfo.innerHTML = `
-            <div class="flex items-center text-emerald-400 mb-1">
-              <i class="fa-solid fa-shield-check mr-2 text-lg"></i>
-              <span class="font-extrabold text-xs uppercase tracking-widest">Status: Super Aman 🎉</span>
-            </div>
-            <p class="text-sm text-emerald-300 font-medium mt-1">
-              Slebew! Klien ini bersih dari utang <span class="font-bold text-emerald-400">(Rp 0)</span>.
-            </p>
-          `;
-        }
-      } else {
-        boxInfo.classList.add('hidden');
-      }
-    });
-
-    // 4. Proses Submit Form ke Google Sheet
-    function handleFormSubmit(event) {
-      event.preventDefault();
-
-      const btn = document.getElementById('btnSubmit');
-      const originalBtnContent = btn.innerHTML;
-      btn.disabled = true;
-      btn.innerHTML = `<i class="fa-solid fa-circle-notch animate-spin mr-2"></i> Sabar Ngab...`;
-      btn.classList.add('opacity-75', 'cursor-not-allowed');
-
-      const payload = {
-        name: document.getElementById('inputNama').value,
-        month: document.getElementById('selectBulan').value,
-        year: document.getElementById('selectTahun').value,
-        amount: Number(document.getElementById('inputJumlah').value), 
-        note: document.getElementById('inputKeterangan').value
-      };
-
-      if(typeof google === 'undefined') {
-          // Fallback buat test tanpa GS
-          setTimeout(() => {
-            Toast.fire({ icon: 'success', title: 'Menyala Abangku! 🔥', text: 'Data udah masuk sirkel aman.' });
-            btn.disabled = false; btn.innerHTML = originalBtnContent; btn.classList.remove('opacity-75', 'cursor-not-allowed');
-          }, 1500);
-          return;
-      }
-
-      google.script.run
-        .withSuccessHandler((res) => {
-          btn.disabled = false;
-          btn.innerHTML = originalBtnContent;
-          btn.classList.remove('opacity-75', 'cursor-not-allowed');
-
-          if (res.success) {
-            Toast.fire({
-              icon: 'success',
-              title: 'Menyala Abangku! 🔥',
-              text: 'Data cuan lu udah aman tercatat di sistem.',
-            }).then(() => {
-              document.getElementById('inputJumlah').value = '';
-              document.getElementById('inputKeterangan').value = '';
-              document.getElementById('inputNama').value = '';
-              document.getElementById('infoTunggakanBox').classList.add('hidden');
-              
-              document.getElementById('loadingNama').classList.remove('hidden');
-              loadInitialData(); 
+    // Saat halaman dibuka, ambil daftar nama dari Google Sheets (GET)
+    window.onload = function() {
+      fetch(WEB_APP_URL)
+        .then(response => response.json())
+        .then(res => {
+          if(res.status === 'success') {
+            const selectNama = document.getElementById('nama');
+            res.data.forEach(item => {
+              // Menampilkan nama beserta info tunggakannya
+              let textTunggakan = item.tunggakan > 0 ? ` (Tunggakan: Rp${item.tunggakan})` : '';
+              let option = document.createElement('option');
+              option.value = item.name;
+              option.text = item.name + textTunggakan;
+              selectNama.appendChild(option);
             });
+            // Sembunyikan loader, tampilkan form
+            document.getElementById('loader').style.display = 'none';
+            document.getElementById('angsuranForm').style.display = 'block';
           } else {
-            Toast.fire({ icon: 'error', title: 'Yahh Gagal 💀', text: res.message });
+            document.getElementById('loader').innerText = "Gagal memuat data: " + res.message;
           }
         })
-        .withFailureHandler((err) => {
-          btn.disabled = false;
-          btn.innerHTML = originalBtnContent;
-          btn.classList.remove('opacity-75', 'cursor-not-allowed');
-          Toast.fire({ icon: 'error', title: 'Server Down Bro', text: err.toString() });
-        })
-        .submitData(payload);
+        .catch(err => {
+          document.getElementById('loader').innerText = "Error koneksi ke server.";
+        });
+    };
+
+    // Fungsi untuk mengirim form ke Google Sheets (POST)
+    function kirimData() {
+      const btn = document.getElementById('btnSubmit');
+      const msgBox = document.getElementById('message');
+      
+      btn.disabled = true;
+      btn.innerText = 'Memproses... ⏳';
+      msgBox.className = '';
+      msgBox.innerText = '';
+
+      const payload = {
+        email: document.getElementById('email').value,
+        name: document.getElementById('nama').value,
+        year: document.getElementById('tahun').value,
+        month: document.getElementById('bulan').value,
+        amount: document.getElementById('nominal').value,
+        note: document.getElementById('catatan').value
+      };
+
+      fetch(WEB_APP_URL, {
+        method: "POST",
+        body: JSON.stringify(payload)
+      })
+      .then(response => response.json())
+      .then(result => {
+        if(result.success) {
+          msgBox.className = 'msg-success';
+          msgBox.innerText = result.message + ' ✅';
+          
+          // Kosongkan form (kecuali email dan tahun)
+          document.getElementById('nama').value = '';
+          document.getElementById('nominal').value = '';
+          document.getElementById('catatan').value = '';
+        } else {
+          msgBox.className = 'msg-error';
+          msgBox.innerText = 'Gagal: ' + result.message;
+        }
+      })
+      .catch(error => {
+        msgBox.className = 'msg-error';
+        msgBox.innerText = "Error koneksi: " + error.message;
+      })
+      .finally(() => {
+        btn.disabled = false;
+        btn.innerText = 'Simpan Data Angsuran';
+      });
     }
   </script>
 </body>
