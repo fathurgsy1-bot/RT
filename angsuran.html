@@ -33,15 +33,12 @@
   </style>
 </head>
 
-<!-- Layout Flex Column biar main content ngisi sisa layar -->
 <body class="antialiased selection:bg-purple-500 selection:text-white flex flex-col min-h-screen text-slate-200">
 
-  <!-- Header Navigasi -->
   <header class="sticky top-0 z-50 bg-[#0B0E14]/80 backdrop-blur-lg border-b border-slate-700/60 shadow-md">
     <div class="max-w-4xl mx-auto px-4 md:px-8">
       <div class="flex justify-between items-center h-20">
         
-        <!-- Logo -->
         <div class="flex items-center space-x-3 cursor-pointer group">
           <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-xl shadow-[0_0_15px_rgba(139,92,246,0.5)] group-hover:shadow-[0_0_25px_rgba(139,92,246,0.7)] transition-all">
             W
@@ -49,13 +46,11 @@
           <span class="font-bold text-2xl text-white tracking-tight">SI-WARGA<span class="text-purple-500">.</span></span>
         </div>
 
-        <!-- Navigation Links -->
         <div class="hidden md:flex items-center gap-1 font-medium text-sm">
           <a href="https://rt04rw26.vercel.app/#beranda" class="px-3 py-2 text-slate-300 hover:text-purple-400 hover:bg-purple-500/10 rounded-lg transition-all">Beranda</a>
           <a href="https://rt04rw26.vercel.app/#rencana-bo-2026" class="px-3 py-2 text-slate-300 hover:text-purple-400 hover:bg-purple-500/10 rounded-lg transition-all">BO 2026</a>
           <a href="https://rt04rw26.vercel.app/#data-warga" class="px-3 py-2 text-slate-300 hover:text-purple-400 hover:bg-purple-500/10 rounded-lg transition-all">Data</a>
           
-          <!-- Dropdown Keuangan Dark Mode -->
           <div class="relative group">
             <button class="flex items-center gap-1 px-3 py-2 text-slate-300 hover:text-purple-400 hover:bg-purple-500/10 rounded-lg transition-all">
               Keuangan <i class="fas fa-chevron-down text-[10px] transition-transform group-hover:rotate-180"></i>
@@ -93,7 +88,6 @@
     </div>
   </header>
 
-  <!-- Container Form (Ditambah tag <main> buat alignment ke tengah layar) -->
   <main class="flex-grow flex items-center justify-center p-4">
     <div class="w-full max-w-lg glass-card rounded-3xl shadow-[0_0_40px_rgba(139,92,246,0.15)] p-6 sm:p-8 transform transition-all">
       
@@ -180,56 +174,94 @@
     </div>
   </main>
 
- <script>
-    // ==============================================================
-    // PERHATIAN: Masukkan URL Web App Google Script kamu di sini!
-    // ==============================================================
+  <script>
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyCQN3xWboZjkAjHJMqzpilH6ZfRpg4paygfa_2qsxTRx8rUJ87WhcCdod7xZKIWv2B/exec"; 
+    
+    // Simpan data warga secara global untuk cek tunggakan secara instan
+    let dataWargaGlobal = [];
 
-    // Saat halaman dibuka, ambil daftar nama dari Google Sheets (GET)
+    // Setup Awal (Tahun & Ambil Data Warga)
     window.onload = function() {
+      // 1. Setup Dropdown Tahun Otomatis (Tahun ini, +/- 1 tahun)
+      const currentYear = new Date().getFullYear();
+      const selectTahun = document.getElementById('selectTahun');
+      for (let i = currentYear - 1; i <= currentYear + 1; i++) {
+        let option = document.createElement('option');
+        option.value = i;
+        option.text = i;
+        if (i === currentYear) option.selected = true;
+        selectTahun.appendChild(option);
+      }
+
+      // 2. Setup Dropdown Bulan (Default: Bulan Ini)
+      const currentMonthIndex = new Date().getMonth();
+      document.getElementById('selectBulan').selectedIndex = currentMonthIndex;
+
+      // 3. Ambil data dari Google Apps Script (Nama & Tunggakan)
       fetch(WEB_APP_URL)
         .then(response => response.json())
         .then(res => {
           if(res.status === 'success') {
-            const selectNama = document.getElementById('nama');
+            dataWargaGlobal = res.data;
+            const dataList = document.getElementById('listNama');
+            
             res.data.forEach(item => {
-              // Menampilkan nama beserta info tunggakannya
-              let textTunggakan = item.tunggakan > 0 ? ` (Tunggakan: Rp${item.tunggakan})` : '';
               let option = document.createElement('option');
               option.value = item.name;
-              option.text = item.name + textTunggakan;
-              selectNama.appendChild(option);
+              dataList.appendChild(option);
             });
-            // Sembunyikan loader, tampilkan form
-            document.getElementById('loader').style.display = 'none';
-            document.getElementById('angsuranForm').style.display = 'block';
+            
+            // Sembunyikan tulisan "Loading..."
+            document.getElementById('loadingNama').style.display = 'none';
           } else {
-            document.getElementById('loader').innerText = "Gagal memuat data: " + res.message;
+            document.getElementById('loadingNama').innerHTML = '<i class="fa-solid fa-triangle-exclamation text-rose-500"></i> Gagal';
           }
         })
         .catch(err => {
-          document.getElementById('loader').innerText = "Error koneksi ke server.";
+          document.getElementById('loadingNama').innerHTML = '<i class="fa-solid fa-wifi text-rose-500"></i> Offline';
         });
     };
 
-    // Fungsi untuk mengirim form ke Google Sheets (POST)
-    function kirimData() {
-      const btn = document.getElementById('btnSubmit');
-      const msgBox = document.getElementById('message');
-      
-      btn.disabled = true;
-      btn.innerText = 'Memproses... ⏳';
-      msgBox.className = '';
-      msgBox.innerText = '';
+    // Fitur Cek Tunggakan Otomatis (Triggered saat user mengetik nama)
+    document.getElementById('inputNama').addEventListener('input', function(e) {
+      const selectedName = e.target.value.trim();
+      const matchedUser = dataWargaGlobal.find(user => user.name === selectedName);
+      const box = document.getElementById('infoTunggakanBox');
 
+      if (matchedUser) {
+        if (matchedUser.tunggakan > 0) {
+          // Ada Tunggakan -> Merah
+          box.className = 'mt-4 p-3 rounded-xl border border-rose-500/30 bg-rose-500/10 text-rose-400 text-sm font-medium transition-all duration-300 block';
+          box.innerHTML = `<i class="fa-solid fa-triangle-exclamation mr-1"></i> Orang ini punya tunggakan: <strong>Rp ${matchedUser.tunggakan.toLocaleString('id-ID')}</strong>`;
+        } else {
+          // Bersih -> Hijau
+          box.className = 'mt-4 p-3 rounded-xl border border-emerald-500/30 bg-emerald-500/10 text-emerald-400 text-sm font-medium transition-all duration-300 block';
+          box.innerHTML = `<i class="fa-solid fa-circle-check mr-1"></i> Asyik! Nggak ada tunggakan.`;
+        }
+      } else {
+        // Nama belum ketemu/dihapus
+        box.className = 'hidden mt-4 p-4 rounded-xl border transition-all duration-300';
+      }
+    });
+
+    // Handle Submit Form (POST)
+    function handleFormSubmit(event) {
+      event.preventDefault(); // Mencegah reload halaman
+
+      const btn = document.getElementById('btnSubmit');
+      const originalBtnContent = btn.innerHTML;
+      
+      // Ubah tombol jadi loading
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-circle-notch animate-spin text-xl"></i> <span>Memproses...</span>';
+
+      // Susun Payload (Sesuai parameter dari Script Google terbaru, tanpa email)
       const payload = {
-        email: document.getElementById('email').value,
-        name: document.getElementById('nama').value,
-        year: document.getElementById('tahun').value,
-        month: document.getElementById('bulan').value,
-        amount: document.getElementById('nominal').value,
-        note: document.getElementById('catatan').value
+        name: document.getElementById('inputNama').value,
+        year: document.getElementById('selectTahun').value,
+        month: document.getElementById('selectBulan').value,
+        amount: document.getElementById('inputJumlah').value,
+        note: document.getElementById('inputKeterangan').value
       };
 
       fetch(WEB_APP_URL, {
@@ -239,25 +271,51 @@
       .then(response => response.json())
       .then(result => {
         if(result.success) {
-          msgBox.className = 'msg-success';
-          msgBox.innerText = result.message + ' ✅';
+          // SweetAlert Notif Sukses
+          Swal.fire({
+            icon: 'success',
+            title: 'Mantap! 🎉',
+            text: result.message || 'Pembayaran berhasil dikirim!',
+            background: '#1e293b',
+            color: '#f8fafc',
+            confirmButtonColor: '#8b5cf6'
+          });
+
+          // Reset Form & bersihkan Box Tunggakan
+          document.getElementById('financeForm').reset();
+          document.getElementById('infoTunggakanBox').className = 'hidden';
           
-          // Kosongkan form (kecuali email dan tahun)
-          document.getElementById('nama').value = '';
-          document.getElementById('nominal').value = '';
-          document.getElementById('catatan').value = '';
+          // Kembalikan Tahun/Bulan ke default
+          const currentMonthIndex = new Date().getMonth();
+          document.getElementById('selectBulan').selectedIndex = currentMonthIndex;
+
         } else {
-          msgBox.className = 'msg-error';
-          msgBox.innerText = 'Gagal: ' + result.message;
+          // SweetAlert Notif Gagal (Logic Server)
+          Swal.fire({
+            icon: 'error',
+            title: 'Gagal 🚨',
+            text: result.message,
+            background: '#1e293b',
+            color: '#f8fafc',
+            confirmButtonColor: '#8b5cf6'
+          });
         }
       })
       .catch(error => {
-        msgBox.className = 'msg-error';
-        msgBox.innerText = "Error koneksi: " + error.message;
+         // SweetAlert Notif Error (Jaringan)
+         Swal.fire({
+            icon: 'error',
+            title: 'Oops! 📡',
+            text: 'Gagal terhubung ke server. Coba lagi ya.',
+            background: '#1e293b',
+            color: '#f8fafc',
+            confirmButtonColor: '#8b5cf6'
+          });
       })
       .finally(() => {
+        // Kembalikan state tombol
         btn.disabled = false;
-        btn.innerText = 'Simpan Data Angsuran';
+        btn.innerHTML = originalBtnContent;
       });
     }
   </script>
