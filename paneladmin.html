@@ -38,7 +38,6 @@
             100% { background-position: 0% 50%; }
         }
 
-        /* UTILITIES */
         .hidden {
             display: none !important;
         }
@@ -75,32 +74,6 @@
             font-size: 0.9rem;
             color: rgba(255, 255, 255, 0.8);
             margin-bottom: 2rem;
-        }
-
-        .tabs-auth {
-            display: flex;
-            background: rgba(0, 0, 0, 0.15);
-            padding: 5px;
-            border-radius: 12px;
-            margin-bottom: 1.5rem;
-        }
-
-        .tab-btn {
-            flex: 1;
-            padding: 10px;
-            background: none;
-            border: none;
-            color: rgba(255,255,255,0.6);
-            font-weight: 600;
-            cursor: pointer;
-            border-radius: 8px;
-            transition: all 0.3s ease;
-        }
-
-        .tab-btn.active {
-            background: rgba(255, 255, 255, 0.25);
-            color: #fff;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
 
         .form-group {
@@ -243,7 +216,6 @@
             flex-direction: column;
             gap: 8px;
             overflow-y: auto;
-            flex-main: 1;
         }
 
         .menu::-webkit-scrollbar {
@@ -252,10 +224,6 @@
         .menu::-webkit-scrollbar-thumb {
             background: rgba(255,255,255,0.2);
             border-radius: 4px;
-        }
-
-        .menu li {
-            width: 100%;
         }
 
         .menu a {
@@ -320,7 +288,6 @@
             border-radius: 24px;
             overflow: hidden;
             box-shadow: 0 15px 40px rgba(0,0,0,0.15);
-            position: relative;
         }
 
         iframe {
@@ -330,22 +297,6 @@
             background-color: #fcfcfc;
         }
 
-        /* Setup Info Panel Overlay for Demo Developers */
-        .dev-badge {
-            position: fixed;
-            bottom: 15px;
-            right: 15px;
-            background: rgba(0,0,0,0.8);
-            padding: 8px 15px;
-            border-radius: 30px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            cursor: pointer;
-            border: 1px solid rgba(255,255,255,0.2);
-            z-index: 100;
-        }
-
-        /* Responsive Layout */
         @media (max-width: 900px) {
             body {
                 flex-direction: column;
@@ -378,21 +329,16 @@
 </head>
 <body>
 
-    <!-- CONTAINER 1: AUTHENTICATION (LOGIN & REGISTER) -->
+    <!-- AUTHENTICATION (LOGIN) -->
     <div id="auth-panel" class="login-container">
         <h1>Welcome Back ✨</h1>
-        <p>Manage your ecosystem beautifully.</p>
-
-        <div class="tabs-auth">
-            <button id="tab-login" class="tab-btn active" onclick="switchTab('login')">Masuk</button>
-            <button id="tab-register" class="tab-btn" onclick="switchTab('register')">Daftar Warga</button>
-        </div>
+        <p>Login to RT 4 RW 26 Admin Panel</p>
 
         <!-- FORM LOGIN -->
         <form id="form-login" onsubmit="handleLogin(event)">
             <div class="form-group">
-                <label for="login-identifier">Username atau Email</label>
-                <input type="text" id="login-identifier" placeholder="warga_keren / email@warga.com" required>
+                <label for="login-identifier">Username</label>
+                <input type="text" id="login-identifier" placeholder="Masukkan username" required>
             </div>
             <div class="form-group">
                 <label for="login-password">Password</label>
@@ -401,32 +347,11 @@
             <button type="submit" class="btn-submit">Sign In 🚀</button>
         </form>
 
-        <!-- FORM REGISTER -->
-        <form id="form-register" class="hidden" onsubmit="handleRegister(event)">
-            <div class="form-group">
-                <label for="reg-nama">Nama Lengkap</label>
-                <input type="text" id="reg-nama" placeholder="Budi Santoso" required>
-            </div>
-            <div class="form-group">
-                <label for="reg-username">Username</label>
-                <input type="text" id="reg-username" placeholder="budi_s" required>
-            </div>
-            <div class="form-group">
-                <label for="reg-email">Email</label>
-                <input type="email" id="reg-email" placeholder="budi@warga.com" required>
-            </div>
-            <div class="form-group">
-                <label for="reg-password">Password</label>
-                <input type="password" id="reg-password" placeholder="Buat password aman" required>
-            </div>
-            <button type="submit" class="btn-submit">Daftarkan Warga 📝</button>
-        </form>
-
         <div id="status-notif" class="notification"></div>
     </div>
 
 
-    <!-- CONTAINER 2: ADMIN PANEL INTERFACE (HIDDEN BY DEFAULT) -->
+    <!-- ADMIN PANEL INTERFACE -->
     <div id="admin-panel" class="admin-interface hidden">
         <!-- Sidebar Navigation -->
         <div class="sidebar">
@@ -435,8 +360,8 @@
                 <button class="btn-logout" onclick="logout()">Logout</button>
             </div>
             <ul class="menu">
-                <li><a href="#" onclick="loadContent(this, '💸 Angsuran Kas', 'https://wikipedia.org/wiki/Main_Page')" class="active">💸 Angsuran Kas</a></li>
-                <li><a href="#" onclick="loadContent(this, '📉 Tunggakan Warga', 'https://example.com')">📉 Tunggakan</a></li>
+                <li><a href="#" onclick="loadContent(this, '💸 Angsuran Kas', 'https://bing.com')" class="active">💸 Angsuran Kas</a></li>
+                <li><a href="#" onclick="loadContent(this, '📉 Tunggakan Warga', 'https://wikipedia.org')">📉 Tunggakan</a></li>
                 <li><a href="#" onclick="loadContent(this, '👥 Data Seluruh Warga', 'https://example.com')">👥 Data Warga</a></li>
                 <li><a href="#" onclick="loadContent(this, '📅 Jadwal Kegiatan', 'https://example.com')">📅 Kegiatan</a></li>
                 <li><a href="#" onclick="loadContent(this, '💌 Undangan Digital', 'https://example.com')">💌 Undangan</a></li>
@@ -450,47 +375,15 @@
         <div class="main-content">
             <div class="content-header">
                 <h1 id="content-title">💸 Angsuran Kas</h1>
-                <div id="content-url-badge" class="badge-url">Source: Loading...</div>
+                <div id="content-url-badge" class="badge-url">Source: https://bing.com</div>
             </div>
             <div class="content-wrapper">
-                <iframe id="app-frame" src="about:blank"></iframe>
+                <iframe id="app-frame" src="https://bing.com"></iframe>
             </div>
         </div>
     </div>
 
-    <!-- Developer Notes / Guide Badge -->
-    <div class="dev-badge" onclick="alert('💡 INFO INTEGRASI SPREADSHEET:\n\nKarena Google Sheets tidak bisa diakses langsung via frontend (demi keamanan password), Anda wajib memasang GOOGLE APPS SCRIPT sebagai jembatan backend API.\n\nPanduan lengkap & kode Apps Script sudah saya buatkan di instruksi teks!')">
-        Setup Google Sheet API Link 🛠️
-    </div>
-
     <script>
-        // --- CONFIGURATION ---
-        // Ganti URL ini dengan URL Web App dari Google Apps Script Anda setelah deploy!
-        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycb...CONTOH.../exec"; 
-        
-        // --- INTERFACE NAVIGATION ---
-        function switchTab(type) {
-            const tabLogin = document.getElementById('tab-login');
-            const tabRegister = document.getElementById('tab-register');
-            const formLogin = document.getElementById('form-login');
-            const formRegister = document.getElementById('form-register');
-            const notif = document.getElementById('status-notif');
-            
-            notif.className = 'notification';
-            
-            if (type === 'login') {
-                tabLogin.classList.add('active');
-                tabRegister.classList.remove('active');
-                formLogin.classList.remove('hidden');
-                formRegister.classList.add('hidden');
-            } else {
-                tabRegister.classList.add('active');
-                tabLogin.classList.remove('active');
-                formRegister.classList.remove('hidden');
-                formLogin.classList.add('hidden');
-            }
-        }
-
         function loadContent(element, title, url) {
             // Update Active Menu
             const menus = document.querySelectorAll('.menu a');
@@ -506,7 +399,6 @@
             iframe.src = url;
         }
 
-        // --- AUTHENTICATION LOGIC (API INTEGRATION) ---
         function showNotification(text, type) {
             const notif = document.getElementById('status-notif');
             notif.innerText = text;
@@ -518,97 +410,18 @@
             const identifier = document.getElementById('login-identifier').value;
             const password = document.getElementById('login-password').value;
 
-            showNotification("Mengecek kredensial ke Spreadsheet...", "success");
-
-            // SIMULASI OFFLINE JIKA WEB_APP_URL BELUM DI-SETUP
-            if(WEB_APP_URL.includes("CONTOH")) {
-                setTimeout(() => {
-                    showNotification("Mode Demo: Login Berhasil! (Silakan setup Google Apps Script untuk koneksi asli)", "success");
-                    setTimeout(() => {
-                        enterAdminPanel();
-                    }, 1000);
-                }, 1200);
-                return;
+            // HARDCODE LOGIN
+            if (identifier === "rt4rw26" && password === "rt4rw26") {
+                showNotification("Login Berhasil! Mengalihkan...", "success");
+                setTimeout(() => enterAdminPanel(), 1000);
+            } else {
+                showNotification("Gagal: Username atau Password salah!", "error");
             }
-
-            // HIT GOOGLE APPS SCRIPT BACKEND API
-            fetch(WEB_APP_URL, {
-                method: "POST",
-                mode: "no-cors", // Seringkali Apps Script membutuhkan penanganan CORS khusus atau dikirim via parameter GET/POST terstruktur
-                headers: { "Content-Type": "application/x-www-form-urlencoded" },
-                body: new URLSearchParams({
-                    "action": "login",
-                    "identifier": identifier,
-                    "password": password
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === "success") {
-                    showNotification("Login Berhasil! Mengalihkan...", "success");
-                    setTimeout(() => enterAdminPanel(), 1000);
-                } else {
-                    showNotification("Gagal: " + data.message, "error");
-                }
-            })
-            .catch(error => {
-                console.error("Error:", error);
-                showNotification("Gagal terhubung ke Google Sheet Server.", "error");
-            });
-        }
-
-        function handleRegister(event) {
-            event.preventDefault();
-            const nama = document.getElementById('reg-nama').value;
-            const username = document.getElementById('reg-username').value;
-            const email = document.getElementById('reg-email').value;
-            const password = document.getElementById('reg-password').value;
-
-            showNotification("Mengirim data pendaftaran ke Spreadsheet...", "success");
-
-            if(WEB_APP_URL.includes("CONTOH")) {
-                setTimeout(() => {
-                    showNotification("Mode Demo: Pendaftaran Berhasil disimulasikan!", "success");
-                    document.getElementById('form-register').reset();
-                    setTimeout(() => switchTab('login'), 1500);
-                }, 1200);
-                return;
-            }
-
-            fetch(WEB_APP_URL, {
-                method: "POST",
-                headers: { "Content-Type": "application/x-www-form-urlencoded" },
-                body: new URLSearchParams({
-                    "action": "register",
-                    "nama": nama,
-                    "username": username,
-                    "email": email,
-                    "password": password // Dienkripsi di sisi server Apps Script (MD5/SHA256) demi keamanan tinggi
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === "success") {
-                    showNotification("Pendaftaran Sukses! Silakan masuk.", "success");
-                    document.getElementById('form-register').reset();
-                    setTimeout(() => switchTab('login'), 1500);
-                } else {
-                    showNotification("Gagal Daftar: " + data.message, "error");
-                }
-            })
-            .catch(error => {
-                console.error("Error:", error);
-                showNotification("Terjadi kesalahan sistem pendaftaran.", "error");
-            });
         }
 
         function enterAdminPanel() {
             document.getElementById('auth-panel').classList.add('hidden');
             document.getElementById('admin-panel').classList.remove('hidden');
-            
-            // Set default view on login
-            const firstMenu = document.querySelector('.menu a');
-            if(firstMenu) firstMenu.click();
         }
 
         function logout() {
@@ -616,7 +429,6 @@
             document.getElementById('auth-panel').classList.remove('hidden');
             document.getElementById('form-login').reset();
             document.getElementById('status-notif').className = 'notification';
-            showNotification("Anda telah keluar.", "success");
         }
     </script>
 </body>
