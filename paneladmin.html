@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel Vibe ✨</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            /* Gen Z Mesh/Linear Gradient */
+            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            height: 100vh;
+            display: flex;
+            overflow: hidden;
+            color: #fff;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Glassmorphism Sidebar */
+        .sidebar {
+            width: 280px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-right: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 2rem 1rem;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 5px 0 15px rgba(0,0,0,0.1);
+            z-index: 10;
+        }
+
+        .sidebar h2 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 2rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .menu {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .menu li {
+            width: 100%;
+        }
+
+        .menu a {
+            text-decoration: none;
+            color: #fff;
+            font-weight: 600;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 15px;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid transparent;
+        }
+
+        .menu a:hover, .menu a.active {
+            background: rgba(255, 255, 255, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+        }
+
+        /* Main Content Area */
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .content-wrapper {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            position: relative;
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background-color: #f9f9f9;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                height: auto;
+                padding: 1rem;
+                border-right: none;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            }
+            .menu {
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            .menu li {
+                width: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar Menu -->
+    <div class="sidebar">
+        <h2>Admin Hub ✨</h2>
+        <ul class="menu">
+            <li><a href="#" onclick="loadContent(this, 'https://bing.com')" class="active">💸 Angsuran Kas</a></li>
+            <li><a href="#" onclick="loadContent(this, 'https://wikipedia.org')">📉 Tunggakan</a></li>
+            <li><a href="#" onclick="loadContent(this, 'https://example.com')">👥 Data Warga</a></li>
+            <li><a href="#" onclick="loadContent(this, 'https://example.com')">📅 Kegiatan</a></li>
+            <li><a href="#" onclick="loadContent(this, 'https://example.com')">💌 Undangan</a></li>
+            <li><a href="#" onclick="loadContent(this, 'https://example.com')">📥 Laporan Srt Masuk</a></li>
+            <li><a href="#" onclick="loadContent(this, 'https://example.com')">📤 Laporan Srt Keluar</a></li>
+            <li><a href="#" onclick="loadContent(this, 'https://example.com')">📊 Laporan Warga</a></li>
+        </ul>
+    </div>
+
+    <!-- Main Content Area (Iframe) -->
+    <div class="main-content">
+        <div class="content-wrapper">
+            <!-- URL default yang akan terbuka pertama kali -->
+            <iframe id="app-frame" src="https://bing.com"></iframe>
+        </div>
+    </div>
+
+    <script>
+        // Fungsi untuk mengganti URL iframe dan memberi efek aktif pada menu
+        function loadContent(element, url) {
+            // Hapus class 'active' dari semua menu
+            const menus = document.querySelectorAll('.menu a');
+            menus.forEach(menu => menu.classList.remove('active'));
+
+            // Tambahkan class 'active' pada menu yang diklik
+            element.classList.add('active');
+
+            // Ganti src pada iframe dengan URL tujuan
+            const iframe = document.getElementById('app-frame');
+            iframe.src = url;
+        }
+    </script>
+
+</body>
+</html>
