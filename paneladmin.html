@@ -50,7 +50,7 @@
             border: 1px solid rgba(255, 255, 255, 0.25);
             padding: 2.5rem;
             border-radius: 24px;
-            width: 100%;
+            width: 90%;
             max-width: 420px;
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
             text-align: center;
@@ -160,7 +160,7 @@
             to { opacity: 1; }
         }
 
-        /* Glassmorphism Sidebar with Toggle Logic */
+        /* Glassmorphism Sidebar */
         .sidebar {
             width: 290px;
             background: rgba(255, 255, 255, 0.08);
@@ -176,7 +176,6 @@
             position: relative;
         }
 
-        /* Collapsed Sidebar State */
         .sidebar.collapsed {
             width: 85px;
             padding: 2rem 0.6rem;
@@ -219,6 +218,7 @@
             cursor: pointer;
             transition: all 0.2s;
         }
+        
         .btn-logout:hover {
             background: #e73c7e;
             border-color: transparent;
@@ -265,7 +265,9 @@
 
         .menu::-webkit-scrollbar {
             width: 4px;
+            height: 4px;
         }
+        
         .menu::-webkit-scrollbar-thumb {
             background: rgba(255,255,255,0.2);
             border-radius: 4px;
@@ -377,52 +379,63 @@
             background-color: #fcfcfc;
         }
 
+        /* MOBILE RESPONSIVE FIX */
         @media (max-width: 900px) {
             body {
-                flex-direction: column;
-                height: auto;
-                overflow-y: auto;
+                display: block;
             }
             .admin-interface {
                 flex-direction: column;
-                height: auto;
             }
             .sidebar {
                 width: 100% !important;
                 border-right: none;
                 border-bottom: 1px solid rgba(255, 255, 255, 0.15);
-                padding: 1.5rem !important;
+                padding: 1.2rem !important;
+            }
+            .sidebar-header {
+                margin-bottom: 1rem;
             }
             .sidebar.collapsed .menu a .text {
                 opacity: 1 !important;
                 max-width: unset !important;
                 transform: none !important;
+                display: inline-block;
             }
             .toggle-btn {
                 display: none;
             }
             .menu {
                 flex-direction: row;
-                flex-wrap: wrap;
+                flex-wrap: nowrap;
+                overflow-x: auto; /* Bisa scroll samping */
+                padding-bottom: 5px;
             }
             .menu li {
                 width: auto;
+                flex-shrink: 0;
             }
             .main-content {
-                height: 70vh;
+                height: calc(100vh - 140px); /* Kalkulasi tinggi sisa setelah sidebar mobile */
                 padding: 15px;
+            }
+            .content-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+            .badge-url {
+                max-width: 100%;
             }
         }
     </style>
 </head>
 <body>
 
-    <!-- AUTHENTICATION (LOGIN) -->
     <div id="auth-panel" class="login-container">
         <h1>Welcome Back ✨</h1>
         <p>Login to RT 4 RW 26 Admin Panel</p>
 
-        <!-- FORM LOGIN -->
         <form id="form-login" onsubmit="handleLogin(event)">
             <div class="form-group">
                 <label for="login-identifier">Username</label>
@@ -439,11 +452,8 @@
     </div>
 
 
-    <!-- ADMIN PANEL INTERFACE -->
     <div id="admin-panel" class="admin-interface hidden">
-        <!-- Sidebar Navigation -->
         <div class="sidebar" id="sidebar">
-            <!-- Toggle Sidebar Button -->
             <button class="toggle-btn" onclick="toggleSidebar()">❬</button>
             
             <div class="sidebar-header">
@@ -462,19 +472,39 @@
             </ul>
         </div>
 
-        <!-- Main Workspace -->
         <div class="main-content">
             <div class="content-header">
-                <h1 id="content-title">💸 Angsuran Kas</h1>
-                <div id="content-url-badge" class="badge-url">Source: https://bing.com</div>
+                <h1 id="content-title">💸 Laporan Kas</h1>
+                <div id="content-url-badge" class="badge-url">Source: https://rt04rw26.vercel.app/dataangsuran.html</div>
             </div>
             <div class="content-wrapper">
-                <iframe id="app-frame" src="https://bing.com"></iframe>
+                <iframe id="app-frame" src="https://rt04rw26.vercel.app/dataangsuran.html"></iframe>
             </div>
         </div>
     </div>
 
     <script>
+        const SESSION_KEY = 'rt4rw26_admin_session';
+        const SESSION_EXPIRY_MS = 24 * 60 * 60 * 1000; // 1 Hari dalam Milidetik
+
+        // CEK SESSION KETIKA BROWSER DIBUKA / DIRELOAD
+        document.addEventListener('DOMContentLoaded', () => {
+            const sessionData = localStorage.getItem(SESSION_KEY);
+            
+            if (sessionData) {
+                const sessionTime = parseInt(sessionData, 10);
+                const currentTime = new Date().getTime();
+
+                // Cek apakah belum lebih dari 1 hari
+                if (currentTime - sessionTime < SESSION_EXPIRY_MS) {
+                    enterAdminPanel();
+                } else {
+                    // Session kadaluarsa, hapus data lama
+                    localStorage.removeItem(SESSION_KEY);
+                }
+            }
+        });
+
         // Fungsi untuk mengecilkan / membesarkan sidebar
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
@@ -518,6 +548,10 @@
             // HARDCODE LOGIN
             if (identifier === "rt4rw26" && password === "rt4rw26") {
                 showNotification("Login Berhasil! Mengalihkan...", "success");
+                
+                // Simpan Timestamp ke LocalStorage untuk Session 1 Hari
+                localStorage.setItem(SESSION_KEY, new Date().getTime().toString());
+                
                 setTimeout(() => enterAdminPanel(), 1000);
             } else {
                 showNotification("Gagal: Username atau Password salah!", "error");
@@ -530,6 +564,10 @@
         }
 
         function logout() {
+            // Hapus session
+            localStorage.removeItem(SESSION_KEY);
+            
+            // Kembalikan ke halaman login
             document.getElementById('admin-panel').classList.add('hidden');
             document.getElementById('auth-panel').classList.remove('hidden');
             document.getElementById('form-login').reset();
