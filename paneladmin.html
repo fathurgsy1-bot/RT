@@ -107,10 +107,6 @@
             box-shadow: 0 0 10px rgba(255,255,255,0.1);
         }
 
-        .form-group input::placeholder {
-            color: rgba(255, 255, 255, 0.4);
-        }
-
         .btn-submit {
             width: 100%;
             padding: 14px;
@@ -164,7 +160,7 @@
             to { opacity: 1; }
         }
 
-        /* Glassmorphism Sidebar */
+        /* Glassmorphism Sidebar with Toggle Logic */
         .sidebar {
             width: 290px;
             background: rgba(255, 255, 255, 0.08);
@@ -176,6 +172,14 @@
             flex-direction: column;
             box-shadow: 5px 0 25px rgba(0,0,0,0.1);
             z-index: 10;
+            transition: width 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1);
+            position: relative;
+        }
+
+        /* Collapsed Sidebar State */
+        .sidebar.collapsed {
+            width: 85px;
+            padding: 2rem 0.6rem;
         }
 
         .sidebar-header {
@@ -184,6 +188,8 @@
             justify-content: space-between;
             margin-bottom: 2rem;
             padding: 0 10px;
+            overflow: hidden;
+            white-space: nowrap;
         }
 
         .sidebar h2 {
@@ -192,6 +198,14 @@
             text-transform: uppercase;
             letter-spacing: 1px;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            transition: opacity 0.3s;
+        }
+
+        .sidebar.collapsed h2 {
+            opacity: 0;
+            width: 0;
+            pointer-events: none;
+            margin-right: 0;
         }
 
         .btn-logout {
@@ -210,12 +224,43 @@
             border-color: transparent;
         }
 
+        .sidebar.collapsed .btn-logout {
+            display: none;
+        }
+
+        /* Toggle Button */
+        .toggle-btn {
+            position: absolute;
+            top: 24px;
+            right: -15px;
+            width: 30px;
+            height: 30px;
+            background: #fff;
+            color: #e73c7e;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            font-weight: bold;
+            font-size: 0.9rem;
+            z-index: 20;
+            transition: transform 0.4s;
+        }
+
+        .sidebar.collapsed .toggle-btn {
+            transform: rotate(180deg);
+        }
+
         .menu {
             list-style: none;
             display: flex;
             flex-direction: column;
             gap: 8px;
             overflow-y: auto;
+            overflow-x: hidden;
         }
 
         .menu::-webkit-scrollbar {
@@ -233,12 +278,42 @@
             font-size: 0.9rem;
             display: flex;
             align-items: center;
-            gap: 12px;
             padding: 12px 16px;
             border-radius: 14px;
             transition: all 0.3s ease;
             background: rgba(255, 255, 255, 0.03);
             border: 1px solid transparent;
+            white-space: nowrap;
+            width: 100%;
+        }
+
+        .menu a .icon {
+            font-size: 1.1rem;
+            display: inline-block;
+            min-width: 28px;
+        }
+
+        .menu a .text {
+            transition: opacity 0.3s, transform 0.3s;
+            opacity: 1;
+        }
+
+        .sidebar.collapsed .menu a {
+            justify-content: center;
+            padding: 12px 0;
+        }
+
+        .sidebar.collapsed .menu a .icon {
+            min-width: unset;
+            text-align: center;
+        }
+
+        .sidebar.collapsed .menu a .text {
+            opacity: 0;
+            max-width: 0;
+            display: inline-block;
+            overflow: hidden;
+            transform: translateX(-10px);
         }
 
         .menu a:hover, .menu a.active {
@@ -248,6 +323,10 @@
             transform: translateX(4px);
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
         }
+        
+        .sidebar.collapsed .menu a:hover, .sidebar.collapsed .menu a.active {
+            transform: scale(1.05);
+        }
 
         /* Main Content Area */
         .main-content {
@@ -256,6 +335,7 @@
             display: flex;
             flex-direction: column;
             background: rgba(0, 0, 0, 0.05);
+            transition: all 0.4s;
         }
 
         .content-header {
@@ -308,10 +388,18 @@
                 height: auto;
             }
             .sidebar {
-                width: 100%;
+                width: 100% !important;
                 border-right: none;
                 border-bottom: 1px solid rgba(255, 255, 255, 0.15);
-                padding: 1.5rem;
+                padding: 1.5rem !important;
+            }
+            .sidebar.collapsed .menu a .text {
+                opacity: 1 !important;
+                max-width: unset !important;
+                transform: none !important;
+            }
+            .toggle-btn {
+                display: none;
             }
             .menu {
                 flex-direction: row;
@@ -354,20 +442,23 @@
     <!-- ADMIN PANEL INTERFACE -->
     <div id="admin-panel" class="admin-interface hidden">
         <!-- Sidebar Navigation -->
-        <div class="sidebar">
+        <div class="sidebar" id="sidebar">
+            <!-- Toggle Sidebar Button -->
+            <button class="toggle-btn" onclick="toggleSidebar()">❬</button>
+            
             <div class="sidebar-header">
                 <h2>Admin Hub ⚡</h2>
                 <button class="btn-logout" onclick="logout()">Logout</button>
             </div>
             <ul class="menu">
-                <li><a href="#" onclick="loadContent(this, '💸 Angsuran Kas', 'https://bing.com')" class="active">💸 Angsuran Kas</a></li>
-                <li><a href="#" onclick="loadContent(this, '📉 Tunggakan Warga', 'https://wikipedia.org')">📉 Tunggakan</a></li>
-                <li><a href="#" onclick="loadContent(this, '👥 Data Seluruh Warga', 'https://example.com')">👥 Data Warga</a></li>
-                <li><a href="#" onclick="loadContent(this, '📅 Jadwal Kegiatan', 'https://example.com')">📅 Kegiatan</a></li>
-                <li><a href="#" onclick="loadContent(this, '💌 Undangan Digital', 'https://example.com')">💌 Undangan</a></li>
-                <li><a href="#" onclick="loadContent(this, '📥 Laporan Surat Masuk', 'https://example.com')">📥 Laporan Srt Masuk</a></li>
-                <li><a href="#" onclick="loadContent(this, '📤 Laporan Surat Keluar', 'https://example.com')">📤 Laporan Srt Keluar</a></li>
-                <li><a href="#" onclick="loadContent(this, '📊 Laporan Warga', 'https://example.com')">📊 Laporan Warga</a></li>
+                <li><a href="#" onclick="loadContent(this, '💸 Angsuran Kas', 'https://bing.com')" class="active"><span class="icon">💸</span><span class="text">Angsuran Kas</span></a></li>
+                <li><a href="#" onclick="loadContent(this, '📉 Tunggakan Warga', 'https://wikipedia.org')"><span class="icon">📉</span><span class="text">Tunggakan</span></a></li>
+                <li><a href="#" onclick="loadContent(this, '👥 Data Seluruh Warga', 'https://example.com')"><span class="icon">👥</span><span class="text">Data Warga</span></a></li>
+                <li><a href="#" onclick="loadContent(this, '📅 Jadwal Kegiatan', 'https://example.com')"><span class="icon">📅</span><span class="text">Kegiatan</span></a></li>
+                <li><a href="#" onclick="loadContent(this, '💌 Undangan Digital', 'https://example.com')"><span class="icon">💌</span><span class="text">Undangan</span></a></li>
+                <li><a href="#" onclick="loadContent(this, '📥 Laporan Surat Masuk', 'https://example.com')"><span class="icon">📥</span><span class="text">Laporan Srt Masuk</span></a></li>
+                <li><a href="#" onclick="loadContent(this, '📤 Laporan Surat Keluar', 'https://example.com')"><span class="icon">📤</span><span class="text">Laporan Srt Keluar</span></a></li>
+                <li><a href="#" onclick="loadContent(this, '📊 Laporan Warga', 'https://example.com')"><span class="icon">📊</span><span class="text">Laporan Warga</span></a></li>
             </ul>
         </div>
 
@@ -384,6 +475,20 @@
     </div>
 
     <script>
+        // Fungsi untuk mengecilkan / membesarkan sidebar
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const toggleBtn = document.querySelector('.toggle-btn');
+            
+            sidebar.classList.toggle('collapsed');
+            
+            if (sidebar.classList.contains('collapsed')) {
+                toggleBtn.innerText = '❭';
+            } else {
+                toggleBtn.innerText = '❬';
+            }
+        }
+
         function loadContent(element, title, url) {
             // Update Active Menu
             const menus = document.querySelectorAll('.menu a');
