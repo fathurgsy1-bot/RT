@@ -172,12 +172,19 @@
            KHUSUS UNTUK MODE DOWNLOAD/PRINT PDF
            ========================================== */
         @media print {
+            @page {
+                size: A4 portrait;
+                margin: 0; /* Margin ditangani oleh padding di dalam .paper */
+            }
+
             html, body {
+                width: 210mm;
+                height: 297mm;
                 background: white !important;
                 background-image: none !important;
                 margin: 0 !important;
                 padding: 0 !important;
-                height: 100%;
+                overflow: hidden; /* Kunci rahasia agar tidak ada halaman kosong di akhir */
                 color: black !important;
             }
             
@@ -188,15 +195,17 @@
             .paper-wrapper {
                 display: block !important;
                 width: 100%;
+                height: 100%;
             }
 
             .paper {
-                width: 210mm;
-                min-height: 297mm;
+                width: 100%;
+                height: 100%;
                 background: white;
-                padding: 2.5cm 2.5cm;
+                /* Padding disesuaikan standar surat resmi (Atas: 2cm, Kanan: 2cm, Bawah: 2cm, Kiri: 2.5cm) */
+                padding: 2cm 2cm 2cm 2.5cm;
                 box-sizing: border-box;
-                font-family: Arial, Helvetica, sans-serif;
+                font-family: 'Times New Roman', Times, serif; /* Umumnya surat resmi menggunakan font serif */
                 color: black;
                 font-size: 12pt;
                 line-height: 1.5;
@@ -206,39 +215,39 @@
             .kop-surat-container {
                 display: flex;
                 align-items: center;
-                margin-bottom: 5px;
+                margin-bottom: 2px;
             }
 
             .kop-surat-logo {
-                width: 90px;
+                width: 85px; /* Sedikit dikecilkan agar proporsional */
                 height: auto;
-                margin-right: 15px;
+                margin-right: 20px;
             }
 
             .kop-surat-text {
                 flex-grow: 1;
                 text-align: center;
                 font-weight: bold;
-                line-height: 1.3;
+                line-height: 1.2; /* Spasi kop lebih rapat */
             }
 
             .kop-surat-text .baris-1 { font-size: 16pt; }
             .kop-surat-text .baris-2 { font-size: 14pt; }
-            .kop-surat-text .baris-3 { font-size: 14pt; margin-top: 5px; }
+            .kop-surat-text .baris-3 { font-size: 14pt; margin-top: 3px; }
 
             .garis-kop {
                 border-top: 3px solid black;
                 border-bottom: 1px solid black;
                 height: 2px;
-                margin-top: 10px;
-                margin-bottom: 25px;
+                margin-top: 8px;
+                margin-bottom: 20px;
             }
 
             /* Meta Informasi Surat */
             .meta-surat {
                 display: flex;
                 justify-content: space-between;
-                margin-bottom: 25px;
+                margin-bottom: 20px;
             }
 
             .meta-kiri table {
@@ -248,12 +257,12 @@
             
             .meta-kiri table td {
                 vertical-align: top;
-                padding: 2px 5px 2px 0;
+                padding: 1px 5px 1px 0;
             }
 
             /* Tujuan Surat */
             .tujuan {
-                margin-bottom: 25px;
+                margin-bottom: 20px;
                 line-height: 1.4;
                 white-space: pre-line;
             }
@@ -264,21 +273,21 @@
             }
 
             .tabel-acara {
-                margin: 15px 0 15px 30px;
+                margin: 10px 0 10px 30px;
                 border-collapse: collapse;
             }
             
             .tabel-acara td {
                 vertical-align: top;
-                padding-bottom: 5px;
+                padding-bottom: 4px;
             }
 
-            .tabel-acara td:nth-child(1) { width: 130px; }
+            .tabel-acara td:nth-child(1) { width: 140px; }
             .tabel-acara td:nth-child(2) { padding-right: 10px; width: 10px; }
 
             /* Tanda Tangan */
             .tanda-tangan {
-                margin-top: 50px;
+                margin-top: 30px; /* Disesuaikan agar tidak memakan ruang ke bawah terlalu jauh */
                 text-align: right;
                 padding-right: 30px;
                 display: flex;
@@ -288,26 +297,21 @@
 
             .tanda-tangan p {
                 margin: 0;
-                margin-bottom: 5px;
+                margin-bottom: 0px;
             }
 
             .img-ttd {
-                height: 90px;
+                height: 80px; /* Disesuaikan agar tidak overflow halaman */
                 object-fit: contain;
                 margin-right: 15px;
-                margin-top: 5px;
-                margin-bottom: 5px;
-                /* mix-blend-mode ini akan membuang background putih pada JPEG sehingga menyatu sempurna dengan kertas (efek transparan) */
+                margin-top: -5px;
+                margin-bottom: -5px;
                 mix-blend-mode: multiply;
             }
 
             .nama-ttd {
                 font-weight: bold;
-            }
-
-            @page {
-                size: A4 portrait;
-                margin: 0; 
+                text-decoration: underline; /* Biasanya nama tanda tangan di garis bawahi */
             }
         }
     </style>
@@ -412,10 +416,12 @@
                 </div>
 
                 <div class="tujuan" id="out-tujuan">Kepada Yth.:
-Bapak-Bapak RT 04 RW 026 Cluster
-Dinar Indah Meteseh di SEMARANG</div>
+Bapak-Bapak Warga RT 04 RW 026
+Cluster Dinar Indah Meteseh
+di SEMARANG</div>
 
                 <div class="isi-surat">
+                    <br>
                     Dengan hormat,<br><br>
                     Bersama ini kami mohon dengan hormat kehadiran Bapak-Bapak pada :
                     
@@ -431,7 +437,7 @@ Dinar Indah Meteseh di SEMARANG</div>
                             <td id="out-waktu"></td>
                         </tr>
                         <tr>
-                            <td>Tempat.</td>
+                            <td>Tempat</td>
                             <td>:</td>
                             <td id="out-tempat"></td>
                         </tr>
@@ -442,11 +448,12 @@ Dinar Indah Meteseh di SEMARANG</div>
                         </tr>
                     </table>
 
-                    Demikian atas kehadiran Bapak-Bapak, kami ucapkan terimakasih.
+                    Demikian undangan ini disampaikan. Atas perhatian dan kehadiran Bapak-Bapak, kami ucapkan terima kasih.
                 </div>
 
                 <div class="tanda-tangan">
-                    <p>Hormat kami, RT 04 RW XXVI</p>
+                    <p>Hormat kami,</p>
+                    <p>Ketua RT 04 RW XXVI</p>
                     
                     <img id="out-ttd" src="https://drive.google.com/thumbnail?id=177t3lTCxrUODT5_u6YEuAzY2rwepKHTl&sz=w1000" alt="Tanda Tangan" class="img-ttd">
                     <div class="nama-ttd">GATOT ENDRO YUDO EDI WIBOWO</div>
@@ -456,62 +463,48 @@ Dinar Indah Meteseh di SEMARANG</div>
     </div>
 
     <script>
-        // Data bahasa Indonesia
         const bulanIndo = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
         const hariIndo = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
 
-        // Helper fungsi parseCSV yang diambil dari kode SI-WARGA Anda
         const parseCSV = (csvText) => csvText.split('\n').map(row => row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(cell => cell.replace(/^"|"$/g, '').trim()));
 
-        // Inisialisasi data saat halaman pertama dimuat
         window.onload = function() {
             const now = new Date();
             
-            // 1. Set Tanggal Pembuatan Hari Ini
             const tglBuat = `Semarang, ${now.getDate()} ${bulanIndo[now.getMonth()]} ${now.getFullYear()}`;
             document.getElementById('input-tgl-surat').value = tglBuat;
 
-            // 2. Set Nomor Surat Otomatis Bagian Belakang
             const bulanBerjalan = String(now.getMonth() + 1).padStart(2, '0');
             const tahunBerjalan = now.getFullYear();
             document.getElementById('label-nomor-belakang').innerText = `/RT.04/XXVI/${bulanBerjalan}/${tahunBerjalan}`;
 
-            // 3. Set Default Date Picker untuk Hari/Tanggal Acara (Misal H+3)
             const defaultAcara = new Date(now);
             defaultAcara.setDate(now.getDate() + 3);
             const dateInputFormat = defaultAcara.toISOString().split('T')[0];
             document.getElementById('input-hari-tgl').value = dateInputFormat;
 
-            // 4. Fetch Data Spreadsheet Google dengan format CSV
             fetchSpreadsheetData();
-
-            // Render Output Pertama Kali
             updateSurat();
         };
 
         function updateSurat() {
-            // Update Tanggal Pembuatan
             document.getElementById('out-tgl-surat').innerText = document.getElementById('input-tgl-surat').value;
 
-            // Update Nomor Surat Gabungan
             let noDepan = document.getElementById('input-no-depan').value;
             if(noDepan) noDepan = String(noDepan).padStart(2, '0'); 
             const noBelakang = document.getElementById('label-nomor-belakang').innerText;
             document.getElementById('out-nomor').innerText = noDepan + noBelakang;
 
-            // Update Hari/Tanggal Kalender
             const dateVal = document.getElementById('input-hari-tgl').value;
             if (dateVal) {
                 const d = new Date(dateVal);
                 document.getElementById('out-hari-tgl').innerText = `${hariIndo[d.getDay()]}, ${d.getDate()} ${bulanIndo[d.getMonth()]} ${d.getFullYear()}`;
             }
 
-            // Update Waktu Jam
             let wMulai = document.getElementById('input-waktu-mulai').value.replace(':', '.');
             let wSelesai = document.getElementById('input-waktu-selesai').value.replace(':', '.');
             document.getElementById('out-waktu').innerText = `Pukul ${wMulai} – ${wSelesai} WIB`;
 
-            // Update Tempat (Dropdown / Manual)
             let tempatVal = document.getElementById('input-tempat').value;
             if(tempatVal === 'manual') {
                 document.getElementById('input-tempat-manual').style.display = 'block';
@@ -524,7 +517,6 @@ Dinar Indah Meteseh di SEMARANG</div>
 
         async function fetchSpreadsheetData() {
             const sheetId = '1n58q1Rr-N0jU782C9IzVI75Mgnysxi9b'; 
-            // Mengubah format output menjadi CSV agar bypass masalah parsing JSON
             const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv`;
             const select = document.getElementById('input-tempat');
             
@@ -537,9 +529,7 @@ Dinar Indah Meteseh di SEMARANG</div>
                 
                 select.innerHTML = '<option value="">Pilih Tempat Acara...</option>';
                 
-                // Mulai iterasi dari baris ke-1 (melewati baris ke-0 yang berisi header)
                 rows.slice(1).forEach(row => {
-                    // row[1] adalah Nama, row[2] adalah Alamat/Keterangan
                     if (row.length > 1 && row[1]) {
                         const nama = row[1];
                         const alamat = row[2] || '';
@@ -562,10 +552,8 @@ Dinar Indah Meteseh di SEMARANG</div>
         }
 
         async function simpanKeSpreadsheet() {
-            // URL Web App Google Apps Script Anda
             const KODE_URL_WEB_APP = "https://script.google.com/macros/s/AKfycbxXP4F2t_6k-fdgOFPkXBeOk1GW_n5iAc8q4-LVaZPbfo92pRDn-wTLnWfWX9mNn2o11A/exec"; 
             
-            // Mengambil Nilai Gabungan dari UI yang dirender
             const dataData = {
                 tanggal_pembuatan: document.getElementById('out-tgl-surat').innerText,
                 nomor_surat: document.getElementById('out-nomor').innerText,
@@ -587,7 +575,7 @@ Dinar Indah Meteseh di SEMARANG</div>
             const originalText = btn.innerHTML;
             
             try {
-                updateSurat(); // Pastikan update render terakhir
+                updateSurat(); 
                 
                 btn.innerHTML = `
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-loader">
@@ -596,7 +584,6 @@ Dinar Indah Meteseh di SEMARANG</div>
                 btn.disabled = true;
 
                 await simpanKeSpreadsheet(); 
-                console.log('Pengiriman ke spreadsheet selesai.');
                 
                 btn.innerHTML = originalText;
                 btn.disabled = false;
