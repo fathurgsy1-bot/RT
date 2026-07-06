@@ -297,6 +297,7 @@
                 margin-right: 15px;
                 margin-top: 5px;
                 margin-bottom: 5px;
+                /* mix-blend-mode ini akan membuang background putih pada JPEG sehingga menyatu sempurna dengan kertas (efek transparan) */
                 mix-blend-mode: multiply;
             }
 
@@ -376,7 +377,8 @@
         <div class="paper-wrapper">
             <div class="paper" id="surat-undangan">
                 <div class="kop-surat-container">
-                    <img id="out-logo" src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Lambang_Kota_Semarang.png/400px-Lambang_Kota_Semarang.png" alt="Logo Pemkot" class="kop-surat-logo">
+                    <!-- UBAH ID FILE LOGO DI BAWAH INI -->
+                    <img id="out-logo" src="https://drive.google.com/uc?export=view&id=1LHcoyU4luojQINTuGWRePeYmUQptBj0k" alt="Logo Pemkot" class="kop-surat-logo">
                     <div class="kop-surat-text">
                         <div class="baris-1">PEMERINTAH KOTA SEMARANG</div>
                         <div class="baris-2">KEC. TEMBALANG KEL. METESEH</div>
@@ -446,7 +448,9 @@ Dinar Indah Meteseh di SEMARANG</div>
 
                 <div class="tanda-tangan">
                     <p>Hormat kami, RT 04 RW XXVI</p>
-                    <img id="out-ttd" src="https://upload.wikimedia.org/wikipedia/commons/f/f6/Signature_of_John_Hancock.png" alt="Tanda Tangan" class="img-ttd">
+                    
+                    <!-- UBAH ID FILE TANDA TANGAN DI BAWAH INI -->
+                    <img id="out-ttd" src="https://drive.google.com/uc?export=view&id=177t3lTCxrUODT5_u6YEuAzY2rwepKHTl" alt="Tanda Tangan" class="img-ttd">
                     <div class="nama-ttd">GATOT ENDRO YUDO EDI WIBOWO</div>
                 </div>
             </div>
@@ -520,7 +524,6 @@ Dinar Indah Meteseh di SEMARANG</div>
             document.getElementById('out-tempat').innerText = tempatVal || "(Pilih tempat terlebih dahulu)";
         }
 
-        // FUNGSI FETCH YANG SUDAH DIGANTI MENGGUNAKAN LOGIKA CSV
         async function fetchSpreadsheetData() {
             const sheetId = '1n58q1Rr-N0jU782C9IzVI75Mgnysxi9b'; 
             // Mengubah format output menjadi CSV agar bypass masalah parsing JSON
