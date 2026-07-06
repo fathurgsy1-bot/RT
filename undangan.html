@@ -458,6 +458,9 @@ Dinar Indah Meteseh di SEMARANG</div>
         const bulanIndo = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
         const hariIndo = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
 
+        // Helper fungsi parseCSV yang diambil dari kode SI-WARGA Anda
+        const parseCSV = (csvText) => csvText.split('\n').map(row => row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(cell => cell.replace(/^"|"$/g, '').trim()));
+
         // Inisialisasi data saat halaman pertama dimuat
         window.onload = function() {
             const now = new Date();
@@ -477,7 +480,7 @@ Dinar Indah Meteseh di SEMARANG</div>
             const dateInputFormat = defaultAcara.toISOString().split('T')[0];
             document.getElementById('input-hari-tgl').value = dateInputFormat;
 
-            // 4. Fetch Data Spreadsheet Google
+            // 4. Fetch Data Spreadsheet Google dengan format CSV
             fetchSpreadsheetData();
 
             // Render Output Pertama Kali
@@ -517,37 +520,28 @@ Dinar Indah Meteseh di SEMARANG</div>
             document.getElementById('out-tempat').innerText = tempatVal || "(Pilih tempat terlebih dahulu)";
         }
 
-        // Fungsi fetch yang sudah DIPERBAIKI PARSING JSON-nya
+        // FUNGSI FETCH YANG SUDAH DIGANTI MENGGUNAKAN LOGIKA CSV
         async function fetchSpreadsheetData() {
             const sheetId = '1n58q1Rr-N0jU782C9IzVI75Mgnysxi9b'; 
-            const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json`;
+            // Mengubah format output menjadi CSV agar bypass masalah parsing JSON
+            const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv`;
             const select = document.getElementById('input-tempat');
             
             try {
                 const response = await fetch(url);
+                if (!response.ok) throw new Error("Gagal mengambil data dari Google Sheets");
+                
                 const text = await response.text();
-                
-                // MENGGUNAKAN METODE SUBSTRING (Lebih aman dari regex)
-                const startIndex = text.indexOf('{');
-                const endIndex = text.lastIndexOf('}');
-                
-                if (startIndex === -1 || endIndex === -1) {
-                    throw new Error("Respons bukan JSON. Pastikan Google Sheet sudah di-set 'Anyone with link / Publik'.");
-                }
-                
-                const jsonString = text.substring(startIndex, endIndex + 1);
-                const data = JSON.parse(jsonString);
+                const rows = parseCSV(text);
                 
                 select.innerHTML = '<option value="">Pilih Tempat Acara...</option>';
                 
-                // Looping baris (Asumsi Kolom A: Nama, Kolom B: Alamat/Blok)
-                data.table.rows.forEach((row, index) => {
-                    // Skip header (baris 0) jika berisi teks 'Nama' dll
-                    if(index === 0 && row.c[0]?.v?.toLowerCase().includes('nama')) return; 
-                    
-                    if (row.c && row.c[0] && row.c[0].v) {
-                        const nama = row.c[0].v;
-                        const alamat = (row.c[1] && row.c[1].v) ? row.c[1].v : '';
+                // Mulai iterasi dari baris ke-1 (melewati baris ke-0 yang berisi header)
+                rows.slice(1).forEach(row => {
+                    // row[1] adalah Nama, row[2] adalah Alamat/Keterangan
+                    if (row.length > 1 && row[1]) {
+                        const nama = row[1];
+                        const alamat = row[2] || '';
                         
                         const option = document.createElement('option');
                         option.value = `Bapak ${nama} (${alamat})`;
@@ -560,7 +554,6 @@ Dinar Indah Meteseh di SEMARANG</div>
                 
             } catch (error) {
                 console.error("Gagal load dari spreadsheet:", error);
-                // Alert otomatis jika gagal mengambil data agar user tahu masalahnya
                 alert("Gagal memuat data dari Spreadsheet. Pastikan akses Spreadsheet disetel ke 'Anyone with the link' (Publik).");
                 select.innerHTML = '<option value="manual">Gagal load data (Klik untuk Isi Manual)</option>';
                 document.getElementById('input-tempat-manual').style.display = 'block';
@@ -568,7 +561,7 @@ Dinar Indah Meteseh di SEMARANG</div>
         }
 
         async function simpanKeSpreadsheet() {
-            // URL Web App Google Apps Script Anda (Tetap Gunakan yg Lama)
+            // URL Web App Google Apps Script Anda
             const KODE_URL_WEB_APP = "https://script.google.com/macros/s/AKfycbxXP4F2t_6k-fdgOFPkXBeOk1GW_n5iAc8q4-LVaZPbfo92pRDn-wTLnWfWX9mNn2o11A/exec"; 
             
             // Mengambil Nilai Gabungan dari UI yang dirender
