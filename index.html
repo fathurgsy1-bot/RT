@@ -591,23 +591,35 @@
         
         const headers = rows[0].map(h => (h || "").toLowerCase().trim());
         
-        // Mengubah header pencarian menjadi 'base'
-        const baseIndex = headers.findIndex(h => h.toLowerCase().includes('base'));
+        // Cari kolom yang mengandung kata 'base', 'url', 'link', atau 'gambar'
+        const baseIndex = headers.findIndex(h => h.includes('base') || h.includes('url') || h.includes('link') || h.includes('gambar'));
         
-        if (baseIndex === -1) throw new Error("Kolom 'Base' tidak ditemukan di baris pertama sheet");
+        if (baseIndex === -1) throw new Error("Kolom URL/Link gambar tidak ditemukan di baris pertama");
         
-        // Menghapus filter startsWith('http') agar bisa menerima string base64
+        // Memproses URL dari sheet
         const imageUrls = rows.slice(1)
             .map(row => row[baseIndex])
-            .filter(baseStr => baseStr && baseStr.trim() !== '');
+            .filter(urlStr => urlStr && urlStr.trim() !== '')
+            .map(url => {
+                let cleanUrl = url.trim();
+                // Jika ini adalah link Google Drive, ekstrak ID dan jadikan direct link
+                if (cleanUrl.includes('drive.google.com')) {
+                    // Regex untuk mengambil ID Google Drive (biasanya panjangnya 33 karakter)
+                    const matchId = cleanUrl.match(/[-\w]{25,}/);
+                    if (matchId && matchId[0]) {
+                        return `https://drive.google.com/uc?export=view&id=${matchId[0]}`;
+                    }
+                }
+                return cleanUrl;
+            });
 
-        if (imageUrls.length === 0) throw new Error("Tidak ada data gambar base64 yang valid");
+        if (imageUrls.length === 0) throw new Error("Tidak ada data gambar yang valid");
         
         slideCount = imageUrls.length;
 
         track.innerHTML = imageUrls.map(url => `
             <div class="w-full h-full flex-shrink-0 relative">
-                <img src="${url.trim()}" class="w-full h-full object-cover object-center" alt="Galeri Warga" onerror="this.src='https://via.placeholder.com/800x400?text=Gambar+Gagal+Dimuat'">
+                <img src="${url}" class="w-full h-full object-cover object-center" alt="Galeri Warga" onerror="this.src='https://via.placeholder.com/800x400?text=Gambar+Gagal+Dimuat'">
             </div>
         `).join('');
 
@@ -624,10 +636,11 @@
         loader.innerHTML = `
             <i class="fas fa-exclamation-triangle text-amber-500 text-3xl mb-2"></i>
             <p class="text-white font-semibold text-sm">Gagal memuat slider.</p>
-            <p class="text-[10px] text-gray-300 mt-1 max-w-[250px] text-center leading-tight">Pastikan pengaturan *Share* pada Google Sheet Galeri diubah ke <b>"Anyone with the link"</b> dan kolom 'Base' terisi.</p>
+            <p class="text-[10px] text-gray-300 mt-1 max-w-[250px] text-center leading-tight">${error.message}</p>
         `;
     }
 }
+
         function updateSliderUI() {
             if (slideCount === 0) return;
             const track = document.getElementById('slider-track');
