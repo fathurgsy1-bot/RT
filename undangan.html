@@ -517,19 +517,25 @@ Dinar Indah Meteseh di SEMARANG</div>
             document.getElementById('out-tempat').innerText = tempatVal || "(Pilih tempat terlebih dahulu)";
         }
 
-        // Fungsi fetch menggunakan Google Visualization API agar bypass block (CORS)
+        // Fungsi fetch yang sudah DIPERBAIKI PARSING JSON-nya
         async function fetchSpreadsheetData() {
-    // GANTI ID DI BAWAH INI DENGAN ID DARI FILE GOOGLE SHEETS YANG BARU DISIMPAN
-    const sheetId = '1n58q1Rr-N0jU782C9IzVI75Mgnysxi9b'; 
-    const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json`;
+            const sheetId = '1n58q1Rr-N0jU782C9IzVI75Mgnysxi9b'; 
+            const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json`;
             const select = document.getElementById('input-tempat');
             
             try {
                 const response = await fetch(url);
                 const text = await response.text();
                 
-                // Hapus pembungkus fungsi dari GViz JSON
-                const jsonString = text.match(/google\.visualization\.Query\.setResponse\(([\s\S\w]+)\)/)[1];
+                // MENGGUNAKAN METODE SUBSTRING (Lebih aman dari regex)
+                const startIndex = text.indexOf('{');
+                const endIndex = text.lastIndexOf('}');
+                
+                if (startIndex === -1 || endIndex === -1) {
+                    throw new Error("Respons bukan JSON. Pastikan Google Sheet sudah di-set 'Anyone with link / Publik'.");
+                }
+                
+                const jsonString = text.substring(startIndex, endIndex + 1);
                 const data = JSON.parse(jsonString);
                 
                 select.innerHTML = '<option value="">Pilih Tempat Acara...</option>';
@@ -553,7 +559,9 @@ Dinar Indah Meteseh di SEMARANG</div>
                 select.innerHTML += '<option value="manual">-- Ketik Manual --</option>';
                 
             } catch (error) {
-                console.error("Gagal load dari spreadsheet (Pastikan Sheet di-share Publik 'Anyone with link'):", error);
+                console.error("Gagal load dari spreadsheet:", error);
+                // Alert otomatis jika gagal mengambil data agar user tahu masalahnya
+                alert("Gagal memuat data dari Spreadsheet. Pastikan akses Spreadsheet disetel ke 'Anyone with the link' (Publik).");
                 select.innerHTML = '<option value="manual">Gagal load data (Klik untuk Isi Manual)</option>';
                 document.getElementById('input-tempat-manual').style.display = 'block';
             }
