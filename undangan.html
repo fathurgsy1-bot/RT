@@ -94,7 +94,7 @@
             letter-spacing: 0.8px;
         }
 
-        .form-group input {
+        .form-group input, .form-group select {
             width: 100%;
             padding: 16px 18px;
             background-color: #0f172a;
@@ -107,11 +107,34 @@
             transition: all 0.3s ease;
         }
 
-        .form-group input:focus {
+        .form-group input:focus, .form-group select:focus {
             outline: none;
             border-color: #38bdf8;
             box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.15);
             background-color: #152033;
+        }
+
+        .flex-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .flex-row input {
+            flex: 1;
+        }
+
+        .static-text {
+            color: #cbd5e1;
+            font-size: 1.05rem;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        /* Tampilan Waktu (Khusus agar icon jam/kalender putih di Chrome) */
+        ::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+            cursor: pointer;
         }
 
         button.download-btn {
@@ -307,27 +330,37 @@
             
             <div class="form-group">
                 <label for="input-tgl-surat">Tanggal Pembuatan</label>
-                <input type="text" id="input-tgl-surat" value="Semarang, 3 Februari 2026" oninput="updateSurat()">
+                <input type="text" id="input-tgl-surat" oninput="updateSurat()">
             </div>
 
             <div class="form-group">
-                <label for="input-nomor">Nomor Surat</label>
-                <input type="text" id="input-nomor" value="02/RT.04/XXVI/02/2026" oninput="updateSurat()">
+                <label for="input-no-depan">Nomor Surat</label>
+                <div class="flex-row">
+                    <input type="number" id="input-no-depan" value="01" min="1" style="max-width: 80px; text-align: center;" oninput="updateSurat()">
+                    <span id="label-nomor-belakang" class="static-text">/RT.04/XXVI/...</span>
+                </div>
             </div>
 
             <div class="form-group">
-                <label for="input-hari-tgl">Hari / Tanggal</label>
-                <input type="text" id="input-hari-tgl" value="Sabtu, 7 Februari 2026" oninput="updateSurat()">
+                <label for="input-hari-tgl">Hari / Tanggal Acara</label>
+                <input type="date" id="input-hari-tgl" onchange="updateSurat()">
             </div>
 
             <div class="form-group">
-                <label for="input-waktu">Waktu Acara</label>
-                <input type="text" id="input-waktu" value="Pukul 19.30 – 21.00 WIB" oninput="updateSurat()">
+                <label>Waktu Acara</label>
+                <div class="flex-row">
+                    <input type="time" id="input-waktu-mulai" value="19:30" onchange="updateSurat()">
+                    <span class="static-text">s/d</span>
+                    <input type="time" id="input-waktu-selesai" value="21:00" onchange="updateSurat()">
+                </div>
             </div>
 
             <div class="form-group">
-                <label for="input-tempat">Tempat Acara</label>
-                <input type="text" id="input-tempat" value="Bapak Endy (4D No.4)" oninput="updateSurat()">
+                <label for="input-tempat">Tempat Acara (Dari Spreadsheet)</label>
+                <select id="input-tempat" onchange="updateSurat()">
+                    <option value="">Memuat data dari Google Sheets...</option>
+                </select>
+                <input type="text" id="input-tempat-manual" style="margin-top: 10px; display:none;" oninput="updateSurat()" placeholder="Ketik nama dan alamat manual...">
             </div>
 
             <button class="download-btn" onclick="downloadPDF()">
@@ -358,7 +391,7 @@
                             <tr>
                                 <td>No</td>
                                 <td>:</td>
-                                <td><span id="out-nomor">02/RT.04/XXVI/02/2026</span></td>
+                                <td><span id="out-nomor"></span></td>
                             </tr>
                             <tr>
                                 <td>Lamp.</td>
@@ -373,7 +406,7 @@
                         </table>
                     </div>
                     <div class="meta-kanan">
-                        <span id="out-tgl-surat">Semarang, 3 Februari 2026</span>
+                        <span id="out-tgl-surat"></span>
                     </div>
                 </div>
 
@@ -389,17 +422,17 @@ Dinar Indah Meteseh di SEMARANG</div>
                         <tr>
                             <td>Hari/ Tanggal</td>
                             <td>:</td>
-                            <td id="out-hari-tgl">Sabtu, 7 Februari 2026</td>
+                            <td id="out-hari-tgl"></td>
                         </tr>
                         <tr>
                             <td>Waktu</td>
                             <td>:</td>
-                            <td id="out-waktu">Pukul 19.30 – 21.00 WIB</td>
+                            <td id="out-waktu"></td>
                         </tr>
                         <tr>
                             <td>Tempat.</td>
                             <td>:</td>
-                            <td id="out-tempat">Bapak Endy (4D No.4)</td>
+                            <td id="out-tempat"></td>
                         </tr>
                         <tr>
                             <td>Acara</td>
@@ -421,24 +454,122 @@ Dinar Indah Meteseh di SEMARANG</div>
     </div>
 
     <script>
+        // Data bahasa Indonesia
+        const bulanIndo = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+        const hariIndo = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
+
+        // Inisialisasi data saat halaman pertama dimuat
+        window.onload = function() {
+            const now = new Date();
+            
+            // 1. Set Tanggal Pembuatan Hari Ini
+            const tglBuat = `Semarang, ${now.getDate()} ${bulanIndo[now.getMonth()]} ${now.getFullYear()}`;
+            document.getElementById('input-tgl-surat').value = tglBuat;
+
+            // 2. Set Nomor Surat Otomatis Bagian Belakang
+            const bulanBerjalan = String(now.getMonth() + 1).padStart(2, '0');
+            const tahunBerjalan = now.getFullYear();
+            document.getElementById('label-nomor-belakang').innerText = `/RT.04/XXVI/${bulanBerjalan}/${tahunBerjalan}`;
+
+            // 3. Set Default Date Picker untuk Hari/Tanggal Acara (Misal H+3)
+            const defaultAcara = new Date(now);
+            defaultAcara.setDate(now.getDate() + 3);
+            const dateInputFormat = defaultAcara.toISOString().split('T')[0];
+            document.getElementById('input-hari-tgl').value = dateInputFormat;
+
+            // 4. Fetch Data Spreadsheet Google
+            fetchSpreadsheetData();
+
+            // Render Output Pertama Kali
+            updateSurat();
+        };
+
         function updateSurat() {
+            // Update Tanggal Pembuatan
             document.getElementById('out-tgl-surat').innerText = document.getElementById('input-tgl-surat').value;
-            document.getElementById('out-nomor').innerText = document.getElementById('input-nomor').value;
-            document.getElementById('out-hari-tgl').innerText = document.getElementById('input-hari-tgl').value;
-            document.getElementById('out-waktu').innerText = document.getElementById('input-waktu').value;
-            document.getElementById('out-tempat').innerText = document.getElementById('input-tempat').value;
+
+            // Update Nomor Surat Gabungan
+            let noDepan = document.getElementById('input-no-depan').value;
+            if(noDepan) noDepan = String(noDepan).padStart(2, '0'); 
+            const noBelakang = document.getElementById('label-nomor-belakang').innerText;
+            document.getElementById('out-nomor').innerText = noDepan + noBelakang;
+
+            // Update Hari/Tanggal Kalender
+            const dateVal = document.getElementById('input-hari-tgl').value;
+            if (dateVal) {
+                const d = new Date(dateVal);
+                document.getElementById('out-hari-tgl').innerText = `${hariIndo[d.getDay()]}, ${d.getDate()} ${bulanIndo[d.getMonth()]} ${d.getFullYear()}`;
+            }
+
+            // Update Waktu Jam
+            let wMulai = document.getElementById('input-waktu-mulai').value.replace(':', '.');
+            let wSelesai = document.getElementById('input-waktu-selesai').value.replace(':', '.');
+            document.getElementById('out-waktu').innerText = `Pukul ${wMulai} – ${wSelesai} WIB`;
+
+            // Update Tempat (Dropdown / Manual)
+            let tempatVal = document.getElementById('input-tempat').value;
+            if(tempatVal === 'manual') {
+                document.getElementById('input-tempat-manual').style.display = 'block';
+                tempatVal = document.getElementById('input-tempat-manual').value;
+            } else {
+                document.getElementById('input-tempat-manual').style.display = 'none';
+            }
+            document.getElementById('out-tempat').innerText = tempatVal || "(Pilih tempat terlebih dahulu)";
+        }
+
+        // Fungsi fetch menggunakan Google Visualization API agar bypass block (CORS)
+        async function fetchSpreadsheetData() {
+            const sheetId = '1n58q1Rr-N0jU782C9IzVI75Mgnysxi9b';
+            const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json`;
+            
+            const select = document.getElementById('input-tempat');
+            
+            try {
+                const response = await fetch(url);
+                const text = await response.text();
+                
+                // Hapus pembungkus fungsi dari GViz JSON
+                const jsonString = text.match(/google\.visualization\.Query\.setResponse\(([\s\S\w]+)\)/)[1];
+                const data = JSON.parse(jsonString);
+                
+                select.innerHTML = '<option value="">Pilih Tempat Acara...</option>';
+                
+                // Looping baris (Asumsi Kolom A: Nama, Kolom B: Alamat/Blok)
+                data.table.rows.forEach((row, index) => {
+                    // Skip header (baris 0) jika berisi teks 'Nama' dll
+                    if(index === 0 && row.c[0]?.v?.toLowerCase().includes('nama')) return; 
+                    
+                    if (row.c && row.c[0] && row.c[0].v) {
+                        const nama = row.c[0].v;
+                        const alamat = (row.c[1] && row.c[1].v) ? row.c[1].v : '';
+                        
+                        const option = document.createElement('option');
+                        option.value = `Bapak ${nama} (${alamat})`;
+                        option.text = `Bapak ${nama} - ${alamat}`;
+                        select.appendChild(option);
+                    }
+                });
+                
+                select.innerHTML += '<option value="manual">-- Ketik Manual --</option>';
+                
+            } catch (error) {
+                console.error("Gagal load dari spreadsheet (Pastikan Sheet di-share Publik 'Anyone with link'):", error);
+                select.innerHTML = '<option value="manual">Gagal load data (Klik untuk Isi Manual)</option>';
+                document.getElementById('input-tempat-manual').style.display = 'block';
+            }
         }
 
         async function simpanKeSpreadsheet() {
-            // URL Web App Google Apps Script Anda
+            // URL Web App Google Apps Script Anda (Tetap Gunakan yg Lama)
             const KODE_URL_WEB_APP = "https://script.google.com/macros/s/AKfycbxXP4F2t_6k-fdgOFPkXBeOk1GW_n5iAc8q4-LVaZPbfo92pRDn-wTLnWfWX9mNn2o11A/exec"; 
             
+            // Mengambil Nilai Gabungan dari UI yang dirender
             const dataData = {
-                tanggal_pembuatan: document.getElementById('input-tgl-surat').value,
-                nomor_surat: document.getElementById('input-nomor').value,
-                hari_tanggal: document.getElementById('input-hari-tgl').value,
-                waktu_acara: document.getElementById('input-waktu').value,
-                tempat_acara: document.getElementById('input-tempat').value
+                tanggal_pembuatan: document.getElementById('out-tgl-surat').innerText,
+                nomor_surat: document.getElementById('out-nomor').innerText,
+                hari_tanggal: document.getElementById('out-hari-tgl').innerText,
+                waktu_acara: document.getElementById('out-waktu').innerText,
+                tempat_acara: document.getElementById('out-tempat').innerText
             };
 
             return fetch(KODE_URL_WEB_APP, {
@@ -454,7 +585,7 @@ Dinar Indah Meteseh di SEMARANG</div>
             const originalText = btn.innerHTML;
             
             try {
-                updateSurat();
+                updateSurat(); // Pastikan update render terakhir
                 
                 btn.innerHTML = `
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-loader">
@@ -479,6 +610,5 @@ Dinar Indah Meteseh di SEMARANG</div>
             }
         }
     </script>
-
 </body>
 </html>
