@@ -596,22 +596,30 @@
         
         if (baseIndex === -1) throw new Error("Kolom URL/Link gambar tidak ditemukan di baris pertama");
         
-        // Memproses URL dari sheet
-        const imageUrls = rows.slice(1)
-            .map(row => row[baseIndex])
-            .filter(urlStr => urlStr && urlStr.trim() !== '')
-            .map(url => {
-                let cleanUrl = url.trim();
-                // Jika ini adalah link Google Drive, ekstrak ID dan jadikan direct link
-                if (cleanUrl.includes('drive.google.com')) {
-                    // Regex untuk mengambil ID Google Drive (biasanya panjangnya 33 karakter)
-                    const matchId = cleanUrl.match(/[-\w]{25,}/);
-                    if (matchId && matchId[0]) {
-                        return `https://drive.google.com/uc?export=view&id=${matchId[0]}`;
+        const imageUrls = [];
+        
+        // Memproses setiap baris
+        rows.slice(1).forEach(row => {
+            const cellValue = row[baseIndex];
+            if (cellValue && cellValue.trim() !== '') {
+                // Memecah isi sel berdasarkan baris baru (\n), koma (,), atau titik koma (;)
+                const splitUrls = cellValue.split(/[\n,;]+/);
+                
+                splitUrls.forEach(url => {
+                    let cleanUrl = url.trim();
+                    if (cleanUrl !== '') {
+                        // Jika ini adalah link Google Drive, ekstrak ID dan jadikan direct link
+                        if (cleanUrl.includes('drive.google.com')) {
+                            const matchId = cleanUrl.match(/[-\w]{25,}/);
+                            if (matchId && matchId[0]) {
+                                cleanUrl = `https://drive.google.com/uc?export=view&id=${matchId[0]}`;
+                            }
+                        }
+                        imageUrls.push(cleanUrl);
                     }
-                }
-                return cleanUrl;
-            });
+                });
+            }
+        });
 
         if (imageUrls.length === 0) throw new Error("Tidak ada data gambar yang valid");
         
