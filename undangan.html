@@ -519,9 +519,9 @@ Dinar Indah Meteseh di SEMARANG</div>
 
         // Fungsi fetch menggunakan Google Visualization API agar bypass block (CORS)
         async function fetchSpreadsheetData() {
-            const sheetId = '1n58q1Rr-N0jU782C9IzVI75Mgnysxi9b';
-            const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json`;
-            
+    // GANTI ID DI BAWAH INI DENGAN ID DARI FILE GOOGLE SHEETS YANG BARU DISIMPAN
+    const sheetId = '1n58q1Rr-N0jU782C9IzVI75Mgnysxi9b'; 
+    const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json`;
             const select = document.getElementById('input-tempat');
             
             try {
