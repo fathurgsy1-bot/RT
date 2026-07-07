@@ -3,151 +3,132 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Form Upload Kegiatan</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <title>Daftar Kegiatan</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body class="bg-slate-100 flex items-center justify-center min-h-screen p-4">
+<body>
 
-  <div class="bg-white p-8 rounded-xl shadow-md w-full max-w-md">
-    <h2 class="text-2xl font-bold mb-6 text-slate-800 text-center">Form Input Kegiatan</h2>
-    
-    <form id="uploadForm" onsubmit="handleFormSubmit(event)">
-      <div class="mb-4">
-        <label class="block text-slate-700 font-semibold mb-2" for="namaKegiatan">Nama Kegiatan</label>
-        <input type="text" id="namaKegiatan" required class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-      </div>
-      
-      <div class="mb-4">
-        <label class="block text-slate-700 font-semibold mb-2" for="tanggal">Tanggal Kegiatan</label>
-        <input type="date" id="tanggal" required class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-      </div>
-      
-      <div class="mb-6">
-        <label class="block text-slate-700 font-semibold mb-2" for="foto">Upload Foto</label>
-        <input type="file" id="foto" accept="image/*" required class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
-      </div>
-      
-      <button type="submit" id="submitBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition duration-200 cursor-pointer">
-        Kirim Data
-      </button>
-    </form>
-    
-    <div id="status" class="mt-4 text-center font-medium hidden p-3 rounded-lg"></div>
+<div class="container mt-5">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Data Kegiatan</h2>
+    <a href="https://script.google.com/macros/s/AKfycbxKwWu0g7nOvFlMpNTc8VMoipGsI_77_fBu198JcqHhlauoNCFCbBsmVo9fRzIwlETp/exec" 
+       class="btn btn-primary" target="_blank">
+       + Tambah Kegiatan
+    </a>
   </div>
 
-  <script>
-    const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxKwWu0g7nOvFlMpNTc8VMoipGsI_77_fBu198JcqHhlauoNCFCbBsmVo9fRzIwlETp/exec';
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-hover table-bordered align-middle">
+          <thead class="table-light">
+            <tr>
+              <th>No</th>
+              <th>Nama Kegiatan</th>
+              <th>Tanggal</th>
+              <th>Status</th>
+              <th class="text-center">Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="tabel-body">
+            <tr>
+              <td colspan="5" class="text-center text-muted">Memuat data...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
 
-    function handleFormSubmit(event) {
-      event.preventDefault();
-      
-      const submitBtn = document.getElementById('submitBtn');
-      const statusDiv = document.getElementById('status');
-      const fileInput = document.getElementById('foto');
-      const file = fileInput.files[0];
-      
-      if (!file) {
-        alert('Silakan pilih foto terlebih dahulu.');
-        return;
-      }
-      
-      submitBtn.disabled = true;
-      submitBtn.innerText = 'Memproses Gambar...';
-      
-      statusDiv.classList.remove('hidden', 'bg-green-100', 'text-green-700', 'bg-red-100', 'text-red-700');
-      statusDiv.classList.add('bg-blue-100', 'text-blue-700');
-      statusDiv.innerText = 'Sedang mengompres gambar...';
-      
-      const reader = new FileReader();
-      
-      // Proses setelah file dibaca
-      reader.onload = function(e) {
-        const img = new Image();
-        img.src = e.target.result;
-        
-        // Proses setelah objek Image selesai dimuat
-        img.onload = function() {
-          const canvas = document.createElement('canvas');
-          
-          // --- PENGATURAN KOMPRESI & RESIZE ---
-          const MAX_WIDTH = 800;  // Batas maksimal lebar
-          const MAX_HEIGHT = 800; // Batas maksimal tinggi
-          let width = img.width;
-          let height = img.height;
-          
-          // Kalkulasi proporsi jika gambar lebih besar dari batas maksimal
-          if (width > height) {
-            if (width > MAX_WIDTH) {
-              height *= MAX_WIDTH / width;
-              width = MAX_WIDTH;
-            }
-          } else {
-            if (height > MAX_HEIGHT) {
-              width *= MAX_HEIGHT / height;
-              height = MAX_HEIGHT;
-            }
-          }
-          
-          canvas.width = width;
-          canvas.height = height;
-          
-          const ctx = canvas.getContext('2d');
-          ctx.drawImage(img, 0, 0, width, height);
-          
-          // Mengubah canvas kembali menjadi Base64 (Format JPEG, Kualitas 0.7 atau 70%)
-          // Angka 0.7 bisa Anda naik-turunkan (0.1 hingga 1.0)
-          const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.7);
-          
-          // Melanjutkan proses pengiriman dengan gambar yang sudah terkompresi
-          statusDiv.innerText = 'Mengunggah data ke Spreadsheet...';
-          submitBtn.innerText = 'Mengirim Data...';
-          
-                    // Memisahkan awalan 'data:image/jpeg;base64,' agar hanya tersisa teks Base64-nya saja
-          const base64String = compressedDataUrl.split(',')[1]; 
+<div class="modal fade" id="modalDetail" tabindex="-1" aria-labelledby="modalDetailLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalDetailLabel">Detail Kegiatan</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <table class="table table-borderless">
+          <tr>
+            <td width="35%"><strong>Nama Kegiatan</strong></td>
+            <td width="5%">:</td>
+            <td id="detail-nama">-</td>
+          </tr>
+          <tr>
+            <td><strong>Tanggal</strong></td>
+            <td>:</td>
+            <td id="detail-tanggal">-</td>
+          </tr>
+          <tr>
+            <td><strong>Status</strong></td>
+            <td>:</td>
+            <td id="detail-status">-</td>
+          </tr>
+          <tr>
+            <td><strong>Keterangan Tambahan</strong></td>
+            <td>:</td>
+            <td id="detail-keterangan">-</td>
+          </tr>
+        </table>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+      </div>
+    </div>
+  </div>
+</div>
 
-          
-          const payload = {
-            namaKegiatan: document.getElementById('namaKegiatan').value,
-            tanggal: document.getElementById('tanggal').value,
-            fileName: file.name,
-            fileData: compressedDataUrl, // Menggunakan data hasil kompresi
-            base64Data: base64String
-          };
-          
-          fetch(WEB_APP_URL, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'text/plain;charset=utf-8',
-            },
-            body: JSON.stringify(payload)
-          })
-          .then(response => response.json())
-          .then(data => {
-            submitBtn.disabled = false;
-            submitBtn.innerText = 'Kirim Data';
-            statusDiv.classList.remove('bg-blue-100', 'text-blue-700');
-            
-            if(data.status === "Sukses") {
-              statusDiv.classList.add('bg-green-100', 'text-green-700');
-              statusDiv.innerText = data.pesan;
-              document.getElementById('uploadForm').reset();
-            } else {
-              statusDiv.classList.add('bg-red-100', 'text-red-700');
-              statusDiv.innerText = "Error: " + data.pesan;
-            }
-          })
-          .catch(error => {
-            submitBtn.disabled = false;
-            submitBtn.innerText = 'Kirim Data';
-            statusDiv.classList.remove('bg-blue-100', 'text-blue-700');
-            statusDiv.classList.add('bg-red-100', 'text-red-700');
-            statusDiv.innerText = 'Terjadi kesalahan sistem: ' + error.message;
-          });
-        };
-      };
-      
-      reader.readAsDataURL(file);
-    }
-  </script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+  // URL Spreadsheet Anda: https://docs.google.com/spreadsheets/d/1-Zr-Y2oEX5a38rNGv0Zml_qwcQv3sV0t8ltnDnRLT1o/edit
+  // Catatan: Untuk menarik data langsung dari JS ke Spreadsheet, Anda biasanya membutuhkan endpoint Google Apps Script 
+  // yang mengembalikan JSON. Di bawah ini adalah simulasi (dummy data) bagaimana data dirender.
+
+  const dummyData = [
+    { id: 1, nama: "Rapat Paripurna", tanggal: "2023-10-15", status: "Selesai", keterangan: "Rapat berjalan lancar dan semua hadir." },
+    { id: 2, nama: "Kunjungan Lapangan", tanggal: "2023-10-20", status: "Berjalan", keterangan: "Tim sedang meninjau lokasi proyek." }
+  ];
+
+  function renderTable(data) {
+    const tbody = document.getElementById('tabel-body');
+    tbody.innerHTML = ''; // Kosongkan state loading
+
+    data.forEach((item, index) => {
+      const row = `
+        <tr>
+          <td>${index + 1}</td>
+          <td>${item.nama}</td>
+          <td>${item.tanggal}</td>
+          <td><span class="badge ${item.status === 'Selesai' ? 'bg-success' : 'bg-warning'}">${item.status}</span></td>
+          <td class="text-center">
+            <button class="btn btn-sm btn-info text-white" onclick='showDetail(${JSON.stringify(item)})'>Lihat Detail</button>
+          </td>
+        </tr>
+      `;
+      tbody.innerHTML += row;
+    });
+  }
+
+  // Fungsi untuk menampilkan data ke dalam Modal
+  function showDetail(item) {
+    document.getElementById('detail-nama').innerText = item.nama;
+    document.getElementById('detail-tanggal').innerText = item.tanggal;
+    document.getElementById('detail-status').innerText = item.status;
+    document.getElementById('detail-keterangan').innerText = item.keterangan;
+    
+    // Tampilkan Modal
+    const modal = new bootstrap.Modal(document.getElementById('modalDetail'));
+    modal.show();
+  }
+
+  // Menjalankan fungsi render setelah halaman dimuat (Simulasi Fetch API)
+  window.onload = () => {
+    // Jika Anda punya link Apps Script (GET method) untuk ambil data, ganti baris ini dengan fetch('URL_API_ANDA')
+    renderTable(dummyData); 
+  };
+</script>
+
 </body>
 </html>
