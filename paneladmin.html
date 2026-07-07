@@ -3,76 +3,73 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel & Login Vibe ✨</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <title>E-Sistem Arsip & Simpan Pinjam</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Nunito', sans-serif;
         }
 
         :root {
-            --grad-1: #ee7752;
-            --grad-2: #e73c7e;
-            --grad-3: #23a6d5;
-            --grad-4: #23d5ab;
+            --primary: #4e73df;
+            --primary-dark: #2e59d9;
+            --sidebar-bg: #4e73df;
+            --bg-light: #f8f9fc;
+            --text-dark: #5a5c69;
+            --text-gray: #858796;
+            --border: #e3e6f0;
         }
 
         body {
-            background: linear-gradient(-45deg, var(--grad-1), var(--grad-2), var(--grad-3), var(--grad-4));
-            background-size: 400% 400%;
-            animation: gradientBG 15s ease infinite;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
             height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
             overflow: hidden;
-            color: #fff;
-        }
-
-        @keyframes gradientBG {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
         }
 
         .hidden {
             display: none !important;
         }
 
-        /* LOGIN CONTAINER */
-        .login-container {
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.25);
-            padding: 2.5rem;
-            border-radius: 24px;
+        /* ================= LOGIN PANEL ================= */
+        .login-wrapper {
+            background: var(--primary);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .login-card {
+            background: #fff;
+            padding: 3rem 2.5rem;
+            border-radius: 12px;
             width: 90%;
             max-width: 420px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
             text-align: center;
-            transform: scale(1);
-            transition: transform 0.3s ease;
         }
 
-        .login-container:hover {
-            transform: scale(1.02);
+        .login-card .icon-logo {
+            font-size: 3rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
         }
 
-        .login-container h1 {
-            font-size: 2.2rem;
+        .login-card h1 {
+            font-size: 1.4rem;
             font-weight: 800;
-            margin-bottom: 0.5rem;
-            letter-spacing: -1px;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            color: #3a3b45;
+            margin-bottom: 0.2rem;
         }
 
-        .login-container p {
+        .login-card p {
             font-size: 0.9rem;
-            color: rgba(255, 255, 255, 0.8);
+            color: var(--text-gray);
             margin-bottom: 2rem;
         }
 
@@ -84,345 +81,296 @@
         .form-group label {
             display: block;
             font-size: 0.85rem;
-            font-weight: 600;
-            margin-bottom: 5px;
-            color: rgba(255, 255, 255, 0.9);
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #3a3b45;
         }
 
         .form-group input {
             width: 100%;
-            padding: 12px 16px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 12px;
-            color: #fff;
-            font-size: 0.95rem;
+            padding: 12px 15px;
+            border: 1px solid #d1d3e2;
+            border-radius: 8px;
+            color: #6e707e;
+            font-size: 0.9rem;
             outline: none;
-            transition: all 0.3s ease;
+            transition: border-color 0.2s;
         }
 
         .form-group input:focus {
-            background: rgba(255, 255, 255, 0.2);
-            border-color: rgba(255, 255, 255, 0.6);
-            box-shadow: 0 0 10px rgba(255,255,255,0.1);
+            border-color: #bac8f3;
+            box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
         }
 
         .btn-submit {
             width: 100%;
-            padding: 14px;
-            background: #fff;
-            color: #e73c7e;
+            padding: 12px;
+            background: var(--primary);
+            color: #fff;
             border: none;
-            border-radius: 12px;
-            font-weight: 800;
+            border-radius: 8px;
+            font-weight: 700;
             font-size: 1rem;
             cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: background 0.2s;
             margin-top: 0.5rem;
         }
 
         .btn-submit:hover {
-            background: rgba(255, 255, 255, 0.9);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+            background: var(--primary-dark);
         }
 
         .notification {
             margin-top: 1rem;
             padding: 10px;
-            border-radius: 8px;
+            border-radius: 6px;
             font-size: 0.85rem;
-            font-weight: 600;
+            font-weight: 700;
             display: none;
         }
         .notification.success {
-            background: rgba(35, 213, 171, 0.3);
-            border: 1px solid #23d5ab;
+            background: #1cc88a;
+            color: #fff;
             display: block;
         }
         .notification.error {
-            background: rgba(231, 60, 126, 0.3);
-            border: 1px solid #e73c7e;
+            background: #e74a3b;
+            color: #fff;
             display: block;
         }
 
-        /* MAIN ADMIN INTERFACE */
-        .admin-interface {
-            width: 100%;
-            height: 100vh;
+        /* ================= ADMIN INTERFACE ================= */
+        .admin-wrapper {
             display: flex;
-            animation: fadeIn 0.5s ease forwards;
+            height: 100vh;
+            width: 100%;
+            background: var(--bg-light);
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        /* Glassmorphism Sidebar */
+        /* SIDEBAR */
         .sidebar {
-            width: 290px;
-            background: rgba(255, 255, 255, 0.08);
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
-            border-right: 1px solid rgba(255, 255, 255, 0.15);
-            padding: 2rem 1.2rem;
+            width: 250px;
+            background: var(--sidebar-bg);
+            background-image: linear-gradient(180deg, #4e73df 10%, #224abe 100%);
             display: flex;
             flex-direction: column;
-            box-shadow: 5px 0 25px rgba(0,0,0,0.1);
-            z-index: 10;
-            transition: width 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1);
-            position: relative;
+            transition: all 0.3s ease;
+            z-index: 100;
         }
 
         .sidebar.collapsed {
             width: 85px;
-            padding: 2rem 0.6rem;
         }
 
-        .sidebar-header {
+        .sidebar-brand {
+            height: 4.375rem;
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            margin-bottom: 2rem;
-            padding: 0 10px;
-            overflow: hidden;
+            justify-content: center;
+            color: #fff;
+            text-decoration: none;
+            font-size: 1.1rem;
+            font-weight: 800;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1rem;
             white-space: nowrap;
         }
 
-        .sidebar h2 {
-            font-size: 1.4rem;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
-            transition: opacity 0.3s;
+        .sidebar-brand i {
+            font-size: 1.6rem;
+            margin-right: 10px;
         }
 
-        .sidebar.collapsed h2 {
-            opacity: 0;
-            width: 0;
-            pointer-events: none;
+        .sidebar.collapsed .sidebar-brand .brand-text {
+            display: none;
+        }
+
+        .sidebar.collapsed .sidebar-brand i {
             margin-right: 0;
         }
 
-        .btn-logout {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255,255,255,0.2);
+        .menu {
+            list-style: none;
+            padding: 1rem 0;
+            overflow-y: auto;
+        }
+
+        .menu::-webkit-scrollbar { width: 5px; }
+        .menu::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 5px; }
+
+        .menu li {
+            padding: 0 1rem;
+            margin-bottom: 5px;
+        }
+
+        .menu a {
+            text-decoration: none;
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 700;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            padding: 14px 12px;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .menu a i.nav-icon {
+            font-size: 1.1rem;
+            width: 25px;
+            text-align: center;
+            margin-right: 12px;
+        }
+
+        .sidebar.collapsed .menu a {
+            justify-content: center;
+        }
+
+        .sidebar.collapsed .menu a span {
+            display: none;
+        }
+
+        .sidebar.collapsed .menu a i.nav-icon {
+            margin-right: 0;
+            font-size: 1.2rem;
+        }
+
+        .menu a:hover, .menu a.active {
             color: #fff;
-            padding: 5px 10px;
-            border-radius: 8px;
-            font-size: 0.75rem;
-            font-weight: 600;
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        /* CONTENT AREA */
+        .content-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* TOPBAR */
+        .topbar {
+            height: 4.375rem;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 1.5rem;
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+            z-index: 10;
+        }
+
+        .toggle-btn {
+            background: transparent;
+            border: none;
+            color: var(--primary);
+            font-size: 1.4rem;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .toggle-btn:hover {
+            color: var(--primary-dark);
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-info {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text-gray);
+        }
+
+        .btn-logout {
+            background: #fff;
+            border: 1px solid #e74a3b;
+            color: #e74a3b;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
             cursor: pointer;
             transition: all 0.2s;
         }
         
         .btn-logout:hover {
-            background: #e73c7e;
-            border-color: transparent;
-        }
-
-        .sidebar.collapsed .btn-logout {
-            display: none;
-        }
-
-        /* Toggle Button */
-        .toggle-btn {
-            position: absolute;
-            top: 24px;
-            right: -15px;
-            width: 30px;
-            height: 30px;
-            background: #fff;
-            color: #e73c7e;
-            border: none;
-            border-radius: 50%;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-            font-weight: bold;
-            font-size: 0.9rem;
-            z-index: 20;
-            transition: transform 0.4s;
-        }
-
-        .sidebar.collapsed .toggle-btn {
-            transform: rotate(180deg);
-        }
-
-        .menu {
-            list-style: none;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            overflow-y: auto;
-            overflow-x: hidden;
-        }
-
-        .menu::-webkit-scrollbar {
-            width: 4px;
-            height: 4px;
-        }
-        
-        .menu::-webkit-scrollbar-thumb {
-            background: rgba(255,255,255,0.2);
-            border-radius: 4px;
-        }
-
-        .menu a {
-            text-decoration: none;
-            color: rgba(255, 255, 255, 0.85);
-            font-weight: 600;
-            font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-            padding: 12px 16px;
-            border-radius: 14px;
-            transition: all 0.3s ease;
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid transparent;
-            white-space: nowrap;
-            width: 100%;
-        }
-
-        .menu a .icon {
-            font-size: 1.1rem;
-            display: inline-block;
-            min-width: 28px;
-        }
-
-        .menu a .text {
-            transition: opacity 0.3s, transform 0.3s;
-            opacity: 1;
-        }
-
-        .sidebar.collapsed .menu a {
-            justify-content: center;
-            padding: 12px 0;
-        }
-
-        .sidebar.collapsed .menu a .icon {
-            min-width: unset;
-            text-align: center;
-        }
-
-        .sidebar.collapsed .menu a .text {
-            opacity: 0;
-            max-width: 0;
-            display: inline-block;
-            overflow: hidden;
-            transform: translateX(-10px);
-        }
-
-        .menu a:hover, .menu a.active {
-            background: rgba(255, 255, 255, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.35);
+            background: #e74a3b;
             color: #fff;
-            transform: translateX(4px);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-        }
-        
-        .sidebar.collapsed .menu a:hover, .sidebar.collapsed .menu a.active {
-            transform: scale(1.05);
         }
 
-        /* Main Content Area */
+        /* MAIN CONTENT */
         .main-content {
+            padding: 1.5rem;
             flex: 1;
-            padding: 25px;
             display: flex;
             flex-direction: column;
-            background: rgba(0, 0, 0, 0.05);
-            transition: all 0.4s;
+            overflow-y: auto;
         }
 
         .content-header {
-            margin-bottom: 15px;
+            margin-bottom: 1.2rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
         }
 
         .content-header h1 {
-            font-size: 1.6rem;
-            font-weight: 800;
+            font-size: 1.5rem;
+            font-weight: 400;
+            color: var(--text-dark);
         }
 
         .badge-url {
-            font-size: 0.8rem;
-            background: rgba(0,0,0,0.2);
-            padding: 6px 14px;
-            border-radius: 20px;
-            border: 1px solid rgba(255,255,255,0.1);
+            font-size: 0.75rem;
+            background: #eaecf4;
+            color: var(--text-gray);
+            padding: 6px 12px;
+            border-radius: 6px;
+            border: 1px solid #d1d3e2;
             max-width: 400px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
 
-        .content-wrapper {
+        .iframe-container {
             flex: 1;
-            background: #ffffff;
-            border-radius: 24px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
             overflow: hidden;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
         }
 
         iframe {
             width: 100%;
             height: 100%;
             border: none;
-            background-color: #fcfcfc;
+            background-color: #fff;
         }
 
-        /* MOBILE RESPONSIVE FIX */
-        @media (max-width: 900px) {
-            body {
-                display: block;
-            }
-            .admin-interface {
-                flex-direction: column;
-            }
+        /* MOBILE RESPONSIVE */
+        @media (max-width: 768px) {
             .sidebar {
-                width: 100% !important;
-                border-right: none;
-                border-bottom: 1px solid rgba(255, 255, 255, 0.15);
-                padding: 1.2rem !important;
+                position: fixed;
+                height: 100vh;
+                left: -250px;
+                box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
             }
-            .sidebar-header {
-                margin-bottom: 1rem;
+            .sidebar.mobile-open {
+                left: 0;
             }
-            .sidebar.collapsed .menu a .text {
-                opacity: 1 !important;
-                max-width: unset !important;
-                transform: none !important;
-                display: inline-block;
-            }
-            .toggle-btn {
+            .user-info {
                 display: none;
-            }
-            .menu {
-                flex-direction: row;
-                flex-wrap: nowrap;
-                overflow-x: auto; /* Bisa scroll samping */
-                padding-bottom: 5px;
-            }
-            .menu li {
-                width: auto;
-                flex-shrink: 0;
-            }
-            .main-content {
-                height: calc(100vh - 140px); /* Kalkulasi tinggi sisa setelah sidebar mobile */
-                padding: 15px;
             }
             .content-header {
                 flex-direction: column;
                 align-items: flex-start;
-                gap: 8px;
             }
             .badge-url {
                 max-width: 100%;
@@ -432,62 +380,80 @@
 </head>
 <body>
 
-    <div id="auth-panel" class="login-container">
-        <h1>Welcome Back ✨</h1>
-        <p>Login to RT 4 RW 26 Admin Panel</p>
+    <div id="auth-panel" class="login-wrapper">
+        <div class="login-card">
+            <i class="fas fa-archive icon-logo"></i>
+            <h1>E-Sistem Arsip</h1>
+            <p>Panel Admin RT 4 RW 26</p>
 
-        <form id="form-login" onsubmit="handleLogin(event)">
-            <div class="form-group">
-                <label for="login-identifier">Username</label>
-                <input type="text" id="login-identifier" placeholder="Masukkan username" required>
-            </div>
-            <div class="form-group">
-                <label for="login-password">Password</label>
-                <input type="password" id="login-password" placeholder="••••••••" required>
-            </div>
-            <button type="submit" class="btn-submit">Sign In 🚀</button>
-        </form>
+            <form id="form-login" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label for="login-identifier">Username</label>
+                    <input type="text" id="login-identifier" placeholder="Masukkan username" required>
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Password</label>
+                    <input type="password" id="login-password" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="btn-submit">Login Panel</button>
+            </form>
 
-        <div id="status-notif" class="notification"></div>
+            <div id="status-notif" class="notification"></div>
+        </div>
     </div>
 
 
-    <div id="admin-panel" class="admin-interface hidden">
+    <div id="admin-panel" class="admin-wrapper hidden">
+        
         <div class="sidebar" id="sidebar">
-            <button class="toggle-btn" onclick="toggleSidebar()">❬</button>
-            
-            <div class="sidebar-header">
-                <h2>Admin Hub ⚡</h2>
-                <button class="btn-logout" onclick="logout()">Logout</button>
+            <div class="sidebar-brand">
+                <i class="fas fa-book-open"></i>
+                <span class="brand-text">SIMPAN PINJAM</span>
             </div>
             <ul class="menu">
-                <li><a href="#" onclick="loadContent(this, '💸 Laporan Kas', 'https://rt04rw26.vercel.app/dataangsuran.html')" class="active"><span class="icon">💸</span><span class="text">Angsuran Kas</span></a></li>
-                <li><a href="#" onclick="loadContent(this, '📉 Tunggakan Warga', 'https://wikipedia.org')"><span class="icon">📉</span><span class="text">Tunggakan</span></a></li>
-                <li><a href="#" onclick="loadContent(this, '👥 Data Seluruh Warga', 'https://example.com')"><span class="icon">👥</span><span class="text">Data Warga</span></a></li>
-                <li><a href="#" onclick="loadContent(this, '📅 Jadwal Kegiatan', 'https://example.com')"><span class="icon">📅</span><span class="text">Kegiatan</span></a></li>
-                <li><a href="#" onclick="loadContent(this, '💌 Undangan Digital', 'undangan.html')"><span class="icon">💌</span><span class="text">Undangan</span></a></li>
-                <li><a href="#" onclick="loadContent(this, '📥 Laporan Surat Masuk', 'https://example.com')"><span class="icon">📥</span><span class="text">Laporan Srt Masuk</span></a></li>
-                <li><a href="#" onclick="loadContent(this, '📤 Laporan Surat Keluar', 'https://example.com')"><span class="icon">📤</span><span class="text">Laporan Srt Keluar</span></a></li>
-                <li><a href="#" onclick="loadContent(this, '📊 Laporan Warga', 'https://script.google.com/macros/s/AKfycbxKwWu0g7nOvFlMpNTc8VMoipGsI_77_fBu198JcqHhlauoNCFCbBsmVo9fRzIwlETp/exec')"><span class="icon">📊</span><span class="text">Kegiatan Warga</span></a></li>
+                <li><a href="#" onclick="loadContent(this, '💸 Laporan Kas', 'https://rt04rw26.vercel.app/dataangsuran.html')" class="active"><i class="fas fa-money-bill-wave nav-icon"></i><span>Angsuran Kas</span></a></li>
+                <li><a href="#" onclick="loadContent(this, '📉 Tunggakan Warga', 'https://wikipedia.org')"><i class="fas fa-chart-line nav-icon"></i><span>Tunggakan</span></a></li>
+                <li><a href="#" onclick="loadContent(this, '👥 Data Seluruh Warga', 'https://example.com')"><i class="fas fa-users nav-icon"></i><span>Data Warga</span></a></li>
+                <li><a href="#" onclick="loadContent(this, '📅 Jadwal Kegiatan', 'https://example.com')"><i class="fas fa-calendar-alt nav-icon"></i><span>Kegiatan</span></a></li>
+                <li><a href="#" onclick="loadContent(this, '💌 Undangan Digital', 'undangan.html')"><i class="fas fa-envelope-open-text nav-icon"></i><span>Undangan</span></a></li>
+                <li><a href="#" onclick="loadContent(this, '📥 Laporan Surat Masuk', 'https://example.com')"><i class="fas fa-inbox nav-icon"></i><span>Lap. Srt Masuk</span></a></li>
+                <li><a href="#" onclick="loadContent(this, '📤 Laporan Surat Keluar', 'https://example.com')"><i class="fas fa-paper-plane nav-icon"></i><span>Lap. Srt Keluar</span></a></li>
+                <li><a href="#" onclick="loadContent(this, '📊 Laporan Warga', 'https://script.google.com/macros/s/AKfycbxKwWu0g7nOvFlMpNTc8VMoipGsI_77_fBu198JcqHhlauoNCFCbBsmVo9fRzIwlETp/exec')"><i class="fas fa-chart-bar nav-icon"></i><span>Kegiatan Warga</span></a></li>
             </ul>
         </div>
 
-        <div class="main-content">
-            <div class="content-header">
-                <h1 id="content-title">💸 Laporan Kas</h1>
-                <div id="content-url-badge" class="badge-url">Source: https://rt04rw26.vercel.app/dataangsuran.html</div>
+        <div class="content-wrapper">
+            
+            <nav class="topbar">
+                <button class="toggle-btn" onclick="toggleSidebar()">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="topbar-right">
+                    <span class="user-info">Halo, Admin RT 4</span>
+                    <button class="btn-logout" onclick="logout()">
+                        <i class="fas fa-sign-out-alt"></i> Keluar
+                    </button>
+                </div>
+            </nav>
+
+            <div class="main-content">
+                <div class="content-header">
+                    <h1 id="content-title">💸 Laporan Kas</h1>
+                    <div id="content-url-badge" class="badge-url">Source: https://rt04rw26.vercel.app/dataangsuran.html</div>
+                </div>
+                <div class="iframe-container">
+                    <iframe id="app-frame" src="https://rt04rw26.vercel.app/dataangsuran.html"></iframe>
+                </div>
             </div>
-            <div class="content-wrapper">
-                <iframe id="app-frame" src="https://rt04rw26.vercel.app/dataangsuran.html"></iframe>
-            </div>
+
         </div>
     </div>
 
     <script>
         const SESSION_KEY = 'rt4rw26_admin_session';
-        const SESSION_EXPIRY_MS = 24 * 60 * 60 * 1000; // 1 Hari dalam Milidetik
+        const SESSION_EXPIRY_MS = 24 * 60 * 60 * 1000; // 1 Hari
 
-        // CEK SESSION KETIKA BROWSER DIBUKA / DIRELOAD
+        // CEK SESSION BROWSER DIBUKA
         document.addEventListener('DOMContentLoaded', () => {
             const sessionData = localStorage.getItem(SESSION_KEY);
             
@@ -495,83 +461,81 @@
                 const sessionTime = parseInt(sessionData, 10);
                 const currentTime = new Date().getTime();
 
-                // Cek apakah belum lebih dari 1 hari
                 if (currentTime - sessionTime < SESSION_EXPIRY_MS) {
                     enterAdminPanel();
                 } else {
-                    // Session kadaluarsa, hapus data lama
                     localStorage.removeItem(SESSION_KEY);
                 }
             }
         });
 
-        // Fungsi untuk mengecilkan / membesarkan sidebar
+        // FUNGSI TOGGLE SIDEBAR (Responsive)
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
-            const toggleBtn = document.querySelector('.toggle-btn');
-            
-            sidebar.classList.toggle('collapsed');
-            
-            if (sidebar.classList.contains('collapsed')) {
-                toggleBtn.innerText = '❭';
+            if (window.innerWidth <= 768) {
+                sidebar.classList.toggle('mobile-open');
             } else {
-                toggleBtn.innerText = '❬';
+                sidebar.classList.toggle('collapsed');
             }
         }
 
+        // FUNGSI LOAD KONTEN IFRAME
         function loadContent(element, title, url) {
-            // Update Active Menu
             const menus = document.querySelectorAll('.menu a');
             menus.forEach(menu => menu.classList.remove('active'));
             element.classList.add('active');
 
-            // Update Frame Title & Source Information
             document.getElementById('content-title').innerText = title;
             document.getElementById('content-url-badge').innerText = `Source: ${url}`;
 
-            // Load Content inside Iframe
             const iframe = document.getElementById('app-frame');
             iframe.src = url;
+            
+            // Tutup sidebar di versi mobile setelah menu diklik
+            if (window.innerWidth <= 768) {
+                document.getElementById('sidebar').classList.remove('mobile-open');
+            }
         }
 
+        // FUNGSI NOTIFIKASI
         function showNotification(text, type) {
             const notif = document.getElementById('status-notif');
             notif.innerText = text;
             notif.className = `notification ${type}`;
         }
 
+        // FUNGSI LOGIN
         function handleLogin(event) {
             event.preventDefault();
             const identifier = document.getElementById('login-identifier').value;
             const password = document.getElementById('login-password').value;
 
-            // HARDCODE LOGIN
+            // HARDCODE LOGIN (rt4rw26 / rt4rw26)
             if (identifier === "rt4rw26" && password === "rt4rw26") {
-                showNotification("Login Berhasil! Mengalihkan...", "success");
-                
-                // Simpan Timestamp ke LocalStorage untuk Session 1 Hari
+                showNotification("Akses Diterima! Memuat Dashboard...", "success");
                 localStorage.setItem(SESSION_KEY, new Date().getTime().toString());
-                
                 setTimeout(() => enterAdminPanel(), 1000);
             } else {
-                showNotification("Gagal: Username atau Password salah!", "error");
+                showNotification("Akses Ditolak: Username atau Password salah!", "error");
             }
         }
 
+        // MENGUBAH TAMPILAN KE ADMIN
         function enterAdminPanel() {
             document.getElementById('auth-panel').classList.add('hidden');
             document.getElementById('admin-panel').classList.remove('hidden');
         }
 
+        // FUNGSI LOGOUT
         function logout() {
-            // Hapus session
             localStorage.removeItem(SESSION_KEY);
-            
-            // Kembalikan ke halaman login
             document.getElementById('admin-panel').classList.add('hidden');
             document.getElementById('auth-panel').classList.remove('hidden');
             document.getElementById('form-login').reset();
             document.getElementById('status-notif').className = 'notification';
+            
+            // Reset Sidebar untuk sesi selanjutnya
+            document.getElementById('sidebar').classList.remove('mobile-open');
         }
     </script>
 </body>
