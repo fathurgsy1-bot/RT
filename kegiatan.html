@@ -3,19 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Daftar Kegiatan</title>
+  <title>Daftar Kegiatan Warga</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
 
 <div class="container mt-5">
   <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2>Data Kegiatan</h2>
-    <a href="https://script.google.com/macros/s/AKfycbxKwWu0g7nOvFlMpNTc8VMoipGsI_77_fBu198JcqHhlauoNCFCbBsmVo9fRzIwlETp/exec" 
-   class="btn btn-primary" target="_blank">
-   + Tambah Kegiatan
-</a>
-
+    <h2>Data Kegiatan Warga</h2>
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalTambah">
+      + Tambah Kegiatan
+    </button>
   </div>
 
   <div class="card shadow-sm">
@@ -26,8 +24,8 @@
             <tr>
               <th>No</th>
               <th>Nama Kegiatan</th>
-              <th>Tanggal</th>
-              <th>Status</th>
+              <th>Tanggal Kegiatan</th>
+              <th>Foto</th>
               <th class="text-center">Aksi</th>
             </tr>
           </thead>
@@ -42,36 +40,61 @@
   </div>
 </div>
 
-<div class="modal fade" id="modalDetail" tabindex="-1" aria-labelledby="modalDetailLabel" aria-hidden="true">
-  <div class="modal-dialog">
+<div class="modal fade" id="modalTambah" tabindex="-1" aria-labelledby="modalTambahLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="modalDetailLabel">Detail Kegiatan</h5>
+        <h5 class="modal-title" id="modalTambahLabel">Tambah Kegiatan Baru</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body p-0">
+        <iframe 
+          src="https://script.google.com/macros/s/AKfycbxKwWu0g7nOvFlMpNTc8VMoipGsI_77_fBu198JcqHhlauoNCFCbBsmVo9fRzIwlETp/exec" 
+          width="100%" 
+          height="500px" 
+          frameborder="0"
+          style="border-radius: 0 0 0.5rem 0.5rem;">
+        </iframe>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="modalDetail" tabindex="-1" aria-labelledby="modalDetailLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalDetailLabel">Detail Kegiatan Warga</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
         <table class="table table-borderless">
           <tr>
-            <td width="35%"><strong>Nama Kegiatan</strong></td>
+            <td width="30%"><strong>No</strong></td>
             <td width="5%">:</td>
+            <td id="detail-no">-</td>
+          </tr>
+          <tr>
+            <td><strong>Nama Kegiatan</strong></td>
+            <td>:</td>
             <td id="detail-nama">-</td>
           </tr>
           <tr>
-            <td><strong>Tanggal</strong></td>
+            <td><strong>Tanggal Kegiatan</strong></td>
             <td>:</td>
             <td id="detail-tanggal">-</td>
           </tr>
           <tr>
-            <td><strong>Status</strong></td>
+            <td><strong>Link Foto (Drive)</strong></td>
             <td>:</td>
-            <td id="detail-status">-</td>
-          </tr>
-          <tr>
-            <td><strong>Keterangan Tambahan</strong></td>
-            <td>:</td>
-            <td id="detail-keterangan">-</td>
+            <td id="detail-foto" style="word-break: break-all;">-</td>
           </tr>
         </table>
+        
+        <div class="mt-3">
+          <strong>Preview Gambar (Dari Kolom Base):</strong><br>
+          <img id="detail-base-img" src="" alt="Preview Base64" class="img-fluid border mt-2 d-none" style="max-height: 250px;">
+        </div>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
@@ -83,26 +106,38 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-  // URL Spreadsheet Anda: https://docs.google.com/spreadsheets/d/1-Zr-Y2oEX5a38rNGv0Zml_qwcQv3sV0t8ltnDnRLT1o/edit
-  // Catatan: Untuk menarik data langsung dari JS ke Spreadsheet, Anda biasanya membutuhkan endpoint Google Apps Script 
-  // yang mengembalikan JSON. Di bawah ini adalah simulasi (dummy data) bagaimana data dirender.
-
-  const dummyData = [
-    { id: 1, nama: "Rapat Paripurna", tanggal: "2023-10-15", status: "Selesai", keterangan: "Rapat berjalan lancar dan semua hadir." },
-    { id: 2, nama: "Kunjungan Lapangan", tanggal: "2023-10-20", status: "Berjalan", keterangan: "Tim sedang meninjau lokasi proyek." }
+  // Dummy data di bawah disesuaikan dengan isi baris nyata di Spreadsheet Anda
+  const dataSpreadsheet = [
+    { 
+      no: "1", 
+      nama: "Pembahasan acara 17 agustus 2026", 
+      tanggal: "04/07/2026 20:18:00", 
+      foto: "https://drive.google.com/file/d/1IVHfnM4NybBVOZcrPAxFBOijnfgk8kuX/view?usp=drivesdk, https://drive.google.com/file/d/1hH1US9f-nOIFZZdxjl...",
+      base: "/9j/4AAQSkZJRgABAQAASABIAAD..." // Data base64
+    },
+    { 
+      no: "01/01/1900 0:00:00", 
+      nama: "Pembahasan", 
+      tanggal: "04/07/2026 16:02:00", 
+      foto: "https://drive.google.com/file/d/11OLMS9zFNRsuPpR63ccOQk1W9TkEhbCc/view?usp=drivesdk",
+      base: "/9j/4AAQSkZJRgABAQAASABIAAD..." // Data base64
+    }
   ];
 
   function renderTable(data) {
     const tbody = document.getElementById('tabel-body');
-    tbody.innerHTML = ''; // Kosongkan state loading
+    tbody.innerHTML = ''; 
 
     data.forEach((item, index) => {
+      // Membuat link drive "Foto" menjadi tombol/link yang bisa diklik 
+      const linkHtml = item.foto.split(',').map(link => `<a href="${link.trim()}" target="_blank" class="text-decoration-none">Buka Drive</a>`).join(' | ');
+
       const row = `
         <tr>
-          <td>${index + 1}</td>
+          <td>${item.no}</td>
           <td>${item.nama}</td>
           <td>${item.tanggal}</td>
-          <td><span class="badge ${item.status === 'Selesai' ? 'bg-success' : 'bg-warning'}">${item.status}</span></td>
+          <td>${linkHtml}</td>
           <td class="text-center">
             <button class="btn btn-sm btn-info text-white" onclick='showDetail(${JSON.stringify(item)})'>Lihat Detail</button>
           </td>
@@ -112,22 +147,34 @@
     });
   }
 
-  // Fungsi untuk menampilkan data ke dalam Modal
+  // Fungsi untuk menampilkan data ke dalam Modal Detail
   function showDetail(item) {
+    document.getElementById('detail-no').innerText = item.no;
     document.getElementById('detail-nama').innerText = item.nama;
     document.getElementById('detail-tanggal').innerText = item.tanggal;
-    document.getElementById('detail-status').innerText = item.status;
-    document.getElementById('detail-keterangan').innerText = item.keterangan;
     
+    // Tampilkan semua link foto
+    document.getElementById('detail-foto').innerHTML = item.foto.split(',').map(link => `<a href="${link.trim()}" target="_blank">${link.trim()}</a>`).join('<br>');
+    
+    // Render teks base64 menjadi gambar (jika ada data Base-nya)
+    const imgElement = document.getElementById('detail-base-img');
+    if(item.base && item.base.startsWith('/9j/')) {
+       // Menambahkan header data image JPG pada string base64 agar browser bisa membacanya
+       imgElement.src = "data:image/jpeg;base64," + item.base; 
+       imgElement.classList.remove('d-none');
+    } else {
+       imgElement.src = "";
+       imgElement.classList.add('d-none');
+    }
+
     // Tampilkan Modal
     const modal = new bootstrap.Modal(document.getElementById('modalDetail'));
     modal.show();
   }
 
-  // Menjalankan fungsi render setelah halaman dimuat (Simulasi Fetch API)
+  // Jalankan render tabel
   window.onload = () => {
-    // Jika Anda punya link Apps Script (GET method) untuk ambil data, ganti baris ini dengan fetch('URL_API_ANDA')
-    renderTable(dummyData); 
+    renderTable(dataSpreadsheet); 
   };
 </script>
 
