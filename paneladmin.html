@@ -103,6 +103,20 @@
         .menu::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 5px; }
         .menu li { padding: 0 1rem; margin-bottom: 5px; }
         
+        /* MENU HEADER (GROUPING) */
+        .menu-header {
+            font-size: 0.7rem;
+            font-weight: 800;
+            color: rgba(255, 255, 255, 0.45);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 10px 15px 5px 15px;
+            margin-top: 10px;
+        }
+        .sidebar.collapsed .menu-header {
+            display: none; /* Sembunyikan header saat sidebar dikecilkan */
+        }
+
         .menu a {
             text-decoration: none; color: rgba(255, 255, 255, 0.8); font-weight: 700; font-size: 0.85rem;
             display: flex; align-items: center; padding: 14px 12px; border-radius: 6px; transition: all 0.2s; cursor: pointer;
@@ -223,18 +237,25 @@
                 <i class="fas fa-book-open"></i>
                 <span class="brand-text">SIMPAN PINJAM</span>
             </div>
+            
             <ul class="menu">
                 <li><a onclick="showDashboard(this)" class="active"><i class="fas fa-home nav-icon"></i><span>Dashboard Utama</span></a></li>
+                
                 <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.15); margin: 10px 15px;">
                 
+                <li class="menu-header">Keuangan</li>
                 <li><a onclick="loadContent(this, '💸 Laporan Kas', 'https://rt04rw26.vercel.app/dataangsuran.html')"><i class="fas fa-money-bill-wave nav-icon"></i><span>Angsuran Kas</span></a></li>
                 <li><a onclick="loadContent(this, '📉 Tunggakan Warga', 'https://wikipedia.org')"><i class="fas fa-chart-line nav-icon"></i><span>Tunggakan</span></a></li>
+                
+                <li class="menu-header">Warga & Kegiatan</li>
                 <li><a onclick="loadContent(this, '👥 Data Seluruh Warga', 'https://example.com')"><i class="fas fa-users nav-icon"></i><span>Data Warga</span></a></li>
-                <li><a onclick="loadContent(this, '📅 Jadwal Kegiatan', 'https://example.com')"><i class="fas fa-calendar-alt nav-icon"></i><span>Kegiatan</span></a></li>
-                <li><a onclick="loadContent(this, '💌 Undangan Digital', 'undangan.html')"><i class="fas fa-envelope-open-text nav-icon"></i><span>Undangan</span></a></li>
-                <li><a onclick="loadContent(this, '📥 Laporan Surat Masuk', 'https://example.com')"><i class="fas fa-inbox nav-icon"></i><span>Lap. Srt Masuk</span></a></li>
-                <li><a onclick="loadContent(this, '📤 Laporan Surat Keluar', 'https://example.com')"><i class="fas fa-paper-plane nav-icon"></i><span>Lap. Srt Keluar</span></a></li>
-                <li><a onclick="loadContent(this, '📊 Laporan Warga', 'https://script.google.com/macros/s/AKfycbxKwWu0g7nOvFlMpNTc8VMoipGsI_77_fBu198JcqHhlauoNCFCbBsmVo9fRzIwlETp/exec')"><i class="fas fa-chart-bar nav-icon"></i><span>Kegiatan Warga</span></a></li>
+                <li><a onclick="loadContent(this, '📅 Jadwal Kegiatan', 'https://example.com')"><i class="fas fa-calendar-alt nav-icon"></i><span>Jadwal Kegiatan</span></a></li>
+                <li><a onclick="loadContent(this, '📊 Laporan Warga', 'https://script.google.com/macros/s/AKfycbxKwWu0g7nOvFlMpNTc8VMoipGsI_77_fBu198JcqHhlauoNCFCbBsmVo9fRzIwlETp/exec')"><i class="fas fa-chart-bar nav-icon"></i><span>Laporan Warga</span></a></li>
+
+                <li class="menu-header">Surat Menyurat</li>
+                <li><a onclick="loadContent(this, '💌 Undangan Digital', 'undangan.html')"><i class="fas fa-envelope-open-text nav-icon"></i><span>Undangan Digital</span></a></li>
+                <li><a onclick="loadContent(this, '📥 Surat Masuk', 'https://example.com')"><i class="fas fa-inbox nav-icon"></i><span>Lap. Surat Masuk</span></a></li>
+                <li><a onclick="loadContent(this, '📤 Surat Keluar', 'https://example.com')"><i class="fas fa-paper-plane nav-icon"></i><span>Lap. Surat Keluar</span></a></li>
             </ul>
         </div>
 
@@ -255,7 +276,6 @@
                 </div>
 
                 <div id="dashboard-view" class="dashboard-container">
-                    
                     <div class="row-cards">
                         <div class="stat-card">
                             <div class="stat-details"><h4>Saldo Kas RT Aktif</h4><h2>Rp 12.500.000</h2></div>
@@ -266,7 +286,7 @@
                             <i class="fas fa-exclamation-triangle stat-icon"></i>
                         </div>
                         <div class="stat-card success">
-                            <div class="stat-details success"><h4>Jumlah Kepala Keluarga</h4><h2>48 Warga</h2></div>
+                            <div class="stat-details success"><h4>Jumlah Kepala Keluarga</h4><h2>48 KK</h2></div>
                             <i class="fas fa-users stat-icon"></i>
                         </div>
                         <div class="stat-card info">
@@ -345,26 +365,20 @@
             }
         }
 
-        // FUNGSI UNTUK MENAMPILKAN DASHBOARD UTAMA
         function showDashboard(element) {
-            // Update Menu Aktif
             const menus = document.querySelectorAll('.menu a');
             menus.forEach(menu => menu.classList.remove('active'));
             element.classList.add('active');
 
-            // Update Header
             document.getElementById('content-title').innerText = '🏠 Dashboard Utama';
             document.getElementById('content-url-badge').innerText = 'System Overview';
 
-            // Tampilkan Dashboard, Sembunyikan Iframe
             document.getElementById('dashboard-view').classList.remove('hidden');
             document.getElementById('iframe-view').classList.add('hidden');
             
-            // Tutup sidebar di mobile
             if (window.innerWidth <= 768) { document.getElementById('sidebar').classList.remove('mobile-open'); }
         }
 
-        // FUNGSI LOAD KONTEN IFRAME
         function loadContent(element, title, url) {
             const menus = document.querySelectorAll('.menu a');
             menus.forEach(menu => menu.classList.remove('active'));
@@ -373,7 +387,6 @@
             document.getElementById('content-title').innerText = title;
             document.getElementById('content-url-badge').innerText = `Source: ${url}`;
 
-            // Sembunyikan Dashboard, Tampilkan Iframe
             document.getElementById('dashboard-view').classList.add('hidden');
             document.getElementById('iframe-view').classList.remove('hidden');
 
@@ -416,7 +429,6 @@
             document.getElementById('status-notif').className = 'notification';
             document.getElementById('sidebar').classList.remove('mobile-open');
             
-            // Reset ke tampilan Dashboard ketika logout
             const dashboardMenuBtn = document.querySelector('.menu li:first-child a');
             if(dashboardMenuBtn) showDashboard(dashboardMenuBtn);
         }
