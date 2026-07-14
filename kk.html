@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Rekap KK - Tesseract OCR Pro</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+  <style>
+    body { background-color: #f4f6f9; font-family: 'Segoe UI', Roboto, sans-serif; padding: 10px; }
+    .main-card { background: #fff; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); padding: 18px; margin-bottom: 16px; }
+    .header-title { font-size: 18px; font-weight: 700; color: #212529; display: flex; align-items: center; justify-content: space-between; }
+    
+    .badge-status { background-color: #6c757d; color: white; padding: 6px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; transition: all 0.3s; }
+    
+    .table-container { border: 1px solid #e9ecef; border-radius: 8px; overflow-x: auto; background: #fff; }
+    .table-custom { margin-bottom: 0; white-space: nowrap; }
+    .table-custom th { font-size: 11px; color: #000; text-align: center; background-color: #f8f9fa; padding: 10px; }
+    .table-custom td { padding: 4px; }
+    .table-input { border: 1px solid #ced4da; border-radius: 4px; padding: 6px; font-size: 12px; width: 100%; min-width: 130px; }
+    .nik-input { min-width: 160px; font-family: monospace; font-weight: bold; text-align: center; letter-spacing: 0.5px; }
+    
+    .btn-tambah { border: 1px solid #0d6efd; color: #0d6efd; font-weight: 600; border-radius: 20px; padding: 8px 18px; background: white; }
+    .btn-final { background-color: #198754; color: white; font-weight: 600; border-radius: 20px; padding: 8px 26px; border: none; flex-grow: 1; margin-left: 10px; }
+    
+    #loadingOverlay { display: none; text-align: center; padding: 15px 0; }
+    .progress { height: 8px; margin-top: 10px; border-radius: 4px; }
+    
+    .preview-box { display: none; max-height: 150px; overflow: hidden; border-radius: 6px; border: 1px dashed #ccc; margin-top: 10px; text-align: center; background: #eee; }
+    .preview-box img { max-height: 100%; max-width: 100%; object-fit: contain; filter: grayscale(1); }
+  </style>
+</head>
+<body>
+
+  <div class="main-card border-top border-4 border-primary">
+    <div class="header-title mb-2">
+      <span>🚀 Fast OCR Engine (Optimized)</span>
+      <span class="badge-status" id="statusBadge">Memuat Engine...</span>
+    </div>
+    
+    <div id="statusMessage" class="small text-muted mb-3">Membutuhkan internet untuk unduh modul pertama kali...</div>
+
+    <div class="input-group">
+      <input type="file" class="form-control" id="fotoInput" accept="image/*" disabled>
+    </div>
+    
+    <div class="preview-box" id="previewContainer">
+      <span class="position-absolute badge bg-dark m-1" style="font-size:9px; opacity:0.7;">View Filter</span>
+      <img id="processedPreview" src="" alt="Scan Preview">
+    </div>
+    
+    <div id="loadingOverlay">
+      <div class="spinner-border spinner-border-sm text-primary mb-1" role="status"></div>
+      <div class="small fw-bold text-primary" id="statusText">Mempersiapkan gambar...</div>
+      <div class="progress">
+        <div id="progressBar" class="progress-bar progress-bar-striped progress-bar-animated bg-primary" role="progressbar" style="width: 0%"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="main-card" id="hasilContainer">
+    <div class="fw-bold text-dark mb-2">⚙️ Hasil Baca Karakter Mentah (Raw Data)</div>
+    <textarea class="form-control mb-4" id="rawTextOutput" rows="4" placeholder="Teks hasil scan mentah..." readonly style="font-size: 12px; background-color: #fafafa;"></textarea>
+
+    <div class="fw-bold text-dark mb-2">📋 Tabel Hasil Ekstraksi Otomatis</div>
+    <div class="table-container mb-4">
+      <table class="table table-custom">
+        <thead>
+          <tr>
+            <th>NIK Terdeteksi</th>
+            <th>Nama Lengkap</th>
+            <th>Hubungan Keluarga</th>
+            <th>Aksi</th>
+          </tr>
+        </thead>
+        <tbody id="bodyTabelAnggota"></tbody>
+      </table>
+    </div>
+
+    <div class="d-flex align-items-center">
+      <button class="btn-tambah" onclick="tambahBarisManual('')">⊕ Tambah Baris</button>
+      <button class="btn-final" onclick="exportKeCSV()">☁ Download Rekap CSV</button>
+    </div>
+  </div>
+
+  <script>
+    let ocrWorker = null;
+
+    async function initOcrEngine() {
+      try {
+        ocrWorker = await Tesseract.createWorker({
+          logger: m => {
+            if (m.status === 'recognizing text') {
+              const progress = Math.round(m.progress * 100);
+              document.getElementById('progressBar').style.width = progress + '%';
+              document.getElementById('statusText').innerText = `Memindai Karakter Kertas (${progress}%)...`;
+            }
+          }
+        });
+        
+        await ocrWorker.loadLanguage('ind');
+        await ocrWorker.initialize('ind');
+        
+        await ocrWorker.setParameters({
+          tessedit_pageseg_mode: Tesseract.PSM.SPARSE_TEXT,
+        });
+
+        document.getElementById('statusBadge').innerText = "Siap Digunakan";
+        document.getElementById('statusBadge').style.backgroundColor = "#198754";
+        document.getElementById('statusMessage').innerText = "Engine siap. Upload foto KK dengan pencahayaan terang.";
+        document.getElementById('fotoInput').disabled = false;
+      } catch (error) {
+        console.error(error);
+        alert("Gagal memuat sistem OCR. Pastikan koneksi internet aktif. Pesan Error: " + error.message);
+        document.getElementById('statusBadge').innerText = "Gagal Load";
+        document.getElementById('statusBadge').style.backgroundColor = "#dc3545";
+        document.getElementById('statusMessage').innerText = "Gagal memuat: " + error.message;
+      }
+    }
+
+    function preprocessImage(imgEl) {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      
+      let width = imgEl.width;
+      let height = imgEl.height;
+      const maxDimension = 1800; 
+      
+      if (width > maxDimension || height > maxDimension) {
+        if (width > height) {
+          height *= maxDimension / width;
+          width = maxDimension;
+        } else {
+          width *= maxDimension / height;
+          height = maxDimension;
+        }
+      }
+      
+      canvas.width = width;
+      canvas.height = height;
+      ctx.drawImage(imgEl, 0, 0, width, height);
+      
+      const imgData = ctx.getImageData(0, 0, width, height);
+      const data = imgData.data;
+      
+      const contrast = 80;
+      const factor = (259 * (contrast + 255)) / (255 * (259 - contrast));
+      
+      for (let i = 0; i < data.length; i += 4) {
+        const grayscale = 0.299 * data[i] + 0.587 * data[i+1] + 0.114 * data[i+2];
+        let binarized = factor * (grayscale - 128) + 128;
+        binarized = binarized > 130 ? 255 : 0;
+        
+        data[i] = binarized;
+        data[i+1] = binarized;
+        data[i+2] = binarized;
+      }
+      
+      ctx.putImageData(imgData, 0, 0);
+      return canvas.toDataURL('image/jpeg', 0.85);
+    }
+
+    document.getElementById('fotoInput').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        const img = new Image();
+        img.onload = async function() {
+          document.getElementById('loadingOverlay').style.display = 'block';
+          document.getElementById('progressBar').style.width = '0%';
+          document.getElementById('statusText').innerText = 'Mengoptimalkan kualitas gambar...';
+          
+          const processedDataUrl = preprocessImage(img);
+          document.getElementById('processedPreview').src = processedDataUrl;
+          document.getElementById('previewContainer').style.display = 'block';
+
+          try {
+            const result = await ocrWorker.recognize(processedDataUrl);
+            const rawText = result.data.text;
+            
+            document.getElementById('rawTextOutput').value = rawText;
+            
+            // Perbaikan Regex: Menggunakan grup capture standar yang aman di semua browser
+            const textCleaned = rawText.replace(/(\d)\s+(?=\d)/g, '$1');
+            
+            const regexNIK = /\b\d{16}\b/g;
+            const nicsFound = textCleaned.match(regexNIK);
+            
+            const tbody = document.getElementById('bodyTabelAnggota');
+            tbody.innerHTML = '';
+            
+            if (nicsFound && nicsFound.length > 0) {
+              const uniqueNIKs = [...new Set(nicsFound)];
+              uniqueNIKs.forEach(nik => tambahBarisManual(nik));
+              document.getElementById('statusMessage').innerText = `Berhasil mendeteksi ${uniqueNIKs.length} NIK.`;
+            } else {
+              tambahBarisManual('');
+              document.getElementById('statusMessage').innerText = "Scan selesai, tidak ada NIK terdeteksi. Silakan isi manual.";
+            }
+            
+            document.getElementById('loadingOverlay').style.display = 'none';
+          } catch (err) {
+            console.error(err);
+            alert("Terjadi kesalahan saat scan: " + err.message);
+            document.getElementById('loadingOverlay').style.display = 'none';
+          }
+        };
+        img.src = event.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+
+    function tambahBarisManual(nikValue = '') {
+      const tbody = document.getElementById('bodyTabelAnggota');
+      const tr = document.createElement('tr');
+      const id = Date.now() + Math.random();
+      tr.id = `row_${id}`;
+      
+      tr.innerHTML = `
+        <td><input type="text" class="table-input nik-input" value="${nikValue}" placeholder="16 Digit NIK"></td>
+        <td><input type="text" class="table-input text-uppercase" placeholder="Nama Lengkap"></td>
+        <td><input type="text" class="table-input" placeholder="Hubungan"></td>
+        <td class="text-center"><button class="btn btn-sm btn-danger py-0" onclick="document.getElementById('${tr.id}').remove()">✕</button></td>
+      `;
+      tbody.appendChild(tr);
+    }
+
+    function exportKeCSV() {
+      const rows = document.querySelectorAll('#bodyTabelAnggota tr');
+      let csvContent = "NIK,Nama Lengkap,Hubungan\n";
+      let hasData = false;
+      
+      rows.forEach(row => {
+        const inputs = row.querySelectorAll('input');
+        if (inputs[0].value.trim() || inputs[1].value.trim()) {
+          hasData = true;
+          const rowData = Array.from(inputs).map(input => `"${input.value.replace(/"/g, '""')}"`);
+          csvContent += `${rowData.join(',')}\n`;
+        }
+      });
+
+      if(!hasData) return alert("Belum ada data valid.");
+      
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.setAttribute("href", url);
+      link.setAttribute("download", `Rekap_KK.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+    
+    window.onload = function() { 
+      tambahBarisManual(''); 
+      initOcrEngine();
+    };
+  </script>
+</body>
+</html>
