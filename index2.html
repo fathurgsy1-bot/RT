@@ -1075,6 +1075,7 @@
 
                     allKasData = rowsKas.slice(1).filter(r => r[kasKetIdx]);
                     renderKas();
+                    renderIuranBulanIni();
 
                     const asetVals = rowsKas.map(r => parseAngka(r[5])).filter(v => !isNaN(v) && v > 0);
                     globalAsetKas = asetVals.length > 0 ? asetVals[asetVals.length - 1] : 0;
@@ -1082,7 +1083,11 @@
                     document.getElementById('total-aset-kas').classList.remove('opacity-0');
                     updateGrandTotal();
                 }
-            } catch (err) { console.error("Error Loading Keuangan", err); }
+            } catch (err) {
+                console.error("Error Loading Keuangan", err);
+                const c = document.getElementById('content-iuran-bulan');
+                if (c) c.innerHTML = '<p class="text-red-500 text-center col-span-full py-10 text-sm">Gagal memuat iuran bulan ini.</p>';
+            }
         }
 
         function switchTabRekap(tab) {
@@ -1380,35 +1385,42 @@
             }
         }
 
-        async function fetchIuranBulanIni() {
+        function renderIuranBulanIni() {
             const container = document.getElementById('content-iuran-bulan');
             const summary = document.getElementById('summary-section');
             const blnIdx = new Date().getMonth();
-            document.getElementById('nama-bulan-berjalan').textContent = daftarBulan[blnIdx];
+            const bulanIni = daftarBulan[blnIdx];
+            document.getElementById('nama-bulan-berjalan').textContent = bulanIni;
 
             try {
-                const res = await fetch(appScriptUrl);
-                if (!res.ok) throw new Error("Gagal mengambil iuran bulanan");
-                const { headers, dataRows } = normalizeResponse(JSON.parse(await res.text()));
+                if (kasDebitIdx < 0 || kasKetIdx < 0) throw new Error("Data kas belum siap");
 
-                let colIdx = headers.findIndex(h => h.includes(new Date().getFullYear().toString()));
-                if(colIdx < 0) colIdx = 1; colIdx += blnIdx;
+                const regexNama = /pembayaran\s*kas\s+(.+)/i;
+                let total = 0, paidList = [];
 
-                let total = 0, html = "", paidList = [];
-                dataRows.forEach(r => {
-                    if(!r[0]?.value || r[0].value.toLowerCase().includes("nama")) return;
-                    let val = parseAngka(r[colIdx]?.value);
-                    if(val > 0) {
-                        total += val;
-                        paidList.push({ nama: r[0].value, nominal: val });
-                    }
+                allKasData.forEach(r => {
+                    const bulanRow = (r[kasBulanIdx] || '').toString().trim();
+                    if (bulanRow.toLowerCase() !== bulanIni.toLowerCase()) return;
+
+                    const nominal = parseAngka(r[kasDebitIdx]);
+                    if (nominal <= 0) return;
+
+                    const ket = (r[kasKetIdx] || '').toString().trim();
+                    const match = ket.match(regexNama);
+                    if (!match) return;
+
+                    const nama = match[1].trim().replace(/\s+/g, ' ');
+                    if (!nama) return;
+
+                    total += nominal;
+                    paidList.push({ nama, nominal });
                 });
 
                 paidList.sort((a, b) => a.nama.localeCompare(b.nama));
 
-                paidList.forEach((item, i) => {
+                let html = paidList.map(item => {
                     let initials = item.nama.trim().split(/\s+/).slice(0,2).map(w => w[0]).join('').toUpperCase();
-                    html += `<div class="bg-white p-3 md:p-4 rounded-xl border border-gray-100 shadow-sm flex items-center justify-between gap-3 hover:border-emerald-200 hover:shadow-md transition">
+                    return `<div class="bg-white p-3 md:p-4 rounded-xl border border-gray-100 shadow-sm flex items-center justify-between gap-3 hover:border-emerald-200 hover:shadow-md transition">
                         <div class="flex items-center gap-2.5 md:gap-3 min-w-0">
                             <div class="w-9 h-9 md:w-10 md:h-10 rounded-full bg-gradient-to-br from-emerald-500 to-[var(--primary)] flex items-center justify-center text-white font-bold text-[11px] md:text-xs shrink-0 font-display">${initials || '?'}</div>
                             <div class="min-w-0">
@@ -1418,7 +1430,7 @@
                         </div>
                         <i class="fas fa-circle-check text-emerald-500 text-lg md:text-xl shrink-0"></i>
                     </div>`;
-                });
+                }).join('');
 
                 summary.innerHTML = `<div class="bg-[var(--primary-dark)] text-white p-5 md:p-6 rounded-2xl flex justify-between items-center shadow-lg motif-kawung">
                     <div>
@@ -1428,16 +1440,21 @@
                     </div>
                     <div class="h-10 w-10 md:h-12 md:w-12 bg-white/10 rounded-xl flex items-center justify-center"><i class="fa-solid fa-wallet text-lg md:text-xl"></i></div>
                 </div>`;
-                container.innerHTML = html || '<p class="col-span-full text-center text-gray-500 py-10 text-sm">Belum ada pembayaran masuk.</p>';
+                container.innerHTML = html || '<p class="col-span-full text-center text-gray-500 py-10 text-sm">Belum ada pembayaran masuk dari Kas bulan ini.</p>';
             } catch(e) { container.innerHTML = `<p class="text-red-500 text-center col-span-full py-10 text-sm">Gagal memuat iuran bulan ini.</p>`; }
         }
 
         // --- Main Execution (Parallel Loading) ---
         document.addEventListener("DOMContentLoaded", async () => {
+            // Set filter kas ke bulan berjalan secara default
+            const bulanSekarang = daftarBulan[new Date().getMonth()];
+            const selKas = document.getElementById('filter-bulan-kas');
+            if (selKas) selKas.value = bulanSekarang;
+            document.getElementById('nama-bulan-berjalan').textContent = bulanSekarang;
+
             Promise.all([
                 fetchWargaData(),
                 fetchRekapKeuanganDanKas(),
-                fetchIuranBulanIni(),
                 fetchSliderImages()
             ]).catch(err => console.error("Error pada muatan paralel:", err));
 
