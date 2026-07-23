@@ -1394,18 +1394,38 @@
                 let colIdx = headers.findIndex(h => h.includes(new Date().getFullYear().toString()));
                 if(colIdx < 0) colIdx = 1; colIdx += blnIdx;
 
-                let total = 0, html = "";
+                let total = 0, html = "", paidList = [];
                 dataRows.forEach(r => {
                     if(!r[0]?.value || r[0].value.toLowerCase().includes("nama")) return;
                     let val = parseAngka(r[colIdx]?.value);
                     if(val > 0) {
                         total += val;
-                        html += `<div class="bg-white p-3 md:p-4 rounded-xl border border-gray-100 shadow-sm"><div class="flex justify-between items-center"><span class="font-bold text-gray-800 text-xs md:text-sm truncate">${escapeHtml(r[0].value)}</span><i class="fas fa-check-circle text-emerald-500 text-lg md:text-xl"></i></div></div>`;
+                        paidList.push({ nama: r[0].value, nominal: val });
                     }
                 });
 
+                paidList.sort((a, b) => a.nama.localeCompare(b.nama));
+
+                paidList.forEach((item, i) => {
+                    let initials = item.nama.trim().split(/\s+/).slice(0,2).map(w => w[0]).join('').toUpperCase();
+                    html += `<div class="bg-white p-3 md:p-4 rounded-xl border border-gray-100 shadow-sm flex items-center justify-between gap-3 hover:border-emerald-200 hover:shadow-md transition">
+                        <div class="flex items-center gap-2.5 md:gap-3 min-w-0">
+                            <div class="w-9 h-9 md:w-10 md:h-10 rounded-full bg-gradient-to-br from-emerald-500 to-[var(--primary)] flex items-center justify-center text-white font-bold text-[11px] md:text-xs shrink-0 font-display">${initials || '?'}</div>
+                            <div class="min-w-0">
+                                <p class="font-bold text-gray-800 text-xs md:text-sm truncate">${escapeHtml(item.nama)}</p>
+                                <p class="text-emerald-600 font-bold text-[11px] md:text-xs">${formatRupiah(item.nominal)}</p>
+                            </div>
+                        </div>
+                        <i class="fas fa-circle-check text-emerald-500 text-lg md:text-xl shrink-0"></i>
+                    </div>`;
+                });
+
                 summary.innerHTML = `<div class="bg-[var(--primary-dark)] text-white p-5 md:p-6 rounded-2xl flex justify-between items-center shadow-lg motif-kawung">
-                    <div><p class="text-emerald-200 text-[10px] md:text-xs font-medium uppercase mb-1">Total Terkumpul Bulan Ini</p><h3 class="font-display text-xl md:text-2xl font-bold">${formatRupiah(total)}</h3></div>
+                    <div>
+                        <p class="text-emerald-200 text-[10px] md:text-xs font-medium uppercase mb-1">Total Terkumpul Bulan Ini</p>
+                        <h3 class="font-display text-xl md:text-2xl font-bold">${formatRupiah(total)}</h3>
+                        <p class="text-emerald-200/80 text-[10px] md:text-xs mt-1"><i class="fas fa-user-check mr-1"></i> ${paidList.length} warga sudah membayar</p>
+                    </div>
                     <div class="h-10 w-10 md:h-12 md:w-12 bg-white/10 rounded-xl flex items-center justify-center"><i class="fa-solid fa-wallet text-lg md:text-xl"></i></div>
                 </div>`;
                 container.innerHTML = html || '<p class="col-span-full text-center text-gray-500 py-10 text-sm">Belum ada pembayaran masuk.</p>';
