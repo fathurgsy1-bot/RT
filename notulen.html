@@ -7,13 +7,29 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Outfit', sans-serif;
-            background-color: #0B0E14;
-            color: #9CA3AF;
+        :root{
+            --ink: #090B10;
+            --surface: #12151C;
+            --surface-2: #171B24;
+            --hairline: #23262F;
+            --gold: #C9A15D;
+            --gold-soft: #E4C384;
+            --teal: #3E7A6B;
+            --paper: #EDE7D8;
+            --muted: #8B8D95;
         }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--ink);
+            color: var(--muted);
+            background-image:
+                radial-gradient(ellipse 60% 40% at 15% 0%, rgba(201,161,93,0.10), transparent 60%),
+                radial-gradient(ellipse 50% 35% at 100% 15%, rgba(62,122,107,0.12), transparent 60%);
+            background-attachment: fixed;
+        }
+        .font-display { font-family: 'Fraunces', serif; }
 
         details > summary { list-style: none; }
         details > summary::-webkit-details-marker { display: none; }
@@ -21,44 +37,57 @@
         details[open] summary ~ * {
             animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
-
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(-5px); }
             to { opacity: 1; transform: translateY(0); }
         }
-
         @keyframes floatUp {
-            from { opacity: 0; transform: translateY(12px); }
+            from { opacity: 0; transform: translateY(14px); }
             to { opacity: 1; transform: translateY(0); }
         }
-
-        .glow-text {
-            text-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
-        }
+        .fade-in-item { animation: floatUp 0.45s ease both; }
 
         mark {
-            background-color: rgba(139, 92, 246, 0.35);
-            color: #fff;
+            background-color: rgba(201,161,93,0.28);
+            color: var(--gold-soft);
             border-radius: 3px;
             padding: 0 3px;
         }
 
+        /* Tombol beranda: kuningan / brass, bukan gradien ungu generik */
         .home-btn {
-            background: linear-gradient(135deg, #6366F1, #9333EA);
-            box-shadow: 0 4px 20px rgba(139, 92, 246, 0.35);
+            background: linear-gradient(135deg, var(--gold), #A9793B);
+            color: #191307;
+            box-shadow: 0 6px 24px rgba(201,161,93,0.25);
         }
         .home-btn:hover {
-            box-shadow: 0 6px 28px rgba(139, 92, 246, 0.55);
+            box-shadow: 0 8px 30px rgba(201,161,93,0.4);
             transform: translateY(-1px);
         }
 
-        #mobile-menu {
-            transition: max-height 0.35s ease, opacity 0.25s ease;
+        /* Stempel / seal signature element */
+        .seal {
+            position: relative;
+            border: 1.5px dashed rgba(201,161,93,0.55);
+        }
+        .seal::before {
+            content: "";
+            position: absolute;
+            inset: 4px;
+            border: 1px solid rgba(201,161,93,0.3);
+            border-radius: inherit;
         }
 
-        .fade-in-item {
-            animation: floatUp 0.4s ease both;
+        .ledger-rule {
+            background-image: repeating-linear-gradient(to bottom, transparent 0, transparent 27px, rgba(201,161,93,0.07) 28px);
         }
+
+        #mobile-menu { transition: max-height 0.35s ease, opacity 0.25s ease; }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--ink); }
+        ::-webkit-scrollbar-thumb { background: #262b36; border-radius: 8px; }
+        ::-webkit-scrollbar-thumb:hover { background: #333a48; }
 
         @media (prefers-reduced-motion: reduce) {
             *, *::before, *::after {
@@ -66,88 +95,79 @@
                 transition-duration: 0.001ms !important;
             }
         }
-
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #0B0E14; }
-        ::-webkit-scrollbar-thumb { background: #2a2f3d; border-radius: 8px; }
-        ::-webkit-scrollbar-thumb:hover { background: #3d4356; }
     </style>
 </head>
-<body class="antialiased selection:bg-purple-500 selection:text-white">
+<body class="antialiased selection:bg-[#C9A15D] selection:text-[#191307]">
 
-    <header class="sticky top-0 z-50 bg-[#0B0E14]/80 backdrop-blur-lg border-b border-gray-800/60">
+    <header class="sticky top-0 z-50 bg-[#090B10]/85 backdrop-blur-lg border-b border-[#23262F]">
         <div class="max-w-4xl mx-auto px-4 md:px-8">
             <div class="flex justify-between items-center h-20">
                 <a href="https://rt04rw26.vercel.app" class="flex items-center space-x-3 group">
-                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-xl shadow-[0_0_15px_rgba(139,92,246,0.5)] group-hover:shadow-[0_0_25px_rgba(139,92,246,0.7)] transition-all">
+                    <div class="seal w-11 h-11 rounded-full bg-[#12151C] flex items-center justify-center text-[#C9A15D] font-display font-semibold text-lg group-hover:text-[#E4C384] transition-colors">
                         W
                     </div>
-                    <span class="font-bold text-2xl text-white tracking-tight">SI-WARGA<span class="text-purple-500">.</span></span>
+                    <span class="font-display font-semibold text-2xl text-[#EDE7D8] tracking-tight">SI-WARGA<span class="text-[#C9A15D]">.</span></span>
                 </a>
 
                 <div class="hidden md:flex items-center gap-1 font-medium text-sm">
-                    <a href="https://rt04rw26.vercel.app/#beranda" class="px-3 py-2 text-gray-300 hover:text-purple-400 hover:bg-purple-500/10 rounded-lg transition-all">Beranda</a>
-                    <a href="https://rt04rw26.vercel.app/#rencana-bo-2026" class="px-3 py-2 text-gray-300 hover:text-purple-400 hover:bg-purple-500/10 rounded-lg transition-all">BO 2026</a>
-                    <a href="https://rt04rw26.vercel.app/#data-warga" class="px-3 py-2 text-gray-300 hover:text-purple-400 hover:bg-purple-500/10 rounded-lg transition-all">Data</a>
+                    <a href="https://rt04rw26.vercel.app/#beranda" class="px-3 py-2 text-[#9CA0AA] hover:text-[#E4C384] hover:bg-white/[0.04] rounded-lg transition-all">Beranda</a>
+                    <a href="https://rt04rw26.vercel.app/#rencana-bo-2026" class="px-3 py-2 text-[#9CA0AA] hover:text-[#E4C384] hover:bg-white/[0.04] rounded-lg transition-all">BO 2026</a>
+                    <a href="https://rt04rw26.vercel.app/#data-warga" class="px-3 py-2 text-[#9CA0AA] hover:text-[#E4C384] hover:bg-white/[0.04] rounded-lg transition-all">Data</a>
 
                     <div class="relative group">
-                        <button class="flex items-center gap-1 px-3 py-2 text-gray-300 hover:text-purple-400 hover:bg-purple-500/10 rounded-lg transition-all">
+                        <button class="flex items-center gap-1 px-3 py-2 text-[#9CA0AA] hover:text-[#E4C384] hover:bg-white/[0.04] rounded-lg transition-all">
                             Keuangan
                             <svg class="w-3 h-3 transition-transform group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                         </button>
-                        <div class="absolute left-0 top-full mt-2 w-56 bg-[#141824] border border-gray-800 rounded-2xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 z-50 overflow-hidden">
+                        <div class="absolute left-0 top-full mt-2 w-56 bg-[#12151C] border border-[#23262F] rounded-2xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 z-50 overflow-hidden">
                             <div class="p-2 space-y-1">
-                                <a href="https://rt04rw26.vercel.app/#kas-warga" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-purple-500/10 text-gray-300 hover:text-purple-400 transition-colors">
-                                    <span class="text-sm">💰</span>
-                                    <span class="font-semibold text-sm">Kas Warga</span>
+                                <a href="https://rt04rw26.vercel.app/#kas-warga" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/[0.04] text-[#9CA0AA] hover:text-[#E4C384] transition-colors">
+                                    <span class="text-sm">💰</span><span class="font-semibold text-sm">Kas Warga</span>
                                 </a>
-                                <a href="https://rt04rw26.vercel.app/#tunggakan-warga" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-red-500/10 text-gray-300 hover:text-red-400 transition-colors">
-                                    <span class="text-sm">⚠️</span>
-                                    <span class="font-semibold text-sm">Tunggakan</span>
+                                <a href="https://rt04rw26.vercel.app/#tunggakan-warga" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/[0.04] text-[#9CA0AA] hover:text-red-400 transition-colors">
+                                    <span class="text-sm">⚠️</span><span class="font-semibold text-sm">Tunggakan</span>
                                 </a>
-                                <a href="https://rt04rw26.vercel.app/#iuran-bulan-ini" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-blue-500/10 text-gray-300 hover:text-blue-400 transition-colors">
-                                    <span class="text-sm">🧾</span>
-                                    <span class="font-semibold text-sm">Iuran Bulanan</span>
+                                <a href="https://rt04rw26.vercel.app/#iuran-bulan-ini" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/[0.04] text-[#9CA0AA] hover:text-[#3E7A6B] transition-colors">
+                                    <span class="text-sm">🧾</span><span class="font-semibold text-sm">Iuran Bulanan</span>
                                 </a>
-                                <a href="https://rt04rw26.vercel.app/#angsuran-warga" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-amber-500/10 text-gray-300 hover:text-amber-400 transition-colors">
-                                    <span class="text-sm">📄</span>
-                                    <span class="font-semibold text-sm">Angsuran</span>
+                                <a href="https://rt04rw26.vercel.app/#angsuran-warga" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/[0.04] text-[#9CA0AA] hover:text-[#E4C384] transition-colors">
+                                    <span class="text-sm">📄</span><span class="font-semibold text-sm">Angsuran</span>
                                 </a>
                             </div>
-                            <div class="bg-black/20 px-4 py-2 border-t border-gray-800 text-center">
-                                <p class="text-[10px] text-gray-500 uppercase tracking-widest font-bold">Laporan Finansial</p>
+                            <div class="bg-black/20 px-4 py-2 border-t border-[#23262F] text-center">
+                                <p class="text-[10px] text-[#6B6E76] uppercase tracking-widest font-bold">Laporan Finansial</p>
                             </div>
                         </div>
                     </div>
 
-                    <a href="https://rt04rw26.vercel.app/notulen.html" class="px-3 py-2 text-purple-400 bg-purple-500/10 rounded-lg">Notulen</a>
-                    <a href="https://script.google.com/macros/s/AKfycbxKwWu0g7nOvFlMpNTc8VMoipGsI_77_fBu198JcqHhlauoNCFCbBsmVo9fRzIwlETp/exec" class="px-3 py-2 text-gray-300 hover:text-purple-400 hover:bg-purple-500/10 rounded-lg transition-all">Kegiatan</a>
+                    <a href="https://rt04rw26.vercel.app/notulen.html" class="px-3 py-2 text-[#E4C384] bg-white/[0.04] rounded-lg">Notulen</a>
+                    <a href="https://script.google.com/macros/s/AKfycbxKwWu0g7nOvFlMpNTc8VMoipGsI_77_fBu198JcqHhlauoNCFCbBsmVo9fRzIwlETp/exec" class="px-3 py-2 text-[#9CA0AA] hover:text-[#E4C384] hover:bg-white/[0.04] rounded-lg transition-all">Kegiatan</a>
 
-                    <a href="https://rt04rw26.vercel.app" class="home-btn ml-2 flex items-center gap-2 px-4 py-2 rounded-full text-white text-sm font-semibold transition-all">
+                    <a href="https://rt04rw26.vercel.app" class="home-btn ml-2 flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold transition-all">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
                         Beranda
                     </a>
                 </div>
 
-                <button id="menu-toggle" class="md:hidden w-10 h-10 flex items-center justify-center rounded-lg text-gray-300 hover:bg-gray-800/60 transition-colors" aria-label="Buka menu" aria-expanded="false">
+                <button id="menu-toggle" class="md:hidden w-10 h-10 flex items-center justify-center rounded-lg text-[#9CA0AA] hover:bg-white/[0.06] transition-colors" aria-label="Buka menu" aria-expanded="false">
                     <svg id="menu-icon-open" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
                     <svg id="menu-icon-close" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
             </div>
         </div>
 
-        <div id="mobile-menu" class="md:hidden max-h-0 opacity-0 overflow-hidden border-t border-gray-800/0">
-            <div class="px-4 py-4 space-y-1 bg-[#0B0E14] border-t border-gray-800/60">
-                <a href="https://rt04rw26.vercel.app/#beranda" class="block px-4 py-3 rounded-xl text-gray-300 hover:bg-purple-500/10 hover:text-purple-400 transition-colors">Beranda</a>
-                <a href="https://rt04rw26.vercel.app/#rencana-bo-2026" class="block px-4 py-3 rounded-xl text-gray-300 hover:bg-purple-500/10 hover:text-purple-400 transition-colors">BO 2026</a>
-                <a href="https://rt04rw26.vercel.app/#data-warga" class="block px-4 py-3 rounded-xl text-gray-300 hover:bg-purple-500/10 hover:text-purple-400 transition-colors">Data Warga</a>
-                <a href="https://rt04rw26.vercel.app/#kas-warga" class="block px-4 py-3 rounded-xl text-gray-300 hover:bg-purple-500/10 hover:text-purple-400 transition-colors">Kas Warga</a>
-                <a href="https://rt04rw26.vercel.app/#tunggakan-warga" class="block px-4 py-3 rounded-xl text-gray-300 hover:bg-red-500/10 hover:text-red-400 transition-colors">Tunggakan</a>
-                <a href="https://rt04rw26.vercel.app/#iuran-bulan-ini" class="block px-4 py-3 rounded-xl text-gray-300 hover:bg-blue-500/10 hover:text-blue-400 transition-colors">Iuran Bulanan</a>
-                <a href="https://rt04rw26.vercel.app/#angsuran-warga" class="block px-4 py-3 rounded-xl text-gray-300 hover:bg-amber-500/10 hover:text-amber-400 transition-colors">Angsuran</a>
-                <a href="https://rt04rw26.vercel.app/notulen.html" class="block px-4 py-3 rounded-xl text-purple-400 bg-purple-500/10">Notulen</a>
-                <a href="https://script.google.com/macros/s/AKfycbxKwWu0g7nOvFlMpNTc8VMoipGsI_77_fBu198JcqHhlauoNCFCbBsmVo9fRzIwlETp/exec" class="block px-4 py-3 rounded-xl text-gray-300 hover:bg-purple-500/10 hover:text-purple-400 transition-colors">Kegiatan</a>
-                <a href="https://rt04rw26.vercel.app" class="home-btn flex items-center justify-center gap-2 mt-3 px-4 py-3 rounded-xl text-white font-semibold transition-all">
+        <div id="mobile-menu" class="md:hidden max-h-0 opacity-0 overflow-hidden">
+            <div class="px-4 py-4 space-y-1 bg-[#090B10] border-t border-[#23262F]">
+                <a href="https://rt04rw26.vercel.app/#beranda" class="block px-4 py-3 rounded-xl text-[#9CA0AA] hover:bg-white/[0.05] hover:text-[#E4C384] transition-colors">Beranda</a>
+                <a href="https://rt04rw26.vercel.app/#rencana-bo-2026" class="block px-4 py-3 rounded-xl text-[#9CA0AA] hover:bg-white/[0.05] hover:text-[#E4C384] transition-colors">BO 2026</a>
+                <a href="https://rt04rw26.vercel.app/#data-warga" class="block px-4 py-3 rounded-xl text-[#9CA0AA] hover:bg-white/[0.05] hover:text-[#E4C384] transition-colors">Data Warga</a>
+                <a href="https://rt04rw26.vercel.app/#kas-warga" class="block px-4 py-3 rounded-xl text-[#9CA0AA] hover:bg-white/[0.05] hover:text-[#E4C384] transition-colors">Kas Warga</a>
+                <a href="https://rt04rw26.vercel.app/#tunggakan-warga" class="block px-4 py-3 rounded-xl text-[#9CA0AA] hover:bg-white/[0.05] hover:text-red-400 transition-colors">Tunggakan</a>
+                <a href="https://rt04rw26.vercel.app/#iuran-bulan-ini" class="block px-4 py-3 rounded-xl text-[#9CA0AA] hover:bg-white/[0.05] hover:text-[#3E7A6B] transition-colors">Iuran Bulanan</a>
+                <a href="https://rt04rw26.vercel.app/#angsuran-warga" class="block px-4 py-3 rounded-xl text-[#9CA0AA] hover:bg-white/[0.05] hover:text-[#E4C384] transition-colors">Angsuran</a>
+                <a href="https://rt04rw26.vercel.app/notulen.html" class="block px-4 py-3 rounded-xl text-[#E4C384] bg-white/[0.05]">Notulen</a>
+                <a href="https://script.google.com/macros/s/AKfycbxKwWu0g7nOvFlMpNTc8VMoipGsI_77_fBu198JcqHhlauoNCFCbBsmVo9fRzIwlETp/exec" class="block px-4 py-3 rounded-xl text-[#9CA0AA] hover:bg-white/[0.05] hover:text-[#E4C384] transition-colors">Kegiatan</a>
+                <a href="https://rt04rw26.vercel.app" class="home-btn flex items-center justify-center gap-2 mt-3 px-4 py-3 rounded-xl font-semibold transition-all">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
                     Kembali ke Beranda
                 </a>
@@ -156,20 +176,16 @@
     </header>
 
     <section class="relative pt-16 pb-10 overflow-hidden">
-        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-purple-600/20 rounded-full blur-[120px] pointer-events-none"></div>
-        <div class="absolute top-0 right-0 w-[300px] h-[300px] bg-blue-600/10 rounded-full blur-[100px] pointer-events-none"></div>
-
         <div class="max-w-4xl mx-auto px-4 md:px-8 text-center relative z-10">
-            <div class="inline-flex items-center px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-400 text-sm font-medium mb-6">
-                <span class="w-2 h-2 rounded-full bg-purple-500 mr-2 animate-pulse"></span>
-                <a href="https://rt04rw26.vercel.app/createnotulen.html" class="hover:underline">Arsip Digital 2026</a>
+            <div class="seal inline-flex items-center px-4 py-1.5 rounded-full bg-white/[0.02] text-[#C9A15D] text-xs font-semibold tracking-[0.15em] uppercase mb-7">
+                <a href="https://rt04rw26.vercel.app/createnotulen.html" class="hover:text-[#E4C384]">Arsip Resmi &middot; 2026</a>
             </div>
-            <h1 class="text-4xl md:text-5xl font-bold tracking-tight text-white mb-4 leading-tight glow-text">
-                Notulen <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-500">Bulanan Warga</span>
+            <h1 class="font-display text-4xl md:text-5xl font-semibold tracking-tight text-[#EDE7D8] mb-4 leading-tight">
+                Notulen <span class="italic text-[#C9A15D]">Bulanan</span> Warga
             </h1>
-            <p class="text-gray-500 max-w-lg mx-auto mb-8">Rekap keputusan dan kegiatan rapat warga, tersusun rapi per bulan. Ketik kata kunci untuk mencari cepat.</p>
+            <p class="text-[#8B8D95] max-w-lg mx-auto mb-8">Rekap keputusan dan kegiatan rapat warga, tersusun rapi per bulan layaknya buku catatan resmi. Ketik kata kunci untuk menelusuri arsip.</p>
 
-            <a href="https://rt04rw26.vercel.app" class="home-btn inline-flex items-center gap-2 px-6 py-3 rounded-full text-white font-semibold text-sm transition-all">
+            <a href="https://rt04rw26.vercel.app" class="home-btn inline-flex items-center gap-2 px-6 py-3 rounded-full font-semibold text-sm transition-all">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
                 Kunjungi Beranda SI-WARGA
             </a>
@@ -179,44 +195,44 @@
     <main class="max-w-4xl mx-auto px-4 md:px-8 pb-24 relative z-10">
 
         <div class="mb-8 relative group hidden" id="search-container">
-            <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none text-gray-500 group-focus-within:text-purple-500 transition-colors">
+            <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none text-[#5C5F68] group-focus-within:text-[#C9A15D] transition-colors">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                 </svg>
             </div>
-            <input type="text" id="search-input" class="w-full bg-[#141824] border border-gray-800/60 text-white rounded-2xl pl-12 pr-12 py-4 focus:outline-none focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/50 transition-all placeholder-gray-600 shadow-lg" placeholder="Cari keputusan, kegiatan, atau kata kunci lainnya...">
+            <input type="text" id="search-input" class="w-full bg-[#12151C] border border-[#23262F] text-[#EDE7D8] rounded-2xl pl-12 pr-12 py-4 focus:outline-none focus:border-[#C9A15D]/50 focus:ring-1 focus:ring-[#C9A15D]/40 transition-all placeholder-[#5C5F68] shadow-lg" placeholder="Cari keputusan, kegiatan, atau kata kunci lainnya...">
 
-            <button id="clear-search" class="absolute inset-y-0 right-0 pr-5 flex items-center text-gray-500 hover:text-white hidden transition-colors" aria-label="Hapus pencarian">
+            <button id="clear-search" class="absolute inset-y-0 right-0 pr-5 flex items-center text-[#5C5F68] hover:text-[#EDE7D8] hidden transition-colors" aria-label="Hapus pencarian">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                 </svg>
             </button>
         </div>
 
-        <div id="result-count" class="hidden text-sm text-gray-500 mb-4 px-1"></div>
+        <div id="result-count" class="hidden text-sm text-[#6B6E76] mb-4 px-1"></div>
 
         <div id="display-area" class="space-y-4">
             <div class="flex flex-col items-center justify-center py-20 space-y-5">
                 <div class="relative w-16 h-16">
-                    <div class="absolute inset-0 rounded-full border-[3px] border-gray-800"></div>
-                    <div class="absolute inset-0 rounded-full border-[3px] border-transparent border-t-purple-500 animate-spin"></div>
+                    <div class="absolute inset-0 rounded-full border-[3px] border-[#23262F]"></div>
+                    <div class="absolute inset-0 rounded-full border-[3px] border-transparent border-t-[#C9A15D] animate-spin"></div>
                 </div>
-                <p class="text-purple-400 font-medium animate-pulse tracking-wide">Sinkronisasi Basis Data...</p>
+                <p class="text-[#C9A15D] font-medium animate-pulse tracking-wide">Sinkronisasi Basis Data...</p>
             </div>
         </div>
 
-        <div id="no-results" class="hidden text-center py-16 bg-[#141824] rounded-2xl border border-gray-800/60 mt-4">
-            <div class="w-16 h-16 mx-auto bg-gray-800/50 rounded-full flex items-center justify-center text-gray-500 mb-4">
+        <div id="no-results" class="hidden text-center py-16 bg-[#12151C] rounded-2xl border border-[#23262F] mt-4">
+            <div class="seal w-16 h-16 mx-auto rounded-full flex items-center justify-center text-[#5C5F68] mb-4">
                 <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
             </div>
-            <h3 class="text-xl font-medium text-white mb-2">Pencarian Tidak Ditemukan</h3>
-            <p class="text-gray-500">Tidak ada notulen yang cocok dengan kata kunci yang Anda cari.</p>
+            <h3 class="font-display text-xl font-medium text-[#EDE7D8] mb-2">Pencarian Tidak Ditemukan</h3>
+            <p class="text-[#6B6E76]">Tidak ada notulen yang cocok dengan kata kunci yang Anda cari.</p>
         </div>
     </main>
 
-    <a href="https://rt04rw26.vercel.app" class="home-btn md:hidden fixed bottom-5 right-5 z-40 w-14 h-14 rounded-full flex items-center justify-center text-white transition-all" aria-label="Kembali ke Beranda">
+    <a href="https://rt04rw26.vercel.app" class="home-btn md:hidden fixed bottom-5 right-5 z-40 w-14 h-14 rounded-full flex items-center justify-center transition-all" aria-label="Kembali ke Beranda">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
     </a>
 
@@ -224,7 +240,6 @@
         const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzBAhO47adgZmlYsDzYXNnwbPD201T_ibe604AKr8T23qZrM_8WYwBVDEol3vb25uzD1w/exec';
         let globalData = [];
 
-        // Menu mobile
         const menuToggle = document.getElementById('menu-toggle');
         const mobileMenu = document.getElementById('mobile-menu');
         const iconOpen = document.getElementById('menu-icon-open');
@@ -250,48 +265,45 @@
 
         function formatTanggal(tanggalStr) {
             if (!tanggalStr) return "Arsip Lainnya";
-
             const dateObj = new Date(tanggalStr);
-
             if (!isNaN(dateObj.getTime())) {
                 const namaBulan = [
                     "Januari", "Februari", "Maret", "April", "Mei", "Juni",
                     "Juli", "Agustus", "September", "Oktober", "November", "Desember"
                 ];
-                const bulan = namaBulan[dateObj.getMonth()];
-                const tahun = dateObj.getFullYear();
-
-                return `${bulan} - ${tahun}`;
+                return `${namaBulan[dateObj.getMonth()]} - ${dateObj.getFullYear()}`;
             }
-
             return tanggalStr.toString().trim();
+        }
+
+        function bulanSingkat(title) {
+            const map = { Januari:"JAN", Februari:"FEB", Maret:"MAR", April:"APR", Mei:"MEI", Juni:"JUN", Juli:"JUL", Agustus:"AGU", September:"SEP", Oktober:"OKT", November:"NOV", Desember:"DES" };
+            const bulan = title.split(' - ')[0];
+            return map[bulan] || title.slice(0,3).toUpperCase();
         }
 
         async function loadData() {
             const displayArea = document.getElementById('display-area');
-
             try {
                 const response = await fetch(WEB_APP_URL);
                 if (!response.ok) throw new Error('Gagal terhubung ke server.');
                 const data = await response.json();
-
                 processData(data, displayArea);
             } catch (err) {
                 displayArea.innerHTML = `
-                    <div class="bg-[#141824] border border-red-500/20 rounded-2xl p-10 text-center flex flex-col items-center justify-center max-w-lg mx-auto shadow-2xl relative overflow-hidden">
-                        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-32 bg-red-500/20 blur-[50px]"></div>
+                    <div class="bg-[#12151C] border border-red-500/20 rounded-2xl p-10 text-center flex flex-col items-center justify-center max-w-lg mx-auto shadow-2xl relative overflow-hidden">
                         <div class="bg-red-500/10 text-red-400 p-4 rounded-full mb-5 border border-red-500/20 relative z-10">
                             <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
                             </svg>
                         </div>
-                        <h3 class="text-xl font-bold text-white mb-2 relative z-10">Koneksi Terputus</h3>
-                        <p class="text-gray-400 mb-6 relative z-10">Sistem gagal mengambil data arsip dari server.</p>
+                        <h3 class="font-display text-xl font-semibold text-[#EDE7D8] mb-2 relative z-10">Koneksi Terputus</h3>
+                        <p class="text-[#8B8D95] mb-6 relative z-10">Sistem gagal mengambil data arsip dari server.</p>
                         <div class="flex flex-wrap gap-3 justify-center relative z-10">
-                            <button onclick="location.reload()" class="px-8 py-3 bg-white text-gray-900 font-semibold rounded-full hover:bg-gray-200 transition-colors">
+                            <button onclick="location.reload()" class="px-8 py-3 bg-[#EDE7D8] text-[#12151C] font-semibold rounded-full hover:bg-white transition-colors">
                                 Muat Ulang
                             </button>
-                            <a href="https://rt04rw26.vercel.app" class="home-btn px-8 py-3 text-white font-semibold rounded-full transition-all">
+                            <a href="https://rt04rw26.vercel.app" class="home-btn px-8 py-3 font-semibold rounded-full transition-all">
                                 Kembali ke Beranda
                             </a>
                         </div>
@@ -304,9 +316,9 @@
         function processData(data, container) {
             if (!data || data.length === 0) {
                 container.innerHTML = `
-                    <div class="text-center py-16 bg-[#141824] rounded-2xl border border-gray-800">
-                        <p class="text-gray-500 text-lg mb-5">Direktori kosong. Belum ada arsip yang tercatat.</p>
-                        <a href="https://rt04rw26.vercel.app" class="home-btn inline-flex items-center gap-2 px-6 py-3 rounded-full text-white font-semibold text-sm transition-all">Kembali ke Beranda</a>
+                    <div class="text-center py-16 bg-[#12151C] rounded-2xl border border-[#23262F]">
+                        <p class="text-[#6B6E76] text-lg mb-5">Direktori kosong. Belum ada arsip yang tercatat.</p>
+                        <a href="https://rt04rw26.vercel.app" class="home-btn inline-flex items-center gap-2 px-6 py-3 rounded-full font-semibold text-sm transition-all">Kembali ke Beranda</a>
                     </div>`;
                 return;
             }
@@ -317,19 +329,14 @@
             data.forEach(row => {
                 const tgl = formatTanggal(row.tanggal);
                 const content = row.content ? row.content.toString().trim() : "";
-
                 if (!groupMap[tgl]) {
                     groupMap[tgl] = { title: tgl, contents: [] };
                     globalData.push(groupMap[tgl]);
                 }
-
-                if (content !== "") {
-                    groupMap[tgl].contents.push(content);
-                }
+                if (content !== "") groupMap[tgl].contents.push(content);
             });
 
             document.getElementById('search-container').classList.remove('hidden');
-
             renderHTML(globalData, container);
             setupSearch(container);
         }
@@ -344,7 +351,6 @@
                 resultCount.classList.add('hidden');
                 return;
             }
-
             document.getElementById('no-results').classList.add('hidden');
 
             let totalMatches = 0;
@@ -355,7 +361,6 @@
                 const contentHtml = group.contents.map(item => {
                     const textContent = item;
                     let displayText = textContent;
-
                     const isItemMatch = searchTerm && textContent.toLowerCase().includes(searchTerm.toLowerCase());
 
                     if (isItemMatch) {
@@ -365,12 +370,11 @@
                     }
 
                     const showItem = searchTerm === "" || isItemMatch || isTitleMatch;
-
                     if (!showItem) return '';
 
                     return `
-                        <li class="relative pl-8 py-3 text-gray-300 leading-relaxed group/item border-b border-gray-800/50 last:border-0 hover:text-white transition-colors">
-                            <span class="absolute left-0 top-[16px] text-purple-500 group-hover/item:translate-x-1 transition-transform">
+                        <li class="relative pl-8 py-3 text-[#B7BAC2] leading-relaxed group/item border-b border-[#23262F]/70 last:border-0 hover:text-[#EDE7D8] transition-colors">
+                            <span class="absolute left-0 top-[16px] text-[#C9A15D] group-hover/item:translate-x-1 transition-transform">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
                             </span>
                             ${displayText}
@@ -384,27 +388,25 @@
                 const delay = Math.min(groupIdx * 60, 300);
 
                 return `
-                    <details ${isOpen} style="animation-delay:${delay}ms" class="fade-in-item group bg-[#141824] rounded-2xl border border-gray-800/60 mb-5 hover:border-purple-500/30 transition-colors duration-300 overflow-hidden">
-                        <summary class="flex justify-between items-center p-6 cursor-pointer select-none bg-[#141824] group-hover:bg-[#1A1E2B] transition-colors">
+                    <details ${isOpen} style="animation-delay:${delay}ms" class="fade-in-item group bg-[#12151C] rounded-2xl border border-[#23262F] mb-5 hover:border-[#C9A15D]/40 transition-colors duration-300 overflow-hidden">
+                        <summary class="flex justify-between items-center p-6 cursor-pointer select-none bg-[#12151C] group-hover:bg-[#171B24] transition-colors">
                             <div class="flex items-center space-x-5">
-                                <div class="w-12 h-12 rounded-xl bg-gray-800/50 text-gray-400 border border-gray-700/50 flex items-center justify-center group-open:bg-purple-500/10 group-open:text-purple-400 group-open:border-purple-500/30 transition-all duration-300">
-                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                                    </svg>
+                                <div class="seal w-14 h-14 rounded-full bg-[#0D0F14] text-[#8B8D95] flex flex-col items-center justify-center group-open:text-[#E4C384] group-open:border-[#C9A15D] transition-all duration-300 shrink-0">
+                                    <span class="font-display text-[11px] font-bold tracking-widest leading-none">${bulanSingkat(group.title)}</span>
                                 </div>
                                 <div>
-                                    <span class="text-white font-semibold text-lg md:text-xl capitalize tracking-wide group-open:text-transparent group-open:bg-clip-text group-open:bg-gradient-to-r group-open:from-indigo-400 group-open:to-purple-400 transition-all block">${group.title}</span>
-                                    <span class="text-xs text-gray-500">${group.contents.length} catatan</span>
+                                    <span class="font-display text-[#EDE7D8] font-semibold text-lg md:text-xl capitalize tracking-wide group-open:text-[#E4C384] transition-all block">${group.title}</span>
+                                    <span class="text-xs text-[#6B6E76]">${group.contents.length} catatan</span>
                                 </div>
                             </div>
-                            <div class="w-10 h-10 flex items-center justify-center rounded-full bg-gray-800/50 text-gray-400 group-open:bg-purple-500 group-open:text-white group-open:rotate-180 transition-all duration-500 shadow-sm">
+                            <div class="w-10 h-10 flex items-center justify-center rounded-full bg-white/[0.03] text-[#6B6E76] group-open:bg-[#C9A15D] group-open:text-[#191307] group-open:rotate-180 transition-all duration-500">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                                 </svg>
                             </div>
                         </summary>
 
-                        <div class="px-6 md:px-20 pb-8 pt-2">
+                        <div class="ledger-rule px-6 md:px-20 pb-8 pt-2">
                             <ul class="space-y-1">
                                 ${contentHtml}
                             </ul>
@@ -427,22 +429,16 @@
 
             searchInput.addEventListener('input', (e) => {
                 const term = e.target.value.trim();
+                if (term.length > 0) clearBtn.classList.remove('hidden');
+                else clearBtn.classList.add('hidden');
 
-                if (term.length > 0) {
-                    clearBtn.classList.remove('hidden');
-                } else {
-                    clearBtn.classList.add('hidden');
-                }
-
-                const filteredData = globalData.map(group => {
-                    return {
-                        title: group.title,
-                        contents: group.contents.filter(item =>
-                            group.title.toLowerCase().includes(term.toLowerCase()) ||
-                            item.toLowerCase().includes(term.toLowerCase())
-                        )
-                    };
-                }).filter(group => group.contents.length > 0);
+                const filteredData = globalData.map(group => ({
+                    title: group.title,
+                    contents: group.contents.filter(item =>
+                        group.title.toLowerCase().includes(term.toLowerCase()) ||
+                        item.toLowerCase().includes(term.toLowerCase())
+                    )
+                })).filter(group => group.contents.length > 0);
 
                 renderHTML(filteredData, container, term);
             });
