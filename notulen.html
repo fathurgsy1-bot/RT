@@ -7,17 +7,17 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        body { 
-            font-family: 'Outfit', sans-serif; 
-            background-color: #0B0E14; 
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: #0B0E14;
             color: #9CA3AF;
         }
-        
+
         details > summary { list-style: none; }
         details > summary::-webkit-details-marker { display: none; }
-        
+
         details[open] summary ~ * {
             animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
@@ -27,101 +27,173 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
+        @keyframes floatUp {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
         .glow-text {
             text-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
         }
-        
-        /* Highlight text mark saat pencarian */
+
         mark {
-            background-color: rgba(139, 92, 246, 0.3);
+            background-color: rgba(139, 92, 246, 0.35);
             color: #fff;
-            border-radius: 2px;
-            padding: 0 2px;
+            border-radius: 3px;
+            padding: 0 3px;
         }
+
+        .home-btn {
+            background: linear-gradient(135deg, #6366F1, #9333EA);
+            box-shadow: 0 4px 20px rgba(139, 92, 246, 0.35);
+        }
+        .home-btn:hover {
+            box-shadow: 0 6px 28px rgba(139, 92, 246, 0.55);
+            transform: translateY(-1px);
+        }
+
+        #mobile-menu {
+            transition: max-height 0.35s ease, opacity 0.25s ease;
+        }
+
+        .fade-in-item {
+            animation: floatUp 0.4s ease both;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.001ms !important;
+                transition-duration: 0.001ms !important;
+            }
+        }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0B0E14; }
+        ::-webkit-scrollbar-thumb { background: #2a2f3d; border-radius: 8px; }
+        ::-webkit-scrollbar-thumb:hover { background: #3d4356; }
     </style>
-</head><body class="antialiased selection:bg-purple-500 selection:text-white">
+</head>
+<body class="antialiased selection:bg-purple-500 selection:text-white">
 
     <header class="sticky top-0 z-50 bg-[#0B0E14]/80 backdrop-blur-lg border-b border-gray-800/60">
         <div class="max-w-4xl mx-auto px-4 md:px-8">
             <div class="flex justify-between items-center h-20">
-                <div class="flex items-center space-x-3 cursor-pointer group">
+                <a href="https://rt04rw26.vercel.app" class="flex items-center space-x-3 group">
                     <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-xl shadow-[0_0_15px_rgba(139,92,246,0.5)] group-hover:shadow-[0_0_25px_rgba(139,92,246,0.7)] transition-all">
                         W
                     </div>
                     <span class="font-bold text-2xl text-white tracking-tight">SI-WARGA<span class="text-purple-500">.</span></span>
-                </div>
+                </a>
+
                 <div class="hidden md:flex items-center gap-1 font-medium text-sm">
-                    <a href="https://rt04rw26.vercel.app/#beranda" class="px-3 py-2 text-white-600 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-all">Beranda</a>
-                    <a href="https://rt04rw26.vercel.app/#rencana-bo-2026" class="px-3 py-2 text-white-600 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-all">BO 2026</a>
-                    <a href="https://rt04rw26.vercel.app/#data-warga" class="px-3 py-2 text-white-600 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-all">Data</a>
-                    
+                    <a href="https://rt04rw26.vercel.app/#beranda" class="px-3 py-2 text-gray-300 hover:text-purple-400 hover:bg-purple-500/10 rounded-lg transition-all">Beranda</a>
+                    <a href="https://rt04rw26.vercel.app/#rencana-bo-2026" class="px-3 py-2 text-gray-300 hover:text-purple-400 hover:bg-purple-500/10 rounded-lg transition-all">BO 2026</a>
+                    <a href="https://rt04rw26.vercel.app/#data-warga" class="px-3 py-2 text-gray-300 hover:text-purple-400 hover:bg-purple-500/10 rounded-lg transition-all">Data</a>
+
                     <div class="relative group">
-                        <button class="flex items-center gap-1 px-3 py-2 text-white-600 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-all">
-                            Keuangan <i class="fas fa-chevron-down text-[10px] transition-transform group-hover:rotate-180"></i>
+                        <button class="flex items-center gap-1 px-3 py-2 text-gray-300 hover:text-purple-400 hover:bg-purple-500/10 rounded-lg transition-all">
+                            Keuangan
+                            <svg class="w-3 h-3 transition-transform group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                         </button>
-                        <div class="absolute left-0 top-full mt-2 w-56 bg-white border border-gray-100 rounded-2xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 z-50 overflow-hidden">
+                        <div class="absolute left-0 top-full mt-2 w-56 bg-[#141824] border border-gray-800 rounded-2xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 z-50 overflow-hidden">
                             <div class="p-2 space-y-1">
-                                <a href="https://rt04rw26.vercel.app/#kas-warga" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-purple-50 text-gray-700 hover:text-purple-700 transition-colors">
-                                    <i class="fas fa-wallet text-sm w-5 text-center"></i> 
+                                <a href="https://rt04rw26.vercel.app/#kas-warga" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-purple-500/10 text-gray-300 hover:text-purple-400 transition-colors">
+                                    <span class="text-sm">💰</span>
                                     <span class="font-semibold text-sm">Kas Warga</span>
                                 </a>
-                                <a href="https://rt04rw26.vercel.app/#tunggakan-warga" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-red-50 text-gray-700 hover:text-red-700 transition-colors">
-                                    <i class="fas fa-exclamation-circle text-sm w-5 text-center"></i> 
+                                <a href="https://rt04rw26.vercel.app/#tunggakan-warga" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-red-500/10 text-gray-300 hover:text-red-400 transition-colors">
+                                    <span class="text-sm">⚠️</span>
                                     <span class="font-semibold text-sm">Tunggakan</span>
                                 </a>
-                                <a href="https://rt04rw26.vercel.app/#iuran-bulan-ini" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-blue-50 text-gray-700 hover:text-blue-700 transition-colors">
-                                    <i class="fas fa-receipt text-sm w-5 text-center"></i> 
+                                <a href="https://rt04rw26.vercel.app/#iuran-bulan-ini" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-blue-500/10 text-gray-300 hover:text-blue-400 transition-colors">
+                                    <span class="text-sm">🧾</span>
                                     <span class="font-semibold text-sm">Iuran Bulanan</span>
                                 </a>
-                                <a href="https://rt04rw26.vercel.app/#angsuran-warga" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-amber-50 text-gray-700 hover:text-amber-700 transition-colors">
-                                    <i class="fas fa-file-invoice-dollar text-sm w-5 text-center"></i> 
+                                <a href="https://rt04rw26.vercel.app/#angsuran-warga" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-amber-500/10 text-gray-300 hover:text-amber-400 transition-colors">
+                                    <span class="text-sm">📄</span>
                                     <span class="font-semibold text-sm">Angsuran</span>
                                 </a>
                             </div>
-                            <div class="bg-gray-50/80 px-4 py-2 border-t border-gray-100 text-center">
-                                <p class="text-[10px] text-gray-400 uppercase tracking-widest font-bold">Laporan Finansial</p>
+                            <div class="bg-black/20 px-4 py-2 border-t border-gray-800 text-center">
+                                <p class="text-[10px] text-gray-500 uppercase tracking-widest font-bold">Laporan Finansial</p>
                             </div>
                         </div>
                     </div>
-                    
-                    <a href="https://rt04rw26.vercel.app/notulen.html" class="px-3 py-2 text-white-600 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-all">Notulen</a>
-                    <a href="https://script.google.com/macros/s/AKfycbxKwWu0g7nOvFlMpNTc8VMoipGsI_77_fBu198JcqHhlauoNCFCbBsmVo9fRzIwlETp/exec" class="px-3 py-2 text-white-600 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-all">Kegiatan</a>
+
+                    <a href="https://rt04rw26.vercel.app/notulen.html" class="px-3 py-2 text-purple-400 bg-purple-500/10 rounded-lg">Notulen</a>
+                    <a href="https://script.google.com/macros/s/AKfycbxKwWu0g7nOvFlMpNTc8VMoipGsI_77_fBu198JcqHhlauoNCFCbBsmVo9fRzIwlETp/exec" class="px-3 py-2 text-gray-300 hover:text-purple-400 hover:bg-purple-500/10 rounded-lg transition-all">Kegiatan</a>
+
+                    <a href="https://rt04rw26.vercel.app" class="home-btn ml-2 flex items-center gap-2 px-4 py-2 rounded-full text-white text-sm font-semibold transition-all">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                        Beranda
+                    </a>
                 </div>
+
+                <button id="menu-toggle" class="md:hidden w-10 h-10 flex items-center justify-center rounded-lg text-gray-300 hover:bg-gray-800/60 transition-colors" aria-label="Buka menu" aria-expanded="false">
+                    <svg id="menu-icon-open" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                    <svg id="menu-icon-close" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+        </div>
+
+        <div id="mobile-menu" class="md:hidden max-h-0 opacity-0 overflow-hidden border-t border-gray-800/0">
+            <div class="px-4 py-4 space-y-1 bg-[#0B0E14] border-t border-gray-800/60">
+                <a href="https://rt04rw26.vercel.app/#beranda" class="block px-4 py-3 rounded-xl text-gray-300 hover:bg-purple-500/10 hover:text-purple-400 transition-colors">Beranda</a>
+                <a href="https://rt04rw26.vercel.app/#rencana-bo-2026" class="block px-4 py-3 rounded-xl text-gray-300 hover:bg-purple-500/10 hover:text-purple-400 transition-colors">BO 2026</a>
+                <a href="https://rt04rw26.vercel.app/#data-warga" class="block px-4 py-3 rounded-xl text-gray-300 hover:bg-purple-500/10 hover:text-purple-400 transition-colors">Data Warga</a>
+                <a href="https://rt04rw26.vercel.app/#kas-warga" class="block px-4 py-3 rounded-xl text-gray-300 hover:bg-purple-500/10 hover:text-purple-400 transition-colors">Kas Warga</a>
+                <a href="https://rt04rw26.vercel.app/#tunggakan-warga" class="block px-4 py-3 rounded-xl text-gray-300 hover:bg-red-500/10 hover:text-red-400 transition-colors">Tunggakan</a>
+                <a href="https://rt04rw26.vercel.app/#iuran-bulan-ini" class="block px-4 py-3 rounded-xl text-gray-300 hover:bg-blue-500/10 hover:text-blue-400 transition-colors">Iuran Bulanan</a>
+                <a href="https://rt04rw26.vercel.app/#angsuran-warga" class="block px-4 py-3 rounded-xl text-gray-300 hover:bg-amber-500/10 hover:text-amber-400 transition-colors">Angsuran</a>
+                <a href="https://rt04rw26.vercel.app/notulen.html" class="block px-4 py-3 rounded-xl text-purple-400 bg-purple-500/10">Notulen</a>
+                <a href="https://script.google.com/macros/s/AKfycbxKwWu0g7nOvFlMpNTc8VMoipGsI_77_fBu198JcqHhlauoNCFCbBsmVo9fRzIwlETp/exec" class="block px-4 py-3 rounded-xl text-gray-300 hover:bg-purple-500/10 hover:text-purple-400 transition-colors">Kegiatan</a>
+                <a href="https://rt04rw26.vercel.app" class="home-btn flex items-center justify-center gap-2 mt-3 px-4 py-3 rounded-xl text-white font-semibold transition-all">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                    Kembali ke Beranda
+                </a>
             </div>
         </div>
     </header>
 
-    <section class="relative pt-16 pb-12 overflow-hidden">
+    <section class="relative pt-16 pb-10 overflow-hidden">
         <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-purple-600/20 rounded-full blur-[120px] pointer-events-none"></div>
         <div class="absolute top-0 right-0 w-[300px] h-[300px] bg-blue-600/10 rounded-full blur-[100px] pointer-events-none"></div>
 
         <div class="max-w-4xl mx-auto px-4 md:px-8 text-center relative z-10">
             <div class="inline-flex items-center px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-400 text-sm font-medium mb-6">
                 <span class="w-2 h-2 rounded-full bg-purple-500 mr-2 animate-pulse"></span>
-                <a href="https://rt04rw26.vercel.app/createnotulen.html">Arsip Digital 2026</a>
+                <a href="https://rt04rw26.vercel.app/createnotulen.html" class="hover:underline">Arsip Digital 2026</a>
             </div>
-            <h1 class="text-4xl md:text-5xl font-bold tracking-tight text-white mb-6 leading-tight glow-text">
+            <h1 class="text-4xl md:text-5xl font-bold tracking-tight text-white mb-4 leading-tight glow-text">
                 Notulen <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-500">Bulanan Warga</span>
             </h1>
+            <p class="text-gray-500 max-w-lg mx-auto mb-8">Rekap keputusan dan kegiatan rapat warga, tersusun rapi per bulan. Ketik kata kunci untuk mencari cepat.</p>
+
+            <a href="https://rt04rw26.vercel.app" class="home-btn inline-flex items-center gap-2 px-6 py-3 rounded-full text-white font-semibold text-sm transition-all">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                Kunjungi Beranda SI-WARGA
+            </a>
         </div>
     </section>
 
     <main class="max-w-4xl mx-auto px-4 md:px-8 pb-24 relative z-10">
-        
+
         <div class="mb-8 relative group hidden" id="search-container">
             <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none text-gray-500 group-focus-within:text-purple-500 transition-colors">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                 </svg>
             </div>
-            <input type="text" id="search-input" class="w-full bg-[#141824] border border-gray-800/60 text-white rounded-2xl pl-12 pr-4 py-4 focus:outline-none focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/50 transition-all placeholder-gray-600 shadow-lg" placeholder="Cari keputusan, kegiatan, atau kata kunci lainnya...">
-            
-            <button id="clear-search" class="absolute inset-y-0 right-0 pr-5 flex items-center text-gray-500 hover:text-white hidden transition-colors">
+            <input type="text" id="search-input" class="w-full bg-[#141824] border border-gray-800/60 text-white rounded-2xl pl-12 pr-12 py-4 focus:outline-none focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/50 transition-all placeholder-gray-600 shadow-lg" placeholder="Cari keputusan, kegiatan, atau kata kunci lainnya...">
+
+            <button id="clear-search" class="absolute inset-y-0 right-0 pr-5 flex items-center text-gray-500 hover:text-white hidden transition-colors" aria-label="Hapus pencarian">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                 </svg>
             </button>
         </div>
+
+        <div id="result-count" class="hidden text-sm text-gray-500 mb-4 px-1"></div>
 
         <div id="display-area" class="space-y-4">
             <div class="flex flex-col items-center justify-center py-20 space-y-5">
@@ -142,32 +214,56 @@
             <h3 class="text-xl font-medium text-white mb-2">Pencarian Tidak Ditemukan</h3>
             <p class="text-gray-500">Tidak ada notulen yang cocok dengan kata kunci yang Anda cari.</p>
         </div>
-
     </main>
+
+    <a href="https://rt04rw26.vercel.app" class="home-btn md:hidden fixed bottom-5 right-5 z-40 w-14 h-14 rounded-full flex items-center justify-center text-white transition-all" aria-label="Kembali ke Beranda">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+    </a>
+
     <script>
         const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzBAhO47adgZmlYsDzYXNnwbPD201T_ibe604AKr8T23qZrM_8WYwBVDEol3vb25uzD1w/exec';
-        let globalData = []; 
+        let globalData = [];
 
-        // Fungsi baru untuk memformat tanggal menjadi "Bulan - Tahun"
+        // Menu mobile
+        const menuToggle = document.getElementById('menu-toggle');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const iconOpen = document.getElementById('menu-icon-open');
+        const iconClose = document.getElementById('menu-icon-close');
+        let menuOpen = false;
+
+        menuToggle.addEventListener('click', () => {
+            menuOpen = !menuOpen;
+            if (menuOpen) {
+                mobileMenu.style.maxHeight = mobileMenu.scrollHeight + 'px';
+                mobileMenu.style.opacity = '1';
+                iconOpen.classList.add('hidden');
+                iconClose.classList.remove('hidden');
+                menuToggle.setAttribute('aria-expanded', 'true');
+            } else {
+                mobileMenu.style.maxHeight = '0px';
+                mobileMenu.style.opacity = '0';
+                iconOpen.classList.remove('hidden');
+                iconClose.classList.add('hidden');
+                menuToggle.setAttribute('aria-expanded', 'false');
+            }
+        });
+
         function formatTanggal(tanggalStr) {
             if (!tanggalStr) return "Arsip Lainnya";
-            
-            // Konversi string ke objek Date
+
             const dateObj = new Date(tanggalStr);
-            
-            // Validasi apakah konversi berhasil (tanggal valid)
+
             if (!isNaN(dateObj.getTime())) {
                 const namaBulan = [
-                    "Januari", "Februari", "Maret", "April", "Mei", "Juni", 
+                    "Januari", "Februari", "Maret", "April", "Mei", "Juni",
                     "Juli", "Agustus", "September", "Oktober", "November", "Desember"
                 ];
                 const bulan = namaBulan[dateObj.getMonth()];
                 const tahun = dateObj.getFullYear();
-                
+
                 return `${bulan} - ${tahun}`;
             }
-            
-            // Jika data di kolom tanggal bukan format tanggal standar, tampilkan teks aslinya
+
             return tanggalStr.toString().trim();
         }
 
@@ -175,11 +271,10 @@
             const displayArea = document.getElementById('display-area');
 
             try {
-                // Fetch data dari Google Sheets berupa JSON
                 const response = await fetch(WEB_APP_URL);
                 if (!response.ok) throw new Error('Gagal terhubung ke server.');
                 const data = await response.json();
-                
+
                 processData(data, displayArea);
             } catch (err) {
                 displayArea.innerHTML = `
@@ -192,9 +287,14 @@
                         </div>
                         <h3 class="text-xl font-bold text-white mb-2 relative z-10">Koneksi Terputus</h3>
                         <p class="text-gray-400 mb-6 relative z-10">Sistem gagal mengambil data arsip dari server.</p>
-                        <button onclick="location.reload()" class="relative z-10 px-8 py-3 bg-white text-gray-900 font-semibold rounded-full hover:bg-gray-200 transition-colors">
-                            Muat Ulang
-                        </button>
+                        <div class="flex flex-wrap gap-3 justify-center relative z-10">
+                            <button onclick="location.reload()" class="px-8 py-3 bg-white text-gray-900 font-semibold rounded-full hover:bg-gray-200 transition-colors">
+                                Muat Ulang
+                            </button>
+                            <a href="https://rt04rw26.vercel.app" class="home-btn px-8 py-3 text-white font-semibold rounded-full transition-all">
+                                Kembali ke Beranda
+                            </a>
+                        </div>
                     </div>
                 `;
                 console.error(err);
@@ -202,11 +302,11 @@
         }
 
         function processData(data, container) {
-            // Jika data kosong
             if (!data || data.length === 0) {
                 container.innerHTML = `
                     <div class="text-center py-16 bg-[#141824] rounded-2xl border border-gray-800">
-                        <p class="text-gray-500 text-lg">Direktori kosong. Belum ada arsip yang tercatat.</p>
+                        <p class="text-gray-500 text-lg mb-5">Direktori kosong. Belum ada arsip yang tercatat.</p>
+                        <a href="https://rt04rw26.vercel.app" class="home-btn inline-flex items-center gap-2 px-6 py-3 rounded-full text-white font-semibold text-sm transition-all">Kembali ke Beranda</a>
                     </div>`;
                 return;
             }
@@ -214,9 +314,7 @@
             const groupMap = {};
             globalData = [];
 
-            // Grouping data berdasarkan kolom "tanggal" yang sudah diformat
             data.forEach(row => {
-                // Terapkan fungsi formatTanggal di sini
                 const tgl = formatTanggal(row.tanggal);
                 const content = row.content ? row.content.toString().trim() : "";
 
@@ -230,38 +328,40 @@
                 }
             });
 
-            // Tampilkan Search Bar
             document.getElementById('search-container').classList.remove('hidden');
-            
-            // Render Data Awal
+
             renderHTML(globalData, container);
             setupSearch(container);
         }
 
         function renderHTML(dataToRender, container, searchTerm = "") {
-            // Cek jika seluruh grup tidak memiliki content setelah difilter
             const hasData = dataToRender.some(group => group.contents.length > 0);
-            
+            const resultCount = document.getElementById('result-count');
+
             if (!hasData || dataToRender.length === 0) {
                 container.innerHTML = "";
                 document.getElementById('no-results').classList.remove('hidden');
+                resultCount.classList.add('hidden');
                 return;
             }
-            
+
             document.getElementById('no-results').classList.add('hidden');
 
-            container.innerHTML = dataToRender.map((group) => {
+            let totalMatches = 0;
+
+            container.innerHTML = dataToRender.map((group, groupIdx) => {
                 const isTitleMatch = searchTerm && group.title.toLowerCase().includes(searchTerm.toLowerCase());
-                
+
                 const contentHtml = group.contents.map(item => {
                     const textContent = item;
                     let displayText = textContent;
-                    
+
                     const isItemMatch = searchTerm && textContent.toLowerCase().includes(searchTerm.toLowerCase());
-                    
+
                     if (isItemMatch) {
-                        const regex = new RegExp(`(${searchTerm})`, 'gi');
+                        const regex = new RegExp(`(${searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
                         displayText = textContent.replace(regex, '<mark>$1</mark>');
+                        totalMatches++;
                     }
 
                     const showItem = searchTerm === "" || isItemMatch || isTitleMatch;
@@ -278,13 +378,13 @@
                     `;
                 }).join('');
 
-                // Jika content di grup ini kosong (karena search), jangan render grupnya
                 if (contentHtml === '') return '';
 
                 const isOpen = searchTerm !== "" ? "open" : "";
+                const delay = Math.min(groupIdx * 60, 300);
 
                 return `
-                    <details ${isOpen} class="group bg-[#141824] rounded-2xl border border-gray-800/60 mb-5 hover:border-purple-500/30 transition-colors duration-300 overflow-hidden">
+                    <details ${isOpen} style="animation-delay:${delay}ms" class="fade-in-item group bg-[#141824] rounded-2xl border border-gray-800/60 mb-5 hover:border-purple-500/30 transition-colors duration-300 overflow-hidden">
                         <summary class="flex justify-between items-center p-6 cursor-pointer select-none bg-[#141824] group-hover:bg-[#1A1E2B] transition-colors">
                             <div class="flex items-center space-x-5">
                                 <div class="w-12 h-12 rounded-xl bg-gray-800/50 text-gray-400 border border-gray-700/50 flex items-center justify-center group-open:bg-purple-500/10 group-open:text-purple-400 group-open:border-purple-500/30 transition-all duration-300">
@@ -292,7 +392,10 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                                     </svg>
                                 </div>
-                                <span class="text-white font-semibold text-lg md:text-xl capitalize tracking-wide group-open:text-transparent group-open:bg-clip-text group-open:bg-gradient-to-r group-open:from-indigo-400 group-open:to-purple-400 transition-all">${group.title}</span>
+                                <div>
+                                    <span class="text-white font-semibold text-lg md:text-xl capitalize tracking-wide group-open:text-transparent group-open:bg-clip-text group-open:bg-gradient-to-r group-open:from-indigo-400 group-open:to-purple-400 transition-all block">${group.title}</span>
+                                    <span class="text-xs text-gray-500">${group.contents.length} catatan</span>
+                                </div>
                             </div>
                             <div class="w-10 h-10 flex items-center justify-center rounded-full bg-gray-800/50 text-gray-400 group-open:bg-purple-500 group-open:text-white group-open:rotate-180 transition-all duration-500 shadow-sm">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -300,7 +403,7 @@
                                 </svg>
                             </div>
                         </summary>
-                        
+
                         <div class="px-6 md:px-20 pb-8 pt-2">
                             <ul class="space-y-1">
                                 ${contentHtml}
@@ -309,6 +412,13 @@
                     </details>
                 `;
             }).join('');
+
+            if (searchTerm !== "") {
+                resultCount.textContent = `Ditemukan ${totalMatches} hasil untuk "${searchTerm}"`;
+                resultCount.classList.remove('hidden');
+            } else {
+                resultCount.classList.add('hidden');
+            }
         }
 
         function setupSearch(container) {
@@ -317,8 +427,8 @@
 
             searchInput.addEventListener('input', (e) => {
                 const term = e.target.value.trim();
-                
-                if(term.length > 0) {
+
+                if (term.length > 0) {
                     clearBtn.classList.remove('hidden');
                 } else {
                     clearBtn.classList.add('hidden');
@@ -327,8 +437,8 @@
                 const filteredData = globalData.map(group => {
                     return {
                         title: group.title,
-                        contents: group.contents.filter(item => 
-                            group.title.toLowerCase().includes(term.toLowerCase()) || 
+                        contents: group.contents.filter(item =>
+                            group.title.toLowerCase().includes(term.toLowerCase()) ||
                             item.toLowerCase().includes(term.toLowerCase())
                         )
                     };
