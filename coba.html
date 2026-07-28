@@ -1,337 +1,223 @@
 <!DOCTYPE html>
-<html lang="id" class="dark">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SI-WARGA 2026 | Arsip Bulanan</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Tambahkan FontAwesome untuk ikon tombol floating -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>Aset Canva - IT Outing 2026</title>
+    <link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@700;900&family=Azeret+Mono:wght@500&display=swap" rel="stylesheet">
     <style>
-        body { 
-            font-family: 'Outfit', sans-serif; 
-            background-color: #0B0E14; 
-            color: #9CA3AF;
+        body {
+            background-color: #0f172a;
+            color: #f8fafc;
+            font-family: 'Urbanist', sans-serif;
+            margin: 0;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
-        
-        details > summary { list-style: none; }
-        details > summary::-webkit-details-marker { display: none; }
-        
-        details[open] summary ~ * {
-            animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
         }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-5px); }
-            to { opacity: 1; transform: translateY(0); }
+        .header h1 {
+            color: #14b8a6;
+            font-size: 36px;
+            margin-bottom: 10px;
         }
-
-        .glow-text {
-            text-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
+        .header p {
+            color: #94a3b8;
+            font-family: 'Azeret Mono', monospace;
+            font-size: 14px;
         }
-        
-        /* Highlight text mark saat pencarian */
-        mark {
-            background-color: rgba(139, 92, 246, 0.3);
-            color: #fff;
-            border-radius: 2px;
-            padding: 0 2px;
+        .container {
+            display: flex;
+            gap: 40px;
+            flex-wrap: wrap;
+            justify-content: center;
+            max-width: 1200px;
+        }
+        .asset-card {
+            background-color: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            width: 450px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        }
+        .svg-container {
+            background-color: #020617;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 350px;
+        }
+        .btn {
+            background-color: #14b8a6;
+            color: #020617;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: 700;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Urbanist', sans-serif;
+            width: 100%;
+        }
+        .btn:hover {
+            background-color: #0d9488;
+            transform: translateY(-2px);
+        }
+        .instructions {
+            margin-top: 50px;
+            background-color: #1e293b;
+            padding: 30px;
+            border-radius: 12px;
+            max-width: 800px;
+        }
+        .instructions h2 {
+            color: #fb923c;
+            margin-top: 0;
+        }
+        .instructions ol {
+            color: #cbd5e1;
+            line-height: 1.8;
+            font-size: 16px;
+        }
+        .instructions li strong {
+            color: #14b8a6;
         }
     </style>
 </head>
-<body class="antialiased selection:bg-purple-500 selection:text-white">
+<body>
 
-    <header class="sticky top-0 z-50 bg-[#0B0E14]/80 backdrop-blur-lg border-b border-gray-800/60">
-        <div class="max-w-4xl mx-auto px-4 md:px-8">
-            <div class="flex justify-between items-center h-20">
-                <div class="flex items-center space-x-3 cursor-pointer group">
-                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-xl shadow-[0_0_15px_rgba(139,92,246,0.5)] group-hover:shadow-[0_0_25px_rgba(139,92,246,0.7)] transition-all">
-                        W
-                    </div>
-                    <span class="font-bold text-2xl text-white tracking-tight">SI-WARGA<span class="text-purple-500">.</span></span>
-                </div>
-                
-                <div class="hidden md:flex items-center gap-1 font-medium text-sm">
-                    <a href="https://rt04rw26.vercel.app/#beranda" class="px-3 py-2 text-white hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-all">Beranda</a>
-                    <a href="https://rt04rw26.vercel.app/#rencana-bo-2026" class="px-3 py-2 text-white hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-all">BO 2026</a>
-                    <a href="https://rt04rw26.vercel.app/#data-warga" class="px-3 py-2 text-white hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-all">Data</a>
+    <div class="header">
+        <h1>#movingtogether Design Assets</h1>
+        <p>IT DIVISION OUTING 2026 | CANVA SVG EXPORT</p>
+    </div>
+
+    <div class="container">
+        <!-- Asset 1: Main Graphic -->
+        <div class="asset-card">
+            <h3>Grafis Utama (Belakang Baju)</h3>
+            <div class="svg-container" id="svg-main-container">
+                <!-- SVG Code for Main Graphic -->
+                <svg id="svg-main" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="100%" height="300">
+                    <!-- Background Sun -->
+                    <circle cx="200" cy="200" r="120" fill="#fb923c"/>
                     
-                    <div class="relative group">
-                        <button class="flex items-center gap-1 px-3 py-2 text-white hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-all">
-                            Keuangan <i class="fas fa-chevron-down text-[10px] transition-transform group-hover:rotate-180"></i>
-                        </button>
-                        
-                        <div class="absolute left-0 top-full mt-2 w-56 bg-white border border-gray-100 rounded-2xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 z-50 overflow-hidden">
-                            <div class="p-2 space-y-1">
-                                <a href="https://rt04rw26.vercel.app/#kas-warga" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-purple-50 text-gray-700 hover:text-purple-700 transition-colors">
-                                    <i class="fas fa-wallet text-sm w-5 text-center"></i> 
-                                    <span class="font-semibold text-sm">Kas Warga</span>
-                                </a>
-                                <a href="https://rt04rw26.vercel.app/#tunggakan-warga" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-red-50 text-gray-700 hover:text-red-700 transition-colors">
-                                    <i class="fas fa-exclamation-circle text-sm w-5 text-center"></i> 
-                                    <span class="font-semibold text-sm">Tunggakan</span>
-                                </a>
-                                <a href="https://rt04rw26.vercel.app/#iuran-bulan-ini" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-blue-50 text-gray-700 hover:text-blue-700 transition-colors">
-                                    <i class="fas fa-receipt text-sm w-5 text-center"></i> 
-                                    <span class="font-semibold text-sm">Iuran Bulanan</span>
-                                </a>
-                                <a href="https://rt04rw26.vercel.app/#angsuran-warga" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-amber-50 text-gray-700 hover:text-amber-700 transition-colors">
-                                    <i class="fas fa-file-invoice-dollar text-sm w-5 text-center"></i> 
-                                    <span class="font-semibold text-sm">Angsuran</span>
-                                </a>
-                            </div>
-                            <div class="bg-gray-50/80 px-4 py-2 border-t border-gray-100 text-center">
-                                <p class="text-[10px] text-gray-400 uppercase tracking-widest font-bold">Laporan Finansial</p>
-                            </div>
-                        </div>
-                    </div>
+                    <!-- Retro Sun Cuts (Horizontal Lines) -->
+                    <rect x="70" y="240" width="260" height="8" fill="#020617"/>
+                    <rect x="70" y="260" width="260" height="12" fill="#020617"/>
+                    <rect x="70" y="285" width="260" height="18" fill="#020617"/>
+                    <rect x="70" y="315" width="260" height="25" fill="#020617"/>
                     
-                    <a href="https://rt04rw26.vercel.app/notulen.html" class="px-3 py-2 text-white hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-all">Notulen</a>
-                </div>
-            </div>
-        </div>
-    </header>
+                    <!-- Tech Elements (Circuit lines) -->
+                    <path d="M 50 150 L 100 150 L 120 120 L 140 120" fill="none" stroke="#14b8a6" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+                    <circle cx="140" cy="120" r="5" fill="#14b8a6"/>
+                    <circle cx="50" cy="150" r="5" fill="#14b8a6"/>
 
-    <section class="relative pt-16 pb-12 overflow-hidden">
-        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-purple-600/20 rounded-full blur-[120px] pointer-events-none"></div>
-        <div class="absolute top-0 right-0 w-[300px] h-[300px] bg-blue-600/10 rounded-full blur-[100px] pointer-events-none"></div>
+                    <path d="M 350 180 L 320 180 L 300 150 L 280 150" fill="none" stroke="#fbbf24" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+                    <circle cx="280" cy="150" r="5" fill="#fbbf24"/>
+                    
+                    <!-- Trees -->
+                    <polygon points="120,250 100,160 140,160" fill="#0f766e"/>
+                    <polygon points="120,180 105,120 135,120" fill="#0f766e"/>
+                    
+                    <polygon points="150,260 135,180 165,180" fill="#115e59"/>
+                    
+                    <polygon points="280,250 260,150 300,150" fill="#0f766e"/>
+                    <polygon points="280,170 265,100 295,100" fill="#0f766e"/>
 
-        <div class="max-w-4xl mx-auto px-4 md:px-8 text-center relative z-10">
-            <div class="inline-flex items-center px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-400 text-sm font-medium mb-6">
-                <span class="w-2 h-2 rounded-full bg-purple-500 mr-2 animate-pulse"></span>
-                Arsip Digital 2026
-            </div>
-            <h1 class="text-4xl md:text-5xl font-bold tracking-tight text-white mb-6 leading-tight glow-text">
-                Notulen <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-500">Bulanan Warga</span>
-            </h1>
-        </div>
-    </section>
+                    <polygon points="250,260 230,190 270,190" fill="#115e59"/>
 
-    <main class="max-w-4xl mx-auto px-4 md:px-8 pb-24 relative z-10">
-        
-        <div class="mb-8 relative group hidden" id="search-container">
-            <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none text-gray-500 group-focus-within:text-purple-500 transition-colors">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    <!-- Drone/Tech Object in Sky -->
+                    <rect x="230" y="90" width="20" height="4" fill="#f8fafc" rx="2"/>
+                    <circle cx="232" cy="86" r="3" fill="#14b8a6"/>
+                    <circle cx="248" cy="86" r="3" fill="#14b8a6"/>
+                    <rect x="238" y="94" width="4" height="6" fill="#f8fafc"/>
+                    
+                    <!-- Tent -->
+                    <polygon points="200,170 140,260 260,260" fill="#fbbf24"/>
+                    <polygon points="200,170 140,260 150,260" fill="#d97706"/> <!-- Shadow -->
+                    <polygon points="200,170 190,260 210,260" fill="#020617"/> <!-- Door opening -->
+
+                    <!-- Text Layout (Canva users can replace or use this as guide) -->
+                    <path id="curve" d="M 80 130 A 120 120 0 0 1 320 130" fill="transparent" />
+                    <text font-family="'Urbanist', sans-serif" font-weight="900" font-size="32" fill="#fbbd23" letter-spacing="3">
+                        <textPath href="#curve" startOffset="50%" text-anchor="middle">DON'T PANIC</textPath>
+                    </text>
+
+                    <text x="200" y="315" font-family="'Urbanist', sans-serif" font-weight="900" font-size="34" fill="#14b8a6" text-anchor="middle" letter-spacing="1">MOVING TOGETHER</text>
+                    <text x="200" y="340" font-family="'Azeret Mono', monospace" font-weight="500" font-size="14" fill="#f8fafc" text-anchor="middle" letter-spacing="2">IT DIVISION OUTING 2026</text>
                 </svg>
             </div>
-            <input type="text" id="search-input" class="w-full bg-[#141824] border border-gray-800/60 text-white rounded-2xl pl-12 pr-4 py-4 focus:outline-none focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/50 transition-all placeholder-gray-600 shadow-lg" placeholder="Cari keputusan, kegiatan, atau kata kunci lainnya...">
-            
-            <button id="clear-search" class="absolute inset-y-0 right-0 pr-5 flex items-center text-gray-500 hover:text-white hidden transition-colors">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                </svg>
-            </button>
+            <button class="btn" onclick="downloadSVG('svg-main', 'IT_Outing_Main_Graphic.svg')">Unduh Format SVG</button>
         </div>
 
-        <div id="display-area" class="space-y-4">
-            <div class="flex flex-col items-center justify-center py-20 space-y-5">
-                <div class="relative w-16 h-16">
-                    <div class="absolute inset-0 rounded-full border-[3px] border-gray-800"></div>
-                    <div class="absolute inset-0 rounded-full border-[3px] border-transparent border-t-purple-500 animate-spin"></div>
-                </div>
-                <p class="text-purple-400 font-medium animate-pulse tracking-wide">Sinkronisasi Basis Data...</p>
-            </div>
-        </div>
-
-        <div id="no-results" class="hidden text-center py-16 bg-[#141824] rounded-2xl border border-gray-800/60 mt-4">
-            <div class="w-16 h-16 mx-auto bg-gray-800/50 rounded-full flex items-center justify-center text-gray-500 mb-4">
-                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        <!-- Asset 2: Front Pocket Logo -->
+        <div class="asset-card">
+            <h3>Logo Dada Depan (Kiri)</h3>
+            <div class="svg-container" id="svg-logo-container">
+                <!-- SVG Code for Logo -->
+                <svg id="svg-logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="100%" height="200">
+                    <circle cx="100" cy="100" r="80" fill="none" stroke="#14b8a6" stroke-width="4" stroke-dasharray="10 5"/>
+                    <polygon points="100,50 60,130 140,130" fill="#fb923c"/>
+                    <polygon points="100,50 95,130 105,130" fill="#020617"/>
+                    
+                    <text x="100" y="165" font-family="'Urbanist', sans-serif" font-weight="900" font-size="20" fill="#f8fafc" text-anchor="middle">#movingtogether</text>
+                    <text x="100" y="185" font-family="'Azeret Mono', monospace" font-weight="500" font-size="10" fill="#14b8a6" text-anchor="middle">IT DIV 2026</text>
                 </svg>
             </div>
-            <h3 class="text-xl font-medium text-white mb-2">Pencarian Tidak Ditemukan</h3>
-            <p class="text-gray-500">Tidak ada notulen yang cocok dengan kata kunci yang Anda cari.</p>
+            <button class="btn" onclick="downloadSVG('svg-logo', 'IT_Outing_Pocket_Logo.svg')">Unduh Format SVG</button>
         </div>
+    </div>
 
-    </main>
-
-    <!-- FLOATING ACTION BUTTONS SECTION -->
-    <div class="fixed bottom-6 right-6 z-50 flex flex-col items-end space-y-3">
-        <!-- Button Informasi Warga 2026 -->
-        <a href="https://rt04rw26.vercel.app/" class="bg-purple-600 text-white px-5 py-3 rounded-full shadow-[0_0_15px_rgba(147,51,234,0.4)] font-medium hover:-translate-y-1 hover:shadow-[0_0_25px_rgba(147,51,234,0.7)] transition-all duration-300 flex items-center gap-2 group border border-purple-400/30">
-            <i class="fas fa-info-circle group-hover:scale-110 transition-transform"></i> 
-            Informasi Warga 2026
-        </a>
-        
-        <!-- Button Galeri Kegiatan Foto (Warna Hijau & Diletakkan di Belakang/Bawah) -->
-        <a href="https://script.google.com/macros/s/AKfycbxKwWu0g7nOvFlMpNTc8VMoipGsI_77_fBu198JcqHhlauoNCFCbBsmVo9fRzIwlETp/exec" class="bg-green-600 text-white px-5 py-3 rounded-full shadow-[0_0_15px_rgba(22,163,74,0.4)] font-medium hover:-translate-y-1 hover:shadow-[0_0_25px_rgba(22,163,74,0.7)] transition-all duration-300 flex items-center gap-2 group border border-green-400/30">
-            <i class="fas fa-camera group-hover:scale-110 transition-transform"></i> 
-            Galeri Kegiatan Foto
-        </a>
+    <div class="instructions">
+        <h2>Cara Menggunakan di Canva:</h2>
+        <ol>
+            <li>Klik tombol <strong>"Unduh Format SVG"</strong> pada masing-masing aset di atas. File akan tersimpan di komputer Anda.</li>
+            <li>Buka situs web atau aplikasi <strong>Canva</strong> dan buat desain baru (Pilih "T-Shirt" atau custom size 4500x5400 px).</li>
+            <li>Di menu sebelah kiri Canva, pilih <strong>Unggahan (Uploads)</strong>, lalu klik "Unggah File" dan pilih file SVG yang baru saja diunduh.</li>
+            <li>Tarik file SVG tersebut ke kanvas desain Anda.</li>
+            <li><strong>Fitur Spesial:</strong> Karena ini file SVG (vektor), Anda bisa mengklik gambar tersebut di Canva dan <strong>mengubah warna setiap elemennya</strong> melalui palet warna di bagian atas layar Canva!</li>
+            <li>Tambahkan teks kustom tambahan di Canva jika diperlukan menggunakan font <strong>Urbanist</strong> atau <strong>Azeret Mono</strong>.</li>
+        </ol>
     </div>
 
     <script>
-        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbw0GQw-9388iJS_-X10BinXFyfVoT9F2ZTNcjAt1XORUKX3CRktRVpJE5DBZUuqZaHJ/exec';
-        let globalData = []; 
-
-        async function loadData() {
-            const displayArea = document.getElementById('display-area');
-
-            try {
-                const response = await fetch(WEB_APP_URL);
-                if (!response.ok) throw new Error('Gagal terhubung ke server.');
-                const text = await response.text();
-                
-                processData(text, displayArea);
-            } catch (err) {
-                displayArea.innerHTML = `
-                    <div class="bg-[#141824] border border-red-500/20 rounded-2xl p-10 text-center flex flex-col items-center justify-center max-w-lg mx-auto shadow-2xl relative overflow-hidden">
-                        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-32 bg-red-500/20 blur-[50px]"></div>
-                        <div class="bg-red-500/10 text-red-400 p-4 rounded-full mb-5 border border-red-500/20 relative z-10">
-                            <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
-                            </svg>
-                        </div>
-                        <h3 class="text-xl font-bold text-white mb-2 relative z-10">Koneksi Terputus</h3>
-                        <p class="text-gray-400 mb-6 relative z-10">Sistem gagal mengambil data arsip dari server.</p>
-                        <button onclick="location.reload()" class="relative z-10 px-8 py-3 bg-white text-gray-900 font-semibold rounded-full hover:bg-gray-200 transition-colors">
-                            Muat Ulang
-                        </button>
-                    </div>
-                `;
-            }
-        }
-
-        function processData(text, container) {
-            const lines = text.split('\n').filter(line => line.trim() !== '');
+        function downloadSVG(svgId, fileName) {
+            const svg = document.getElementById(svgId);
+            const serializer = new XMLSerializer();
+            let source = serializer.serializeToString(svg);
             
-            if (lines.length === 0) {
-                container.innerHTML = `
-                    <div class="text-center py-16 bg-[#141824] rounded-2xl border border-gray-800">
-                        <p class="text-gray-500 text-lg">Direktori kosong. Belum ada arsip yang tercatat.</p>
-                    </div>`;
-                return;
+            // Add name spaces.
+            if(!source.match(/^<svg[^>]+xmlns="http\:\/\/www\.w3\.org\/2000\/svg"/)){
+                source = source.replace(/^<svg/, '<svg xmlns="http://www.w3.org/2000/svg"');
+            }
+            if(!source.match(/^<svg[^>]+"http\:\/\/www\.w3\.org\/1999\/xlink"/)){
+                source = source.replace(/^<svg/, '<svg xmlns:xlink="http://www.w3.org/1999/xlink"');
             }
 
-            let currentGroup = null;
+            // Add xml declaration
+            source = '<?xml version="1.0" standalone="no"?>\r\n' + source;
 
-            lines.forEach(line => {
-                const trimmedLine = line.trim();
-                const isMonthTitle = /^\d+\./.test(trimmedLine) || 
-                                     /^(Januari|Februari|Maret|April|Mei|Juni|Juli|Agustus|September|Oktober|November|Desember)\s*\d{0,4}$/i.test(trimmedLine);
+            // Convert svg source to URI data scheme.
+            const url = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(source);
 
-                if (isMonthTitle) {
-                    if (currentGroup) globalData.push(currentGroup);
-                    currentGroup = { title: trimmedLine, contents: [] };
-                } else {
-                    if (currentGroup) {
-                        currentGroup.contents.push(trimmedLine);
-                    } else {
-                        currentGroup = { title: "Arsip Terdahulu", contents: [trimmedLine] };
-                    }
-                }
-            });
-            
-            if (currentGroup) globalData.push(currentGroup);
-
-            document.getElementById('search-container').classList.remove('hidden');
-            
-            renderHTML(globalData, container);
-            setupSearch(container);
+            // Create download link and trigger click
+            const downloadLink = document.createElement("a");
+            downloadLink.href = url;
+            downloadLink.download = fileName;
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.body.removeChild(downloadLink);
         }
-
-        function renderHTML(dataToRender, container, searchTerm = "") {
-            if (dataToRender.length === 0) {
-                container.innerHTML = "";
-                document.getElementById('no-results').classList.remove('hidden');
-                return;
-            }
-            
-            document.getElementById('no-results').classList.add('hidden');
-
-            container.innerHTML = dataToRender.map((group) => {
-                const isTitleMatch = searchTerm && group.title.toLowerCase().includes(searchTerm.toLowerCase());
-                
-                const contentHtml = group.contents.map(item => {
-                    const textContent = item;
-                    let displayText = textContent;
-                    
-                    const isItemMatch = searchTerm && textContent.toLowerCase().includes(searchTerm.toLowerCase());
-                    
-                    if (isItemMatch) {
-                        const regex = new RegExp(`(${searchTerm})`, 'gi');
-                        displayText = textContent.replace(regex, '<mark>$1</mark>');
-                    }
-
-                    const showItem = searchTerm === "" || isItemMatch || isTitleMatch;
-
-                    if (!showItem) return '';
-
-                    return `
-                        <li class="relative pl-8 py-3 text-gray-300 leading-relaxed group/item border-b border-gray-800/50 last:border-0 hover:text-white transition-colors">
-                            <span class="absolute left-0 top-[16px] text-purple-500 group-hover/item:translate-x-1 transition-transform">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                            </span>
-                            ${displayText}
-                        </li>
-                    `;
-                }).join('');
-
-                const isOpen = searchTerm !== "" ? "open" : "";
-
-                return `
-                    <details ${isOpen} class="group bg-[#141824] rounded-2xl border border-gray-800/60 mb-5 hover:border-purple-500/30 transition-colors duration-300 overflow-hidden">
-                        <summary class="flex justify-between items-center p-6 cursor-pointer select-none bg-[#141824] group-hover:bg-[#1A1E2B] transition-colors">
-                            <div class="flex items-center space-x-5">
-                                <div class="w-12 h-12 rounded-xl bg-gray-800/50 text-gray-400 border border-gray-700/50 flex items-center justify-center group-open:bg-purple-500/10 group-open:text-purple-400 group-open:border-purple-500/30 transition-all duration-300">
-                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                                    </svg>
-                                </div>
-                                <span class="text-white font-semibold text-lg md:text-xl capitalize tracking-wide group-open:text-transparent group-open:bg-clip-text group-open:bg-gradient-to-r group-open:from-indigo-400 group-open:to-purple-400 transition-all">${group.title}</span>
-                            </div>
-                            <div class="w-10 h-10 flex items-center justify-center rounded-full bg-gray-800/50 text-gray-400 group-open:bg-purple-500 group-open:text-white group-open:rotate-180 transition-all duration-500 shadow-sm">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                                </svg>
-                            </div>
-                        </summary>
-                        
-                        <div class="px-6 md:px-20 pb-8 pt-2">
-                            <ul class="space-y-1">
-                                ${contentHtml}
-                            </ul>
-                        </div>
-                    </details>
-                `;
-            }).join('');
-        }
-
-        function setupSearch(container) {
-            const searchInput = document.getElementById('search-input');
-            const clearBtn = document.getElementById('clear-search');
-
-            searchInput.addEventListener('input', (e) => {
-                const term = e.target.value.trim();
-                
-                if(term.length > 0) {
-                    clearBtn.classList.remove('hidden');
-                } else {
-                    clearBtn.classList.add('hidden');
-                }
-
-                const filteredData = globalData.filter(group => {
-                    const titleMatch = group.title.toLowerCase().includes(term.toLowerCase());
-                    const contentsMatch = group.contents.some(item => item.toLowerCase().includes(term.toLowerCase()));
-                    return titleMatch || contentsMatch;
-                });
-
-                renderHTML(filteredData, container, term);
-            });
-
-            clearBtn.addEventListener('click', () => {
-                searchInput.value = '';
-                clearBtn.classList.add('hidden');
-                renderHTML(globalData, container, "");
-                searchInput.focus();
-            });
-        }
-
-        loadData();
     </script>
 </body>
 </html>
