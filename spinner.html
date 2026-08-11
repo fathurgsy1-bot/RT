@@ -32,6 +32,45 @@
     position:relative;
   }
 
+  /* ===== Tombol musik ===== */
+  #musicToggle{
+    position:fixed;
+    top:16px; right:16px;
+    z-index:80;
+    width:48px;height:48px;
+    border-radius:50%;
+    border:2px solid var(--emas-terang);
+    background:rgba(27,21,18,.55);
+    backdrop-filter:blur(4px);
+    color:var(--emas-terang);
+    font-size:1.3rem;
+    cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+    transition:transform .15s, background .2s;
+  }
+  #musicToggle:hover{ transform:scale(1.08); background:rgba(27,21,18,.8); }
+  #musicToggle.playing{
+    box-shadow:0 0 0 0 rgba(244,201,72,.6);
+    animation:musicPulse 1.8s ease-out infinite;
+  }
+  @keyframes musicPulse{
+    0%{ box-shadow:0 0 0 0 rgba(244,201,72,.5); }
+    70%{ box-shadow:0 0 0 12px rgba(244,201,72,0); }
+    100%{ box-shadow:0 0 0 0 rgba(244,201,72,0); }
+  }
+  #musicHint{
+    position:fixed;
+    top:68px; right:16px;
+    z-index:80;
+    font-size:.7rem;
+    color:rgba(255,253,246,.7);
+    background:rgba(27,21,18,.55);
+    padding:4px 10px;
+    border-radius:20px;
+    max-width:150px;
+    text-align:center;
+  }
+
   /* ===== Bunting / umbul-umbul di atas ===== */
   .bunting{
     width:100%;
@@ -284,6 +323,9 @@
 </head>
 <body>
 
+  <button id="musicToggle" title="Nyalakan/matikan musik">🔇</button>
+  <div id="musicHint">Ketuk ikon untuk musik latar</div>
+
   <div class="bunting" id="bunting"></div>
   <div class="string"></div>
 
@@ -326,7 +368,159 @@ for(let i=0;i<14;i++){
   buntingEl.appendChild(f);
 }
 
-// ===== Ambil data dari Google Sheets (tab "data upload") =====
+/* =========================================================
+   AUDIO — semua musik & efek suara disintesis langsung di
+   browser dengan Web Audio API (bukan file lagu berhak
+   cipta), jadi aman diputar dan tidak butuh file eksternal.
+   ========================================================= */
+let audioCtx = null;
+let masterGain = null;
+let musicGain = null;
+let sfxGain = null;
+let musicOn = false;
+let musicLoopHandle = null;
+let musicNextTime = 0;
+
+const NOTE_FREQ = {
+  'C3':130.81,'D3':146.83,'E3':164.81,'F3':174.61,'G3':196.00,'A3':220.00,'B3':246.94,
+  'C4':261.63,'D4':293.66,'E4':329.63,'F4':349.23,'G4':392.00,'A4':440.00,'B4':493.88,
+  'C5':523.25,'D5':587.33,'E5':659.25,'F5':698.46,'G5':783.99,'A5':880.00,'B5':987.77,
+  'C6':1046.50
+};
+
+function ensureAudio(){
+  if(!audioCtx){
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    masterGain = audioCtx.createGain();
+    masterGain.gain.value = 1;
+    masterGain.connect(audioCtx.destination);
+
+    musicGain = audioCtx.createGain();
+    musicGain.gain.value = 0.16;
+    musicGain.connect(masterGain);
+
+    sfxGain = audioCtx.createGain();
+    sfxGain.gain.value = 0.35;
+    sfxGain.connect(masterGain);
+  }
+  if(audioCtx.state === 'suspended') audioCtx.resume();
+}
+
+function tone(freq, time, dur, type, vol, destGain){
+  const osc = audioCtx.createOscillator();
+  const g = audioCtx.createGain();
+  osc.type = type;
+  osc.frequency.value = freq;
+  g.gain.setValueAtTime(0, time);
+  g.gain.linearRampToValueAtTime(vol, time + 0.02);
+  g.gain.exponentialRampToValueAtTime(0.001, time + dur);
+  osc.connect(g);
+  g.connect(destGain);
+  osc.start(time);
+  osc.stop(time + dur + 0.05);
+}
+
+function kick(time){
+  const osc = audioCtx.createOscillator();
+  const g = audioCtx.createGain();
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(130, time);
+  osc.frequency.exponentialRampToValueAtTime(42, time + 0.16);
+  g.gain.setValueAtTime(0.9, time);
+  g.gain.exponentialRampToValueAtTime(0.001, time + 0.18);
+  osc.connect(g); g.connect(musicGain);
+  osc.start(time); osc.stop(time + 0.2);
+}
+
+// Melodi & bass orisinal bernuansa mars ceria (bukan lagu yang sudah ada)
+const TEMPO = 132;
+const BEAT = 60 / TEMPO;
+const MELODY = [
+  ['C5',0],['E5',1],['G5',2],['E5',3],
+  ['F5',4],['A5',5],['G5',6],['C5',7]
+];
+const BASS = [
+  ['C3',0],['C3',2],['F3',4],['G3',6]
+];
+const LOOP_BEATS = 8;
+const LOOP_LEN = LOOP_BEATS * BEAT;
+
+function scheduleMusicLoop(startTime){
+  MELODY.forEach(([note,beat])=>{
+    tone(NOTE_FREQ[note], startTime + beat*BEAT, BEAT*0.85, 'square', 0.22, musicGain);
+  });
+  BASS.forEach(([note,beat])=>{
+    tone(NOTE_FREQ[note], startTime + beat*BEAT, BEAT*1.8, 'triangle', 0.3, musicGain);
+    kick(startTime + beat*BEAT);
+  });
+}
+
+function musicScheduler(){
+  if(!musicOn) return;
+  // jadwalkan loop berikutnya sedikit di depan waktu nyata (lookahead sederhana)
+  while(musicNextTime < audioCtx.currentTime + LOOP_LEN){
+    scheduleMusicLoop(musicNextTime);
+    musicNextTime += LOOP_LEN;
+  }
+  musicLoopHandle = setTimeout(musicScheduler, LOOP_LEN * 500);
+}
+
+function startMusic(){
+  ensureAudio();
+  if(musicOn) return;
+  musicOn = true;
+  musicNextTime = audioCtx.currentTime + 0.1;
+  musicScheduler();
+}
+
+function stopMusic(){
+  musicOn = false;
+  clearTimeout(musicLoopHandle);
+}
+
+const musicBtn = document.getElementById('musicToggle');
+const musicHint = document.getElementById('musicHint');
+musicBtn.addEventListener('click', ()=>{
+  if(musicOn){
+    stopMusic();
+    musicBtn.textContent = '🔇';
+    musicBtn.classList.remove('playing');
+  } else {
+    startMusic();
+    musicBtn.textContent = '🔊';
+    musicBtn.classList.add('playing');
+  }
+  musicHint.style.display = 'none';
+});
+
+// Efek suara "tik" saat roda berputar
+function playTick(){
+  ensureAudio();
+  const osc = audioCtx.createOscillator();
+  const g = audioCtx.createGain();
+  osc.type = 'square';
+  osc.frequency.value = 1200;
+  g.gain.setValueAtTime(0.25, audioCtx.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
+  osc.connect(g); g.connect(sfxGain);
+  osc.start();
+  osc.stop(audioCtx.currentTime + 0.06);
+}
+
+// Fanfare kemenangan
+function playFanfare(){
+  ensureAudio();
+  const t0 = audioCtx.currentTime;
+  const seq = [['C5',0],['E5',0.12],['G5',0.24],['C6',0.36]];
+  seq.forEach(([note,delay])=>{
+    tone(NOTE_FREQ[note], t0+delay, 0.5, 'sawtooth', 0.3, sfxGain);
+  });
+  tone(NOTE_FREQ['G5'], t0+0.55, 0.6, 'square', 0.22, sfxGain);
+}
+
+/* =========================================================
+   AMBIL DATA DARI GOOGLE SHEETS (tab "data upload")
+   ========================================================= */
 const sheetId = '1sISk8huyAbvHsgf6nYXUkk6H4u0aevR1J2V__1GGhQY';
 const sheetName = encodeURIComponent('data upload');
 const csvUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv&sheet=${sheetName}`;
@@ -371,7 +565,9 @@ function updateCount(){
   document.getElementById('countInfo').textContent = participants.length + ' peserta di roda';
 }
 
-// ===== Wheel drawing =====
+/* =========================================================
+   RODA
+   ========================================================= */
 const canvas = document.getElementById('wheelCanvas');
 const ctx = canvas.getContext('2d');
 let startAngle = 0;
@@ -380,6 +576,7 @@ let spinTimeout = null;
 let spinAngleStart = 0;
 let spinTime = 0;
 let spinTimeTotal = 0;
+let tickInterval = null;
 
 function drawWheel(){
   if(participants.length === 0) return;
@@ -418,11 +615,24 @@ document.getElementById('spinBtn').addEventListener('click', spin);
 
 function spin(){
   if(participants.length === 0) return;
+  ensureAudio();
   document.getElementById('spinBtn').disabled = true;
 
   spinAngleStart = Math.random() * 10 + 22;
   spinTime = 0;
   spinTimeTotal = Math.random() * 3000 + 5200;
+
+  let tickDelay = 60;
+  clearInterval(tickInterval);
+  function scheduleTick(){
+    playTick();
+    tickDelay = Math.min(tickDelay * 1.06, 380);
+    if(spinTime < spinTimeTotal){
+      tickInterval = setTimeout(scheduleTick, tickDelay);
+    }
+  }
+  scheduleTick();
+
   rotateWheel();
 }
 
@@ -440,6 +650,7 @@ function rotateWheel(){
 
 function stopRotateWheel(){
   cancelAnimationFrame(spinTimeout);
+  clearTimeout(tickInterval);
   const degrees = startAngle * 180 / Math.PI + 90;
   const arcd = arc * 180 / Math.PI;
   const index = Math.floor((360 - degrees % 360) / arcd) % participants.length;
@@ -447,6 +658,7 @@ function stopRotateWheel(){
   document.getElementById('winnerName').textContent = participants[index];
   document.getElementById('overlay').classList.add('show');
   document.getElementById('spinBtn').disabled = false;
+  playFanfare();
   launchConfetti();
 }
 
