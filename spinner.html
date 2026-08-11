@@ -3,18 +3,20 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Spinner Doorprize HUT RI ke-81</title>
+<title>Doorprize HUT RI ke-81</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root{
-    --merah:#C81E2C;
-    --merah-tua:#7A0E17;
+    --merah:#E4142C;
+    --merah-neon:#FF3B54;
+    --merah-tua:#5C0A14;
     --putih:#FFFDF6;
     --emas:#D4A017;
-    --emas-terang:#F4C948;
-    --tinta:#1B1512;
+    --emas-neon:#FFD84D;
+    --tinta:#120D0B;
+    --panel:#1E1512;
   }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
@@ -23,13 +25,14 @@
     font-family:'Plus Jakarta Sans', sans-serif;
     color:var(--putih);
     background:
-      radial-gradient(ellipse at 50% -10%, #9c1622 0%, transparent 60%),
-      linear-gradient(180deg, var(--tinta) 0%, #2a1810 45%, var(--tinta) 100%);
+      radial-gradient(ellipse at 50% 0%, #3a0d12 0%, transparent 55%),
+      linear-gradient(180deg, var(--tinta) 0%, #24140f 50%, var(--tinta) 100%);
     display:flex;
     flex-direction:column;
     align-items:center;
     overflow-x:hidden;
     position:relative;
+    padding-bottom:40px;
   }
 
   /* ===== Tombol musik ===== */
@@ -39,24 +42,21 @@
     z-index:80;
     width:48px;height:48px;
     border-radius:50%;
-    border:2px solid var(--emas-terang);
-    background:rgba(27,21,18,.55);
+    border:2px solid var(--emas-neon);
+    background:rgba(18,13,11,.6);
     backdrop-filter:blur(4px);
-    color:var(--emas-terang);
+    color:var(--emas-neon);
     font-size:1.3rem;
     cursor:pointer;
     display:flex;align-items:center;justify-content:center;
     transition:transform .15s, background .2s;
   }
-  #musicToggle:hover{ transform:scale(1.08); background:rgba(27,21,18,.8); }
-  #musicToggle.playing{
-    box-shadow:0 0 0 0 rgba(244,201,72,.6);
-    animation:musicPulse 1.8s ease-out infinite;
-  }
+  #musicToggle:hover{ transform:scale(1.08); }
+  #musicToggle.playing{ animation:musicPulse 1.8s ease-out infinite; }
   @keyframes musicPulse{
-    0%{ box-shadow:0 0 0 0 rgba(244,201,72,.5); }
-    70%{ box-shadow:0 0 0 12px rgba(244,201,72,0); }
-    100%{ box-shadow:0 0 0 0 rgba(244,201,72,0); }
+    0%{ box-shadow:0 0 0 0 rgba(255,216,77,.5); }
+    70%{ box-shadow:0 0 0 12px rgba(255,216,77,0); }
+    100%{ box-shadow:0 0 0 0 rgba(255,216,77,0); }
   }
   #musicHint{
     position:fixed;
@@ -64,207 +64,220 @@
     z-index:80;
     font-size:.7rem;
     color:rgba(255,253,246,.7);
-    background:rgba(27,21,18,.55);
+    background:rgba(18,13,11,.6);
     padding:4px 10px;
     border-radius:20px;
     max-width:150px;
     text-align:center;
   }
 
-  /* ===== Bunting / umbul-umbul di atas ===== */
-  .bunting{
-    width:100%;
-    max-width:900px;
+  /* ===== Marquee sign ===== */
+  .marquee{
+    position:relative;
+    margin:26px auto 8px;
+    padding:14px 26px;
+    border-radius:16px;
+    background:linear-gradient(180deg,#2a1a12,#180f0a);
+    border:3px solid var(--emas);
+    box-shadow:0 0 0 2px var(--merah-tua), 0 10px 30px rgba(0,0,0,.6);
+    text-align:center;
+    max-width:92vw;
+  }
+  .bulb-row{
     display:flex;
     justify-content:space-between;
-    padding:0 6vw;
-    margin-top:0;
-    position:relative;
-    z-index:3;
+    padding:0 4px;
   }
-  .bunting .flag{
-    width:26px;
-    height:38px;
-    clip-path:polygon(0 0,100% 0,50% 100%);
-    margin-top:-2px;
-    animation:sway 3.2s ease-in-out infinite;
-    transform-origin:top center;
+  .bulb-row.top{ margin-bottom:8px; }
+  .bulb-row.bottom{ margin-top:8px; }
+  .bulb{
+    width:8px;height:8px;
+    border-radius:50%;
+    background:var(--emas-neon);
+    box-shadow:0 0 6px 2px rgba(255,216,77,.8);
+    animation:chase 1.2s infinite;
   }
-  .bunting .flag:nth-child(odd){background:var(--merah);}
-  .bunting .flag:nth-child(even){background:var(--putih);animation-delay:.4s;}
-  .bunting .flag:nth-child(3n){animation-delay:.8s;}
-  @keyframes sway{
-    0%,100%{transform:rotate(-4deg);}
-    50%{transform:rotate(4deg);}
-  }
-  .string{
-    width:100%;
-    max-width:900px;
-    height:2px;
-    background:rgba(244,201,72,.5);
-  }
-
-  /* ===== Header ===== */
-  header{
-    text-align:center;
-    margin:26px 20px 4px;
-    position:relative;
-    z-index:3;
+  @keyframes chase{
+    0%,100%{ opacity:.25; }
+    50%{ opacity:1; }
   }
   .eyebrow{
-    font-size:.72rem;
+    font-size:.68rem;
     letter-spacing:4px;
     text-transform:uppercase;
-    color:var(--emas-terang);
+    color:var(--emas-neon);
     font-weight:700;
   }
   h1{
     font-family:'Anton', sans-serif;
     font-weight:400;
-    font-size:clamp(2.4rem, 8vw, 4.2rem);
-    letter-spacing:1px;
+    font-size:clamp(2.1rem, 7.5vw, 3.6rem);
+    letter-spacing:2px;
     margin:2px 0 0;
     line-height:.95;
-    color:var(--putih);
-    text-shadow: 0 3px 0 var(--merah-tua), 0 6px 18px rgba(0,0,0,.5);
+    color:#fff;
   }
-  h1 .num{
-    color:var(--emas-terang);
-    -webkit-text-stroke:1.5px var(--merah-tua);
+  h1 .num{ color:var(--emas-neon); }
+  .neon-text{
+    text-shadow:
+      0 0 4px rgba(255,255,255,.8),
+      0 0 12px var(--merah-neon),
+      0 0 26px var(--merah-neon),
+      0 0 46px var(--merah);
+    animation:flicker 3.4s infinite;
+  }
+  @keyframes flicker{
+    0%,19%,21%,23%,80%,100%{ opacity:1; }
+    20%,22%,24%{ opacity:.75; }
   }
   .tagline{
-    margin-top:8px;
-    font-size:1rem;
+    margin-top:6px;
+    font-size:.92rem;
     font-weight:600;
     color:rgba(255,253,246,.75);
     letter-spacing:.5px;
   }
 
-  /* ===== Sunburst signature behind wheel ===== */
-  .stage{
-    position:relative;
-    width:min(92vw, 460px);
-    aspect-ratio:1/1;
-    margin:34px auto 6px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-  }
-  .sunburst{
-    position:absolute;
-    inset:-14%;
-    border-radius:50%;
-    background:repeating-conic-gradient(
-      var(--emas) 0deg 4deg,
-      transparent 4deg 12deg
-    );
-    opacity:.35;
-    animation:spin-slow 90s linear infinite;
-    filter:drop-shadow(0 0 30px rgba(212,160,23,.25));
-  }
-  @keyframes spin-slow{ to{ transform:rotate(360deg); } }
-
-  .pointer{
-    position:absolute;
-    top:-6px;
-    left:50%;
-    transform:translateX(-50%);
-    width:0;height:0;
-    border-left:17px solid transparent;
-    border-right:17px solid transparent;
-    border-top:30px solid var(--emas-terang);
-    z-index:6;
-    filter:drop-shadow(0 3px 4px rgba(0,0,0,.5));
-  }
-  .pointer::after{
-    content:'';
-    position:absolute;
-    top:-30px; left:-6px;
-    width:12px;height:12px;
-    border-radius:50%;
-    background:var(--emas-terang);
-    box-shadow:0 0 0 3px var(--merah-tua);
-  }
-
-  #wheelCanvas{
-    position:relative;
-    width:100%;
-    height:100%;
-    border-radius:50%;
-    display:block;
-    background:var(--putih);
-    border:7px solid var(--emas-terang);
-    box-shadow:
-      0 0 0 5px var(--merah-tua),
-      0 0 0 9px var(--emas),
-      0 20px 45px rgba(0,0,0,.55);
-    transition: transform 5.4s cubic-bezier(0.15, 0.65, 0.1, 1);
-    z-index:2;
-  }
-  .hub{
-    position:absolute;
-    width:19%;
-    aspect-ratio:1/1;
-    border-radius:50%;
-    background:radial-gradient(circle at 35% 30%, var(--emas-terang), var(--emas) 55%, #9c7a12 100%);
-    border:3px solid var(--merah-tua);
-    z-index:5;
-    display:flex;align-items:center;justify-content:center;
-    font-size:1.4rem;
-    box-shadow:0 4px 12px rgba(0,0,0,.45);
-  }
-
-  /* ===== Status / loading ===== */
+  /* ===== Status ===== */
   #loading{
-    margin:30px auto;
+    margin:26px auto;
     max-width:380px;
     font-size:.92rem;
     background:rgba(255,253,246,.08);
-    border:1px solid rgba(244,201,72,.35);
+    border:1px solid rgba(255,216,77,.35);
     padding:16px 20px;
     border-radius:14px;
     line-height:1.5;
   }
   #loading small{opacity:.65;display:block;margin-top:6px;}
 
-  /* ===== Spin button ===== */
-  #spinBtn{
-    background:linear-gradient(180deg, var(--emas-terang), var(--emas));
+  /* ===== Mesin slot ===== */
+  .cabinet{
+    position:relative;
+    width:min(92vw, 380px);
+    margin:30px auto 0;
+    background:linear-gradient(180deg,#2c1c14,#180f0a 60%);
+    border-radius:26px;
+    border:4px solid var(--emas);
+    box-shadow:
+      0 0 0 3px var(--merah-tua),
+      0 25px 50px rgba(0,0,0,.6),
+      inset 0 0 30px rgba(0,0,0,.5);
+    padding:20px 18px 24px;
+  }
+  .cabinet-top-lights{
+    display:flex;
+    justify-content:space-between;
+    margin-bottom:14px;
+    padding:0 2px;
+  }
+
+  .reel-frame{
+    position:relative;
+    border-radius:14px;
+    padding:6px;
+    background:linear-gradient(180deg,#3a2416,#120b07);
+    box-shadow:inset 0 0 0 2px var(--emas-neon), inset 0 6px 18px rgba(0,0,0,.7);
+  }
+  .reel-window{
+    position:relative;
+    height:210px; /* 3 baris x 70px */
+    overflow:hidden;
+    border-radius:10px;
+    background:linear-gradient(180deg,#fffef8,#fff1cf);
+  }
+  .reel-strip{
+    position:absolute;
+    top:0; left:0; right:0;
+    will-change:transform;
+  }
+  .reel-item{
+    height:70px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:0 10px;
+    font-weight:800;
+    font-size:1.05rem;
     color:var(--merah-tua);
-    border:none;
-    padding:15px 46px;
-    font-family:'Anton', sans-serif;
-    font-weight:400;
-    font-size:1.25rem;
-    letter-spacing:1.5px;
-    border-radius:50px;
-    cursor:pointer;
-    margin:30px 0 8px;
-    box-shadow:0 6px 0 #8a6a10, 0 12px 24px rgba(0,0,0,.45);
-    transition:transform .08s;
+    letter-spacing:.3px;
+  }
+  .payline{
+    position:absolute;
+    left:0; right:0;
+    top:70px;
+    height:70px;
+    border-top:3px solid var(--merah-neon);
+    border-bottom:3px solid var(--merah-neon);
+    box-shadow:0 0 14px rgba(255,59,84,.7), inset 0 0 14px rgba(255,59,84,.25);
+    pointer-events:none;
     z-index:3;
   }
-  #spinBtn:active{ transform:translateY(4px); box-shadow:0 2px 0 #8a6a10; }
-  #spinBtn:disabled{ opacity:.55; cursor:not-allowed; }
+  .reel-window::before,
+  .reel-window::after{
+    content:'';
+    position:absolute;
+    left:0;right:0;
+    height:70px;
+    z-index:2;
+    pointer-events:none;
+  }
+  .reel-window::before{
+    top:0;
+    background:linear-gradient(180deg, rgba(255,253,246,.95), rgba(255,253,246,0));
+  }
+  .reel-window::after{
+    bottom:0;
+    background:linear-gradient(0deg, rgba(255,253,246,.95), rgba(255,253,246,0));
+  }
+
+  .cabinet-foot{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-top:20px;
+    gap:14px;
+  }
 
   .count{
-    font-size:.8rem;
-    color:rgba(255,253,246,.6);
-    margin-bottom:20px;
+    font-size:.78rem;
+    color:rgba(255,253,246,.65);
   }
 
+  #spinBtn{
+    background:radial-gradient(circle at 35% 30%, #ff6a7d, var(--merah) 55%, var(--merah-tua) 100%);
+    color:#fff;
+    border:none;
+    width:100%;
+    padding:17px 0;
+    font-family:'Anton', sans-serif;
+    font-weight:400;
+    font-size:1.3rem;
+    letter-spacing:2px;
+    border-radius:50px;
+    cursor:pointer;
+    margin-top:18px;
+    box-shadow:
+      0 7px 0 #7a0a14,
+      0 14px 28px rgba(0,0,0,.55),
+      inset 0 2px 6px rgba(255,255,255,.4);
+    transition:transform .08s;
+  }
+  #spinBtn:active{ transform:translateY(5px); box-shadow:0 2px 0 #7a0a14, inset 0 2px 6px rgba(255,255,255,.4); }
+  #spinBtn:disabled{ opacity:.55; cursor:not-allowed; }
+
   footer{
-    margin:36px 0 26px;
+    margin:34px 0 10px;
     text-align:center;
-    font-size:.75rem;
+    font-size:.72rem;
     color:rgba(255,253,246,.4);
-    z-index:3;
   }
 
   /* ===== Winner modal ===== */
   .overlay{
     position:fixed; inset:0;
-    background:rgba(10,5,3,.8);
+    background:rgba(8,4,3,.82);
     display:none;
     align-items:center;justify-content:center;
     z-index:50;
@@ -279,8 +292,8 @@
     padding:38px 28px 30px;
     text-align:center;
     max-width:360px;width:100%;
-    border:4px solid var(--emas-terang);
-    box-shadow:0 25px 70px rgba(0,0,0,.55);
+    border:4px solid var(--emas-neon);
+    box-shadow:0 25px 70px rgba(0,0,0,.6);
     animation:pop .45s cubic-bezier(.2,1.4,.4,1);
   }
   @keyframes pop{
@@ -326,28 +339,35 @@
   <button id="musicToggle" title="Nyalakan/matikan musik">🔇</button>
   <div id="musicHint">Ketuk ikon untuk musik latar</div>
 
-  <div class="bunting" id="bunting"></div>
-  <div class="string"></div>
-
-  <header>
+  <div class="marquee">
+    <div class="bulb-row top" id="bulbTop"></div>
     <div class="eyebrow">Dirgahayu Republik Indonesia</div>
-    <h1>DOORPRIZE <span class="num">81</span></h1>
-    <div class="tagline">Maju Terus, Nusantara Baru!</div>
-  </header>
+<h1 class="neon-text">HUT RI KE - <span class="num">81</span></h1>
+    <h1 class="neon-text">UNDIAN DOORPRIZE</h1>
+    <div class="tagline">RT. 04 RW. 26</div>
+    <div class="bulb-row bottom" id="bulbBottom"></div>
+  </div>
 
   <div id="loading">⏳ Memuat data peserta dari Google Spreadsheet…
     <small>Pastikan akses sheet disetel ke "Siapa saja yang memiliki link"</small>
   </div>
 
-  <div class="stage" id="stage" style="display:none;">
-    <div class="sunburst"></div>
-    <div class="pointer"></div>
-    <canvas id="wheelCanvas" width="600" height="600"></canvas>
-    <div class="hub">🎁</div>
-  </div>
+  <div class="cabinet" id="cabinet" style="display:none;">
+    <div class="cabinet-top-lights" id="bulbCabinet"></div>
 
-  <button id="spinBtn" style="display:none;">PUTAR SPINNER</button>
-  <div class="count" id="countInfo"></div>
+    <div class="reel-frame">
+      <div class="reel-window">
+        <div class="reel-strip" id="reelStrip"></div>
+        <div class="payline"></div>
+      </div>
+    </div>
+
+    <div class="cabinet-foot">
+      <div class="count" id="countInfo"></div>
+    </div>
+
+    <button id="spinBtn">🎰 PUTAR!</button>
+  </div>
 
   <footer>Dibuat untuk merayakan Kemerdekaan RI ke-81 · 17 Agustus 2026</footer>
 
@@ -360,18 +380,21 @@
   </div>
 
 <script>
-// ===== Bunting flags =====
-const buntingEl = document.getElementById('bunting');
-for(let i=0;i<14;i++){
-  const f = document.createElement('div');
-  f.className = 'flag';
-  buntingEl.appendChild(f);
+/* ===== Lampu marquee berkejaran ===== */
+function fillBulbs(container, count){
+  for(let i=0;i<count;i++){
+    const b = document.createElement('div');
+    b.className = 'bulb';
+    b.style.animationDelay = (i * 0.09) + 's';
+    container.appendChild(b);
+  }
 }
+fillBulbs(document.getElementById('bulbTop'), 12);
+fillBulbs(document.getElementById('bulbBottom'), 12);
+fillBulbs(document.getElementById('bulbCabinet'), 10);
 
 /* =========================================================
-   AUDIO — semua musik & efek suara disintesis langsung di
-   browser dengan Web Audio API (bukan file lagu berhak
-   cipta), jadi aman diputar dan tidak butuh file eksternal.
+   AUDIO
    ========================================================= */
 let audioCtx = null;
 let masterGain = null;
@@ -432,7 +455,6 @@ function kick(time){
   osc.start(time); osc.stop(time + 0.2);
 }
 
-// Melodi & bass orisinal bernuansa mars ceria (bukan lagu yang sudah ada)
 const TEMPO = 132;
 const BEAT = 60 / TEMPO;
 const MELODY = [
@@ -457,7 +479,6 @@ function scheduleMusicLoop(startTime){
 
 function musicScheduler(){
   if(!musicOn) return;
-  // jadwalkan loop berikutnya sedikit di depan waktu nyata (lookahead sederhana)
   while(musicNextTime < audioCtx.currentTime + LOOP_LEN){
     scheduleMusicLoop(musicNextTime);
     musicNextTime += LOOP_LEN;
@@ -493,7 +514,6 @@ musicBtn.addEventListener('click', ()=>{
   musicHint.style.display = 'none';
 });
 
-// Efek suara "tik" saat roda berputar
 function playTick(){
   ensureAudio();
   const osc = audioCtx.createOscillator();
@@ -507,7 +527,6 @@ function playTick(){
   osc.stop(audioCtx.currentTime + 0.06);
 }
 
-// Fanfare kemenangan
 function playFanfare(){
   ensureAudio();
   const t0 = audioCtx.currentTime;
@@ -519,14 +538,16 @@ function playFanfare(){
 }
 
 /* =========================================================
-   AMBIL DATA DARI GOOGLE SHEETS (tab "data upload")
+   AMBIL & UPDATE DATA DARI GOOGLE SHEETS
    ========================================================= */
 const sheetId = '1sISk8huyAbvHsgf6nYXUkk6H4u0aevR1J2V__1GGhQY';
 const sheetName = encodeURIComponent('data upload');
 const csvUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv&sheet=${sheetName}`;
 
+// UPDATE URL INI DENGAN WEB APP URL DARI GOOGLE APPS SCRIPT ANDA
+const scriptURL = 'URL_WEB_APP_APPS_SCRIPT_ANDA_DISINI'; 
+
 let participants = [];
-const wheelColors = ['#C81E2C', '#FFFDF6', '#D4A017'];
 
 Papa.parse(csvUrl, {
   download: true,
@@ -536,18 +557,29 @@ Papa.parse(csvUrl, {
     if(data.length > 0){
       const columnNames = Object.keys(data[0]);
       const targetColumn = columnNames.find(col => col.toLowerCase().includes('nama'));
+      // Mencari kolom dengan kata 'cek'
+      const cekColumn = columnNames.find(col => col.toLowerCase().includes('cek'));
+
       if(targetColumn){
         participants = data
+          .filter(row => {
+            // Memastikan data yang diambil hanya yang kolom 'cek'-nya belum ada isinya (bukan 'ceklist')
+            if (cekColumn) {
+              const cekValue = row[cekColumn] ? row[cekColumn].toString().trim().toLowerCase() : '';
+              return cekValue !== 'ceklist' && cekValue === ''; 
+            }
+            return true; 
+          })
           .map(row => row[targetColumn])
           .filter(name => name && name.trim() !== '');
+
         if(participants.length > 0){
           document.getElementById('loading').style.display = 'none';
-          document.getElementById('stage').style.display = 'flex';
-          document.getElementById('spinBtn').style.display = 'inline-block';
+          document.getElementById('cabinet').style.display = 'block';
           updateCount();
-          drawWheel();
+          initReel();
         } else {
-          document.getElementById('loading').innerHTML = '❌ Data pada kolom "Nama" kosong.';
+          document.getElementById('loading').innerHTML = '❌ Semua doorprize sudah dibagikan (kolom cek sudah terisi) atau data kosong.';
         }
       } else {
         document.getElementById('loading').innerHTML = `❌ Tidak ditemukan kolom dengan judul "Nama". Kolom yang tersedia: ${columnNames.join(', ')}`;
@@ -562,118 +594,137 @@ Papa.parse(csvUrl, {
 });
 
 function updateCount(){
-  document.getElementById('countInfo').textContent = participants.length + ' peserta di roda';
+  document.getElementById('countInfo').textContent = participants.length + ' peserta di dalam reel';
+}
+
+// Fungsi untuk mencatat pemenang kembali ke Spreadsheet
+function catatPemenangKeSheet(namaLengkap) {
+  if(!scriptURL || scriptURL === 'URL_WEB_APP_APPS_SCRIPT_ANDA_DISINI') return; // Lewati jika belum diatur
+  
+  const formData = new FormData();
+  formData.append('nama', namaLengkap);
+  formData.append('action', 'updateCeklist');
+
+  fetch(scriptURL, {
+    method: 'POST',
+    body: formData,
+    mode: 'no-cors' // Penting agar tidak terblokir masalah CORS di browser
+  }).then(() => {
+    console.log('Berhasil mengirim data pembaruan ceklist untuk:', namaLengkap);
+  }).catch(err => {
+    console.error('Gagal memperbarui ke Google Sheet', err);
+  });
 }
 
 /* =========================================================
-   RODA
+   REEL MESIN SLOT
    ========================================================= */
-const canvas = document.getElementById('wheelCanvas');
-const ctx = canvas.getContext('2d');
-let startAngle = 0;
-let arc = 0;
-let spinTimeout = null;
-let spinAngleStart = 0;
-let spinTime = 0;
-let spinTimeTotal = 0;
-let tickInterval = null;
+const ITEM_H = 70;
+const REEL_COPIES = 5; 
+const reelStrip = document.getElementById('reelStrip');
+const spinBtn = document.getElementById('spinBtn');
+let spinning = false;
+let tickHandle = null;
 
-function drawWheel(){
-  if(participants.length === 0) return;
-  const r = canvas.width/2;
-  arc = (Math.PI*2) / participants.length;
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-
-  const fontSize = participants.length > 26 ? 12 : participants.length > 16 ? 15 : 19;
-
-  for(let i=0;i<participants.length;i++){
-    const angle = startAngle + i*arc;
-    const color = wheelColors[i % wheelColors.length];
-    ctx.beginPath();
-    ctx.moveTo(r,r);
-    ctx.arc(r,r,r-6, angle, angle+arc, false);
-    ctx.closePath();
-    ctx.fillStyle = color;
-    ctx.fill();
-    ctx.strokeStyle = 'rgba(27,21,18,.15)';
-    ctx.lineWidth = 1.5;
-    ctx.stroke();
-
-    ctx.save();
-    ctx.translate(r,r);
-    ctx.rotate(angle + arc/2);
-    ctx.textAlign = 'right';
-    ctx.fillStyle = (color === '#FFFDF6') ? '#7A0E17' : (color === '#D4A017' ? '#1B1512' : '#FFFDF6');
-    ctx.font = `700 ${fontSize}px 'Plus Jakarta Sans', sans-serif`;
-    const label = participants[i].length > 16 ? participants[i].slice(0,15)+'…' : participants[i];
-    ctx.fillText(label, r - 22, 5);
-    ctx.restore();
+function shuffled(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
   }
+  return a;
 }
 
-document.getElementById('spinBtn').addEventListener('click', spin);
+function renderStrip(items){
+  reelStrip.innerHTML = items.map(n => `<div class="reel-item">${n}</div>`).join('');
+}
+
+function initReel(){
+  let items = [];
+  for(let i=0;i<3;i++) items.push('');
+  items = items.concat(shuffled(participants).slice(0,3));
+  renderStrip(items);
+  reelStrip.style.transition = 'none';
+  reelStrip.style.transform = `translateY(-${ITEM_H}px)`;
+}
+
+spinBtn.addEventListener('click', spin);
 
 function spin(){
-  if(participants.length === 0) return;
+  if(participants.length === 0){
+    alert("Semua peserta sudah terpilih habis!");
+    return;
+  }
+  if(spinning) return;
+  
   ensureAudio();
-  document.getElementById('spinBtn').disabled = true;
+  spinning = true;
+  spinBtn.disabled = true;
 
-  spinAngleStart = Math.random() * 10 + 22;
-  spinTime = 0;
-  spinTimeTotal = Math.random() * 3000 + 5200;
+  const winnerIndex = Math.floor(Math.random() * participants.length);
+  const winnerName = participants[winnerIndex];
 
-  let tickDelay = 60;
-  clearInterval(tickInterval);
+  // Hapus pemenang dari array lokal agar tidak bisa menang dua kali dalam satu sesi
+  participants.splice(winnerIndex, 1);
+  updateCount(); 
+  
+  // Kirim data ke Google Sheets untuk mencatat label 'ceklist' agar permanen 
+  catatPemenangKeSheet(winnerName);
+
+  // Membangun daftar item untuk animasi gulungan
+  let items = [];
+  let pool = participants.length > 0 ? participants : [winnerName]; // fallback jika array habis
+  
+  for(let c=0;c<REEL_COPIES;c++){
+    items = items.concat(shuffled(pool));
+  }
+  items.push(winnerName);              // item target (akan berada di payline)
+  items.push(shuffled(pool)[0] || winnerName); // pengisi baris bawah
+
+  const winnerItemIndex = items.length - 2;
+  renderStrip(items);
+
+  // posisi awal (tanpa animasi) di paling atas
+  reelStrip.style.transition = 'none';
+  reelStrip.style.transform = 'translateY(0px)';
+  // force reflow
+  void reelStrip.offsetHeight;
+
+  const targetY = -(winnerItemIndex - 1) * ITEM_H;
+  const duration = 4.6 + Math.random()*0.8;
+  reelStrip.style.transition = `transform ${duration}s cubic-bezier(0.12,0.7,0.1,1)`;
+  reelStrip.style.transform = `translateY(${targetY}px)`;
+
+  // efek tik 
+  let elapsed = 0;
+  let delay = 45;
+  clearTimeout(tickHandle);
   function scheduleTick(){
     playTick();
-    tickDelay = Math.min(tickDelay * 1.06, 380);
-    if(spinTime < spinTimeTotal){
-      tickInterval = setTimeout(scheduleTick, tickDelay);
+    delay = Math.min(delay * 1.09, 300);
+    elapsed += delay;
+    if(elapsed < duration*1000 - 200){
+      tickHandle = setTimeout(scheduleTick, delay);
     }
   }
   scheduleTick();
 
-  rotateWheel();
-}
-
-function rotateWheel(){
-  spinTime += 30;
-  if(spinTime >= spinTimeTotal){
-    stopRotateWheel();
-    return;
-  }
-  const spinAngle = spinAngleStart - easeOut(spinTime, 0, spinAngleStart, spinTimeTotal);
-  startAngle += (spinAngle * Math.PI / 180);
-  drawWheel();
-  spinTimeout = requestAnimationFrame(rotateWheel);
-}
-
-function stopRotateWheel(){
-  cancelAnimationFrame(spinTimeout);
-  clearTimeout(tickInterval);
-  const degrees = startAngle * 180 / Math.PI + 90;
-  const arcd = arc * 180 / Math.PI;
-  const index = Math.floor((360 - degrees % 360) / arcd) % participants.length;
-
-  document.getElementById('winnerName').textContent = participants[index];
-  document.getElementById('overlay').classList.add('show');
-  document.getElementById('spinBtn').disabled = false;
-  playFanfare();
-  launchConfetti();
+  setTimeout(()=>{
+    spinning = false;
+    spinBtn.disabled = false;
+    document.getElementById('winnerName').textContent = winnerName;
+    document.getElementById('overlay').classList.add('show');
+    playFanfare();
+    launchConfetti();
+  }, duration*1000 + 150);
 }
 
 document.getElementById('closeModal').addEventListener('click', ()=>{
   document.getElementById('overlay').classList.remove('show');
 });
 
-function easeOut(t,b,c,d){
-  const ts=(t/=d)*t;
-  const tc=ts*t;
-  return b+c*(tc + -3*ts + 3*t);
-}
-
 function launchConfetti(){
-  const colors = ['#C81E2C','#D4A017','#FFFDF6'];
+  const colors = ['#E4142C','#FFD84D','#FFFDF6'];
   for(let i=0;i<70;i++){
     const c = document.createElement('div');
     c.className = 'confetti';
