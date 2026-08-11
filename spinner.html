@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spinner Doorprize HUT RI ke-81</title>
+<style>
+  :root{
+    --merah:#e2101a;
+    --putih:#ffffff;
+    --emas:#ffcc00;
+    --dark:#7a0a10;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    min-height:100vh;
+    font-family:'Segoe UI', Roboto, Arial, sans-serif;
+    background:
+      radial-gradient(circle at top, #b3121a 0%, #7a0a10 55%, #4a0509 100%);
+    color:#fff;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding:24px 16px 60px;
+    overflow-x:hidden;
+  }
+  h1{
+    text-align:center;
+    font-size:1.6rem;
+    margin:8px 0 2px;
+    letter-spacing:1px;
+    text-shadow:0 2px 6px rgba(0,0,0,.4);
+  }
+  h1 span{color:var(--emas);}
+  .subtitle{
+    opacity:.85;
+    font-size:.9rem;
+    margin-bottom:20px;
+    text-align:center;
+  }
+  .wheel-wrap{
+    position:relative;
+    width:min(88vw, 380px);
+    aspect-ratio:1/1;
+    margin:10px auto 24px;
+  }
+  .pointer{
+    position:absolute;
+    top:-18px;
+    left:50%;
+    transform:translateX(-50%);
+    width:0;
+    height:0;
+    border-left:16px solid transparent;
+    border-right:16px solid transparent;
+    border-top:28px solid var(--emas);
+    z-index:5;
+    filter:drop-shadow(0 3px 3px rgba(0,0,0,.5));
+  }
+  #wheel{
+    width:100%;
+    height:100%;
+    border-radius:50%;
+    display:block;
+    border:8px solid var(--emas);
+    box-shadow:0 0 0 4px var(--dark), 0 10px 30px rgba(0,0,0,.5);
+    transition: transform 5.5s cubic-bezier(0.17, 0.67, 0.12, 0.99);
+  }
+  .hub{
+    position:absolute;
+    top:50%;left:50%;
+    transform:translate(-50%,-50%);
+    width:18%;
+    aspect-ratio:1/1;
+    background:radial-gradient(circle at 35% 35%, #fff6c9, var(--emas) 60%, #b8860b 100%);
+    border-radius:50%;
+    border:3px solid var(--dark);
+    z-index:4;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:1.3rem;
+  }
+  #spinBtn{
+    background:linear-gradient(180deg, var(--emas), #d9a300);
+    color:#5c1a00;
+    border:none;
+    padding:14px 40px;
+    font-size:1.1rem;
+    font-weight:700;
+    border-radius:50px;
+    cursor:pointer;
+    box-shadow:0 6px 0 #8a6600, 0 10px 18px rgba(0,0,0,.4);
+    letter-spacing:1px;
+    transition:transform .1s;
+  }
+  #spinBtn:active{transform:translateY(4px);box-shadow:0 2px 0 #8a6600;}
+  #spinBtn:disabled{opacity:.6;cursor:not-allowed;}
+
+  .panel{
+    width:min(92vw,420px);
+    background:rgba(0,0,0,.25);
+    border:1px solid rgba(255,255,255,.15);
+    border-radius:16px;
+    padding:16px 18px;
+    margin-top:26px;
+    backdrop-filter:blur(4px);
+  }
+  .panel h3{margin:0 0 10px;font-size:1rem;color:var(--emas);}
+  .panel textarea{
+    width:100%;
+    min-height:110px;
+    border-radius:10px;
+    border:none;
+    padding:10px;
+    font-size:.9rem;
+    resize:vertical;
+    font-family:inherit;
+  }
+  .panel .row{
+    display:flex;
+    gap:10px;
+    margin-top:10px;
+    flex-wrap:wrap;
+  }
+  .panel button.secondary{
+    flex:1;
+    background:transparent;
+    border:1px solid var(--emas);
+    color:var(--emas);
+    padding:9px 12px;
+    border-radius:8px;
+    cursor:pointer;
+    font-size:.85rem;
+  }
+  .panel button.secondary:hover{background:rgba(255,204,0,.15);}
+  .count{
+    font-size:.8rem;
+    opacity:.8;
+    margin-top:6px;
+  }
+
+  .winners{
+    width:min(92vw,420px);
+    margin-top:16px;
+  }
+  .winners h3{color:var(--emas);font-size:1rem;margin-bottom:8px;}
+  .winners ol{
+    padding-left:20px;
+    margin:0;
+    font-size:.92rem;
+    line-height:1.7;
+  }
+  .winners li span.time{
+    opacity:.6;
+    font-size:.75rem;
+    margin-left:6px;
+  }
+
+  /* modal */
+  .overlay{
+    position:fixed;inset:0;
+    background:rgba(0,0,0,.75);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index:50;
+    padding:20px;
+  }
+  .overlay.show{display:flex;}
+  .modal{
+    background:linear-gradient(180deg,#fff,#fff6dc);
+    color:#4a0509;
+    border-radius:20px;
+    padding:32px 26px;
+    text-align:center;
+    max-width:340px;
+    width:100%;
+    box-shadow:0 20px 60px rgba(0,0,0,.5);
+    animation:pop .4s ease;
+    border:4px solid var(--emas);
+  }
+  @keyframes pop{
+    0%{transform:scale(.6);opacity:0;}
+    70%{transform:scale(1.08);}
+    100%{transform:scale(1);opacity:1;}
+  }
+  .modal .label{
+    font-size:.85rem;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    color:#b3121a;
+    font-weight:700;
+  }
+  .modal .name{
+    font-size:1.9rem;
+    font-weight:800;
+    margin:10px 0 16px;
+    word-break:break-word;
+  }
+  .modal button{
+    background:var(--merah);
+    color:#fff;
+    border:none;
+    padding:10px 26px;
+    border-radius:30px;
+    font-size:.95rem;
+    cursor:pointer;
+    font-weight:700;
+  }
+
+  .confetti{
+    position:fixed;
+    top:-10px;
+    width:8px;height:14px;
+    z-index:60;
+    pointer-events:none;
+  }
+
+  footer{
+    margin-top:30px;
+    font-size:.75rem;
+    opacity:.6;
+    text-align:center;
+  }
+</style>
+</head>
+<body>
+
+  <h1>🎉 Doorprize <span>HUT RI ke-81</span> 🎉</h1>
+  <div class="subtitle">Putar roda untuk menentukan pemenang doorprize</div>
+
+  <div class="wheel-wrap">
+    <div class="pointer"></div>
+    <canvas id="wheel" width="600" height="600"></canvas>
+    <div class="hub">🎁</div>
+  </div>
+
+  <button id="spinBtn">PUTAR SEKARANG</button>
+
+  <div class="panel">
+    <h3>Daftar Nama Peserta</h3>
+    <textarea id="namesArea"></textarea>
+    <div class="row">
+      <button class="secondary" id="applyBtn">Terapkan Daftar</button>
+      <button class="secondary" id="resetBtn">Reset ke Data Awal</button>
+    </div>
+    <div class="row">
+      <button class="secondary" id="removeWinnersBtn">Hapus Pemenang dari Roda</button>
+      <button class="secondary" id="clearWinnersBtn">Bersihkan Riwayat Pemenang</button>
+    </div>
+    <div class="count" id="countInfo"></div>
+  </div>
+
+  <div class="winners">
+    <h3>🏆 Riwayat Pemenang</h3>
+    <ol id="winnerList"><li style="opacity:.6;list-style:none;">Belum ada pemenang</li></ol>
+  </div>
+
+  <footer>Dibuat untuk perayaan HUT Kemerdekaan RI ke-81</footer>
+
+  <div class="overlay" id="overlay">
+    <div class="modal">
+      <div class="label">Selamat kepada</div>
+      <div class="name" id="winnerName">-</div>
+      <button id="closeModal">OK, Lanjutkan</button>
+    </div>
+  </div>
+
+<script>
+// ====== DATA PESERTA (dari spreadsheet "Data Warga") ======
+// Anda bisa mengganti daftar ini lewat kotak "Daftar Nama Peserta" di bawah roda,
+// lalu klik "Terapkan Daftar". Satu nama per baris.
+const DEFAULT_NAMES = [
+"JATMIKO","IWAN A","SAHWI","FENDI","ELIS SAMRIANTO","TEGUH CAHYADI",
+"JAUHAR MUBAROK","AHMAD BURHANUDIN","NURRAHMAN","SUTARNO","SIGIT BUDI P",
+"SUPRAYITNO","ANDHI SURYANENDRA","NUR KHOLIS","ARIS","EXWIN SUBIANTO",
+"DANA SAPUTRA","FACHRIE REZA","ALANGGHYA SUSATYA","INDRA JATMIKA",
+"BAMBANG TJAHJONO","GATOT E","ARI ADITYAR","HARYANTO","KURNIA ROCHMAN",
+"WIDIYARTO","ENDY","DANANTO RISKI N","SURATMAN","SONY W","EKO HERIS B",
+"DWI HIMAWAN","FATHURRAHMAN G","KRISTONO EKO P","FELIX NIRWAN","CONDRO P"
+];
+
+const COLORS = ["#e2101a","#ffcc00","#7a0a10","#ffffff","#b3121a","#d9a300"];
+
+let names = [];
+let winners = [];
+let currentRotation = 0;
+let spinning = false;
+
+const canvas = document.getElementById('wheel');
+const ctx = canvas.getContext('2d');
+const namesArea = document.getElementById('namesArea');
+const countInfo = document.getElementById('countInfo');
+const winnerListEl = document.getElementById('winnerList');
+const overlay = document.getElementById('overlay');
+const winnerNameEl = document.getElementById('winnerName');
+const spinBtn = document.getElementById('spinBtn');
+
+function loadNames(list){
+  names = list.filter(n => n.trim() !== '');
+  namesArea.value = names.join('\n');
+  drawWheel();
+  updateCount();
+}
+
+function updateCount(){
+  countInfo.textContent = names.length + ' peserta di roda';
+}
+
+function drawWheel(){
+  const cx = canvas.width/2, cy = canvas.height/2, r = canvas.width/2 - 6;
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+
+  if(names.length === 0){
+    ctx.fillStyle = '#333';
+    ctx.beginPath();
+    ctx.arc(cx,cy,r,0,Math.PI*2);
+    ctx.fill();
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold 24px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('Tidak ada peserta', cx, cy);
+    return;
+  }
+
+  const slice = (Math.PI*2) / names.length;
+  const fontSize = names.length > 24 ? 13 : names.length > 14 ? 16 : 20;
+
+  names.forEach((name, i)=>{
+    const start = i*slice;
+    const end = start+slice;
+    ctx.beginPath();
+    ctx.moveTo(cx,cy);
+    ctx.arc(cx,cy,r,start,end);
+    ctx.closePath();
+    ctx.fillStyle = COLORS[i % COLORS.length];
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(0,0,0,.25)';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    // text
+    ctx.save();
+    ctx.translate(cx,cy);
+    ctx.rotate(start + slice/2);
+    ctx.textAlign = 'right';
+    ctx.fillStyle = (COLORS[i % COLORS.length] === '#ffffff') ? '#7a0a10' : '#ffffff';
+    ctx.font = `bold ${fontSize}px sans-serif`;
+    const label = name.length > 16 ? name.slice(0,15)+'…' : name;
+    ctx.fillText(label, r - 14, 6);
+    ctx.restore();
+  });
+}
+
+function spin(){
+  if(spinning) return;
+  if(names.length === 0){
+    alert('Tidak ada peserta di roda. Tambahkan nama terlebih dahulu.');
+    return;
+  }
+  if(names.length === 1){
+    finishSpin(0);
+    return;
+  }
+  spinning = true;
+  spinBtn.disabled = true;
+
+  const slice = 360 / names.length;
+  const winnerIndex = Math.floor(Math.random()*names.length);
+  // target angle so winnerIndex ends up under pointer (top, 0deg / 12 o'clock)
+  // wheel drawn starting at angle 0 = 3 o'clock, pointer at 12 o'clock (=-90deg / 270deg)
+  const sliceCenter = winnerIndex*slice + slice/2;
+  const pointerAngle = 270; // top in canvas-degree terms (0deg = 3 o'clock, clockwise)
+  const randomOffset = (Math.random()*0.6 - 0.3) * slice; // small jitter within slice
+  const targetAngle = pointerAngle - sliceCenter - randomOffset;
+  const fullSpins = 6 + Math.floor(Math.random()*3); // 6-8 full turns
+  const finalRotation = currentRotation + fullSpins*360 + ((targetAngle - (currentRotation % 360)) % 360 + 360) % 360;
+
+  canvas.style.transition = 'transform 5.5s cubic-bezier(0.17, 0.67, 0.12, 0.99)';
+  canvas.style.transform = `rotate(${finalRotation}deg)`;
+  currentRotation = finalRotation;
+
+  setTimeout(()=>{
+    finishSpin(winnerIndex);
+  }, 5600);
+}
+
+function finishSpin(index){
+  spinning = false;
+  spinBtn.disabled = false;
+  const winnerName = names[index];
+  winners.unshift({name: winnerName, time: new Date().toLocaleTimeString('id-ID')});
+  renderWinners();
+  winnerNameEl.textContent = winnerName;
+  overlay.classList.add('show');
+  launchConfetti();
+}
+
+function renderWinners(){
+  if(winners.length === 0){
+    winnerListEl.innerHTML = '<li style="opacity:.6;list-style:none;">Belum ada pemenang</li>';
+    return;
+  }
+  winnerListEl.innerHTML = winners.map(w =>
+    `<li>${w.name} <span class="time">${w.time}</span></li>`
+  ).join('');
+}
+
+function launchConfetti(){
+  const colors = ['#e2101a','#ffcc00','#ffffff'];
+  for(let i=0;i<60;i++){
+    const c = document.createElement('div');
+    c.className = 'confetti';
+    c.style.left = Math.random()*100 + 'vw';
+    c.style.background = colors[Math.floor(Math.random()*colors.length)];
+    c.style.transform = `rotate(${Math.random()*360}deg)`;
+    document.body.appendChild(c);
+    const duration = 2500 + Math.random()*1500;
+    const drift = (Math.random()-0.5)*200;
+    c.animate([
+      { transform: `translate(0,0) rotate(0deg)`, opacity:1 },
+      { transform: `translate(${drift}px, 100vh) rotate(${360+Math.random()*360}deg)`, opacity:0.9 }
+    ], { duration, easing:'ease-in' });
+    setTimeout(()=>c.remove(), duration+100);
+  }
+}
+
+// ==== controls ====
+spinBtn.addEventListener('click', spin);
+
+document.getElementById('closeModal').addEventListener('click', ()=>{
+  overlay.classList.remove('show');
+});
+
+document.getElementById('applyBtn').addEventListener('click', ()=>{
+  const list = namesArea.value.split('\n');
+  loadNames(list);
+});
+
+document.getElementById('resetBtn').addEventListener('click', ()=>{
+  loadNames(DEFAULT_NAMES);
+});
+
+document.getElementById('removeWinnersBtn').addEventListener('click', ()=>{
+  const winnerNames = new Set(winners.map(w=>w.name));
+  const remaining = names.filter(n => !winnerNames.has(n));
+  loadNames(remaining);
+});
+
+document.getElementById('clearWinnersBtn').addEventListener('click', ()=>{
+  if(confirm('Yakin ingin membersihkan riwayat pemenang?')){
+    winners = [];
+    renderWinners();
+  }
+});
+
+// init
+loadNames(DEFAULT_NAMES);
+</script>
+</body>
+</html>
