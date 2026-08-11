@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Spinner Doorprise HUT RI 81</title>
-    <!-- Menggunakan PapaParse untuk membaca CSV dari Google Sheets -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
     <style>
         body {
@@ -127,26 +126,39 @@
         const csvUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv&sheet=${sheetName}`;
 
         let participants = [];
-        const colors = ['#d32f2f', '#ffffff']; // Tema Merah Putih
+        const colors = ['#d32f2f', '#ffffff']; 
 
         // Mengambil data menggunakan PapaParse
         Papa.parse(csvUrl, {
             download: true,
-            header: false,
+            header: true, // Diubah menjadi true agar membaca baris pertama sebagai Header Kolom
             complete: function(results) {
                 const data = results.data;
-                // Mengambil kolom pertama, membuang baris kosong, dan membuang header bernama 'nama'
-                participants = data
-                    .map(row => row[0])
-                    .filter(name => name && name.trim() !== '' && name.toLowerCase() !== 'nama' && name.toLowerCase() !== 'nama lengkap');
                 
-                if (participants.length > 0) {
-                    document.getElementById('loading').style.display = 'none';
-                    document.getElementById('spinnerContainer').style.display = 'block';
-                    document.getElementById('spinBtn').style.display = 'inline-block';
-                    drawWheel();
+                if (data.length > 0) {
+                    // Mencari nama kolom yang mengandung kata "nama" (case insensitive)
+                    const columnNames = Object.keys(data[0]);
+                    const targetColumn = columnNames.find(col => col.toLowerCase().includes('nama'));
+
+                    if (targetColumn) {
+                        // Mengambil nilai khusus dari kolom "nama" dan membuang baris yang kosong
+                        participants = data
+                            .map(row => row[targetColumn])
+                            .filter(name => name && name.trim() !== '');
+                        
+                        if (participants.length > 0) {
+                            document.getElementById('loading').style.display = 'none';
+                            document.getElementById('spinnerContainer').style.display = 'block';
+                            document.getElementById('spinBtn').style.display = 'inline-block';
+                            drawWheel();
+                        } else {
+                            document.getElementById('loading').innerHTML = '❌ Data pada kolom "Nama" kosong.';
+                        }
+                    } else {
+                        document.getElementById('loading').innerHTML = `❌ Tidak ditemukan kolom dengan judul "Nama". Kolom yang tersedia: ${columnNames.join(', ')}`;
+                    }
                 } else {
-                    document.getElementById('loading').innerHTML = '❌ Data peserta kosong atau Spreadsheet ditutup aksesnya.<br><strong>Solusi:</strong> Buka Google Sheet -> klik tombol "Bagikan/Share" -> ubah akses umum menjadi "Siapa saja yang memiliki link (Anyone with the link)".';
+                    document.getElementById('loading').innerHTML = '❌ Data kosong atau Spreadsheet belum disetel ke "Siapa saja yang memiliki link".';
                 }
             },
             error: function(err) {
@@ -179,12 +191,11 @@
                 ctx.fill();
                 
                 ctx.save();
-                ctx.fillStyle = (i % 2 === 0) ? '#ffffff' : '#d32f2f'; // Kontras warna teks
+                ctx.fillStyle = (i % 2 === 0) ? '#ffffff' : '#d32f2f'; 
                 ctx.translate(250 + Math.cos(angle + arc / 2) * 200, 250 + Math.sin(angle + arc / 2) * 200);
                 ctx.rotate(angle + arc / 2);
                 const text = participants[i];
                 
-                // Menyesuaikan ukuran font dan tata letak nama
                 ctx.font = 'bold 16px Arial';
                 ctx.textAlign = 'right';
                 ctx.fillText(text, 30, 6);
@@ -198,10 +209,9 @@
             document.getElementById('spinBtn').disabled = true;
             document.getElementById('winner').innerText = '';
             
-            // Random rotasi
             spinAngleStart = Math.random() * 10 + 20; 
             spinTime = 0;
-            spinTimeTotal = Math.random() * 3000 + 5000; // Putaran antara 5 hingga 8 detik
+            spinTimeTotal = Math.random() * 3000 + 5000; 
             rotateWheel();
         }
 
@@ -233,7 +243,6 @@
             document.getElementById('spinBtn').disabled = false;
         }
 
-        // Fungsi efek perlambatan putaran (Ease Out)
         function easeOut(t, b, c, d) {
             const ts = (t /= d) * t;
             const tc = ts * t;
