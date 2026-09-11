@@ -184,6 +184,15 @@
     const BULAN = ['Januari','Februari','Maret','April','Mei','Juni',
                    'Juli','Agustus','September','Oktober','November','Desember'];
 
+    // ===== KUNCI UKURAN A5 UNTUK EXPORT (px @ 96dpi) =====
+    // 1mm = 96/25.4 px. Ini dipakai agar hasil JPG SELALU rasio A5
+    // yang benar, baik dibuka di HP maupun di layar besar — karena
+    // media query mobile mengubah .kartu jadi width:100%, yang kalau
+    // tidak dikunci ulang saat render akan membuat JPG jadi gepeng/salah rasio.
+    const MM_TO_PX = 96 / 25.4;
+    const A5_W_PX = Math.round(148 * MM_TO_PX); // ≈ 559
+    const A5_H_PX = Math.round(210 * MM_TO_PX); // ≈ 794
+
     function norm(n) { return (n || '').toString().trim().toUpperCase().replace(/\s+/g, '_'); }
     function setStatus(m, t = 'info') { statusEl.textContent = m; statusEl.className = 'status-msg ' + t; }
     function checkReady() { btnGen.disabled = !(excelLoaded && qrLoaded); }
@@ -295,15 +304,37 @@
         btnDlAll.disabled = false;
     }
 
+    // Opsi html2canvas yang MENGUNCI ukuran hasil render ke A5 (px),
+    // apapun ukuran layar/viewport HP yang sedang dipakai.
+    function a5CanvasOptions(scale) {
+        return {
+            scale: scale,
+            useCORS: true,
+            backgroundColor: '#fff',
+            logging: false,
+            width: A5_W_PX,
+            height: A5_H_PX,
+            windowWidth: A5_W_PX,
+            windowHeight: A5_H_PX,
+            onclone: (clonedDoc, el) => {
+                // paksa ukuran kartu hasil clone tetap A5, override CSS mobile
+                el.style.width = A5_W_PX + 'px';
+                el.style.height = A5_H_PX + 'px';
+                el.style.minHeight = A5_H_PX + 'px';
+                el.style.maxWidth = 'none';
+            }
+        };
+    }
+
     function dl1(card, nama) {
         setStatus('⏳ Render ' + nama + '...', 'info');
-        html2canvas(card, { scale: 3, useCORS: true, backgroundColor: '#fff', logging: false })
+        html2canvas(card, a5CanvasOptions(3))
             .then(c => {
                 const l = document.createElement('a');
                 l.download = 'Kartu_Iuran_' + norm(nama) + '.jpg';
                 l.href = c.toDataURL('image/jpeg', 0.93);
                 l.click();
-                setStatus('✅ ' + nama + '.jpg terunduh.', 'success');
+                setStatus('✅ ' + nama + '.jpg terunduh (A5).', 'success');
             })
             .catch(e => setStatus('❌ ' + e.message, 'error'));
     }
@@ -318,7 +349,7 @@
             const nama = card.dataset.nama || ('Kartu_' + (i + 1));
             setStatus('⏳ ' + (i + 1) + '/' + cards.length + ' - ' + nama, 'info');
             try {
-                const c = await html2canvas(card, { scale: 3, useCORS: true, backgroundColor: '#fff', logging: false });
+                const c = await html2canvas(card, a5CanvasOptions(3));
                 const blob = await new Promise(r => c.toBlob(r, 'image/jpeg', 0.93));
                 zip.file('Kartu_Iuran_' + norm(nama) + '.jpg', blob);
             } catch (e) { console.error(e); }
@@ -329,7 +360,7 @@
             const l = document.createElement('a');
             l.download = 'Kartu_Iuran_RT04RW26_' + new Date().getFullYear() + '.zip';
             l.href = URL.createObjectURL(zb); l.click(); URL.revokeObjectURL(l.href);
-            setStatus('✅ ZIP berisi ' + cards.length + ' kartu terunduh.', 'success');
+            setStatus('✅ ZIP berisi ' + cards.length + ' kartu (A5) terunduh.', 'success');
         } catch (e) { setStatus('❌ ' + e.message, 'error'); }
         btnDlAll.disabled = false;
     }
