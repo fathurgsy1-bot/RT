@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kartu Iuran Bulanan - RT 04 / RW 026</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: #e0e0e0; min-height: 100vh; color: #000;
+    }
+    /* ===== PAGE HEADER ===== */
+    .page-header {
+        background: #fff; padding: 14px 28px; border-bottom: 3px solid #000;
+        position: sticky; top: 0; z-index: 100;
+        display: flex; align-items: center; justify-content: space-between;
+    }
+    .page-header h1 { font-size: 17px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; }
+    .page-header p  { font-size: 12px; font-weight: 600; color: #555; }
+    /* ===== UPLOAD ===== */
+    .upload-panel { max-width: 1100px; margin: 20px auto; padding: 0 16px; }
+    .upload-box {
+        background: #fff; padding: 16px 20px;
+        display: flex; flex-wrap: wrap; gap: 14px; align-items: flex-end; border: 2px solid #000;
+    }
+    .upload-group { display: flex; flex-direction: column; gap: 4px; }
+    .upload-group label { font-size: 11px; font-weight: 800; text-transform: uppercase; }
+    .upload-group input[type="file"] { font-size: 12px; max-width: 260px; cursor: pointer; }
+    .upload-group input[type="number"] {
+        padding: 7px 10px; border: 2px solid #000; font-size: 14px; width: 85px; font-weight: 700;
+    }
+    .btn {
+        padding: 10px 18px; border: 2px solid #000; background: #fff;
+        font-size: 11px; font-weight: 800; cursor: pointer;
+        text-transform: uppercase; transition: all .15s;
+    }
+    .btn:hover { background: #000; color: #fff; }
+    .btn:disabled { opacity: .35; cursor: not-allowed; }
+    .status-msg {
+        margin: 10px 16px; padding: 10px 14px;
+        font-size: 12px; font-weight: 600; display: none;
+        border: 1.5px solid #000; background: #fff;
+    }
+    .status-msg.success, .status-msg.error, .status-msg.info { display: block; }
+
+    /* ----- CARD GRID - PERBAIKAN UTAMA -----
+       min 570px > lebar kartu (148mm = 559px) sehingga kartu
+       TIDAK meluber & TIDAK bertabrakan antar kolom.      */
+    .card-grid {
+        max-width: 1900px;
+        margin: 0 auto;
+        padding: 0 16px 60px;
+        overflow-x: auto;                   /* pengaman layar sempit */
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(570px, 1fr));
+        gap: 28px;
+        justify-items: center;
+    }
+    
+    /* ===== A5 CARD ===== */
+    .kartu {
+        width: 148mm; height: 210mm;
+        background: #fff; border: 3px solid #000;
+        position: relative; display: flex; flex-direction: column;
+        overflow: hidden; page-break-inside: avoid;
+    }
+    .sec-title {
+        text-align: center; padding: 10px 14px 7px;
+        border-bottom: 2px solid #000; flex-shrink: 0;
+    }
+    .sec-title .rw { font-size: 9px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #444; margin-bottom: 2px; }
+    .sec-title .title { font-size: 14px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; }
+    .sec-title .year {
+        font-size: 22px; font-weight: 900; letter-spacing: 5px; margin-top: 3px;
+        display: inline-block; padding: 1px 16px;
+        border-top: 1.5px solid #000; border-bottom: 1.5px solid #000;
+    }
+    .sec-body {
+        display: flex; align-items: center; gap: 12px;
+        padding: 8px 14px; border-bottom: 2px solid #000; flex-shrink: 0;
+    }
+    .qr-box {
+        width: 36mm; height: 36mm; border: 2px solid #000;
+        display: flex; align-items: center; justify-content: center;
+        overflow: hidden; flex-shrink: 0; background: #fff;
+    }
+    .qr-box img { width: 90%; height: 90%; object-fit: contain; }
+    .qr-box .ph { font-size: 14px; font-weight: 700; color: #000; }
+    .info-col { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+    .info-col .nama {
+        font-size: 13px; font-weight: 900; text-transform: uppercase;
+        line-height: 1.3; letter-spacing: .3px; border: 2px solid #000; padding: 5px 10px;
+        text-align: center;
+    }
+    .info-col .no-rumah { font-size: 10px; font-weight: 600; color: #333; text-align: center; }
+    .info-col .no-rumah strong { font-size: 12px; }
+    .sec-table {
+        flex: 1; min-height: 0; padding: 6px 14px;
+        display: flex; flex-direction: column; overflow: hidden;
+    }
+    .sec-table .label {
+        font-size: 9px; font-weight: 800; text-transform: uppercase;
+        letter-spacing: 1.5px; text-align: center; margin-bottom: 4px; flex-shrink: 0;
+    }
+    .iuran-table {
+        width: 100%; height: 100%;
+        border-collapse: collapse; table-layout: fixed;
+    }
+    .iuran-table colgroup col:nth-child(1) { width: 32%; }
+    .iuran-table colgroup col:nth-child(2) { width: 22%; }
+    .iuran-table colgroup col:nth-child(3) { width: 22%; }
+    .iuran-table colgroup col:nth-child(4) { width: 24%; }
+    .iuran-table thead th {
+        font-size: 8px; font-weight: 800; text-transform: uppercase; letter-spacing: .5px;
+        padding: 4px 3px; border: 1.5px solid #000; text-align: center; background: #fff;
+    }
+    .iuran-table thead th:first-child { text-align: left; padding-left: 8px; }
+    .iuran-table tbody td { padding: 0 3px; border: 1.5px solid #000; text-align: center; font-size: 9px; vertical-align: middle; }
+    .iuran-table tbody td:first-child { font-weight: 700; text-align: left; padding-left: 8px; }
+    .sec-footer {
+        padding: 5px 14px; border-top: 2px solid #000;
+        display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
+    }
+    .sec-footer span { font-size: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #444; }
+    .kartu-dl-btn {
+        position: absolute; top: 8px; right: 8px;
+        background: #fff; border: 1.5px solid #000;
+        padding: 2px 7px; font-size: 9px; font-weight: 800;
+        cursor: pointer; z-index: 20; text-transform: uppercase;
+    }
+    .kartu-dl-btn:hover { background: #000; color: #fff; }
+    
+    /* ----- PRINT - A5 ----- */
+    @media print {
+        @page { size: A5 portrait; margin: 0; }
+        body { background: #fff; margin: 0; padding: 0; }
+        .page-header, .upload-panel, .status-msg, .kartu-dl-btn { display: none !important; }
+        .card-grid { display: block; padding: 0; margin: 0; max-width: none; overflow: visible; }
+        .kartu {
+            width: 148mm; height: 210mm; margin: 0 auto;
+            page-break-after: always; page-break-inside: avoid; break-after: page;
+        }
+        .kartu:last-child { page-break-after: auto; break-after: auto; }
+        * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+    }
+    /* ----- MOBILE ----- */
+    @media (max-width: 620px) {
+        .card-grid { grid-template-columns: 1fr; overflow-x: hidden; }
+        .kartu { width: 100%; height: auto; min-height: 210mm; }
+    }
+    </style>
+</head>
+<body>
+    <div class="page-header">
+        <h1>Kartu Iuran Bulanan</h1>
+        <p>RT 04 / RW 026 - <span id="tahun-aktif">2026</span></p>
+    </div>
+    <div class="upload-panel">
+        <div class="upload-box">
+            <div class="upload-group"><label>Excel (WARGA)</label><input type="file" id="inp-excel" accept=".xlsx, .xls"></div>
+            <div class="upload-group"><label>Folder QR</label><input type="file" id="inp-qr" webkitdirectory directory multiple></div>
+            <div class="upload-group"><label>Tahun</label><input type="number" id="inp-tahun" value="2026" min="2000" max="2100"></div>
+            <button class="btn" id="btn-generate" onclick="generateCards()" disabled>Generate</button>
+            <button class="btn" onclick="window.print()">🖨 Cetak A5</button>
+            <button class="btn" id="btn-dl-all" onclick="dlAll()" disabled>⬇ ZIP</button>
+        </div>
+    </div>
+    <div class="status-msg" id="status"></div>
+    <div class="card-grid" id="card-grid"></div>
+
+    <script>
+    let excelData = [], qrImages = {}, excelLoaded = false, qrLoaded = false;
+    const inpExcel = document.getElementById('inp-excel');
+    const inpQR = document.getElementById('inp-qr');
+    const btnGen = document.getElementById('btn-generate');
+    const btnDlAll = document.getElementById('btn-dl-all');
+    const statusEl = document.getElementById('status');
+    const gridEl = document.getElementById('card-grid');
+
+    const BULAN = ['Januari','Februari','Maret','April','Mei','Juni',
+                   'Juli','Agustus','September','Oktober','November','Desember'];
+
+    function norm(n) { return (n || '').toString().trim().toUpperCase().replace(/\s+/g, '_'); }
+    function setStatus(m, t = 'info') { statusEl.textContent = m; statusEl.className = 'status-msg ' + t; }
+    function checkReady() { btnGen.disabled = !(excelLoaded && qrLoaded); }
+
+    inpExcel.addEventListener('change', function () {
+        const f = this.files[0]; if (!f) return;
+        const r = new FileReader();
+        r.onload = e => {
+            try {
+                const wb = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
+                const sn = wb.SheetNames.find(s => s.toUpperCase() === 'WARGA');
+                if (!sn) { setStatus('⚠ Sheet WARGA tidak ditemukan.', 'error'); return; }
+                const rows = XLSX.utils.sheet_to_json(wb.Sheets[sn], { defval: '' });
+                if (!rows.length) { setStatus('⚠ Sheet kosong.', 'error'); return; }
+                excelData = rows; excelLoaded = true; checkReady();
+                setStatus('✅ ' + rows.length + ' warga ( Kolom: ' + Object.keys(rows[0]).join(', ') + ' )', 'success');
+                if (qrLoaded) generateCards();
+            } catch (err) { setStatus('❌ ' + err.message, 'error'); }
+        };
+        r.readAsArrayBuffer(f);
+    });
+
+    inpQR.addEventListener('change', function () {
+        const files = Array.from(this.files); if (!files.length) return;
+        const imgs = files.filter(f => /\.(png|jpe?g|svg|webp|bmp)$/i.test(f.name));
+        if (!imgs.length) { setStatus('⚠ Tidak ada gambar.', 'error'); return; }
+        let n = 0;
+        imgs.forEach(f => {
+            const r = new FileReader();
+            r.onload = e => {
+                qrImages[norm(f.name.replace(/\.[^.]+$/, ''))] = e.target.result;
+                if (++n === imgs.length) {
+                    qrLoaded = true; checkReady();
+                    setStatus('✅ ' + imgs.length + ' QR dimuat.', 'success');
+                    if (excelLoaded) generateCards();
+                }
+            };
+            r.readAsDataURL(f);
+        });
+    });
+
+    function findQR(name) {
+        const k = norm(name);
+        if (qrImages[k]) return qrImages[k];
+        const m = Object.keys(qrImages).filter(x => x.startsWith(k + '_') || x === k);
+        return m.length ? qrImages[m[0]] : null;
+    }
+
+    function generateCards() {
+        if (!excelData.length) return;
+        gridEl.innerHTML = '';
+        const cols = Object.keys(excelData[0]);
+        const namaCol = cols.find(c => /nama/i.test(c)) || cols[0];
+        const alamatCol = cols.find(c => /alamat|rumah|no\s*rumah/i.test(c)) || null;
+        const thn = document.getElementById('inp-tahun').value || String(new Date().getFullYear());
+        
+        const frag = document.createDocumentFragment();
+
+        excelData.forEach((row) => {
+            const nama = (row[namaCol] || '').toString().trim();
+            if (!nama) return;
+            const noR = alamatCol ? (row[alamatCol] || '').toString().trim() : '';
+            const qr = findQR(nama);
+
+            const card = document.createElement('div');
+            card.className = 'kartu'; card.dataset.nama = nama;
+
+            const dlb = document.createElement('button');
+            dlb.className = 'kartu-dl-btn'; dlb.textContent = '⬇ JPG';
+            dlb.onclick = () => dl1(card, nama);
+            card.appendChild(dlb);
+
+            const s1 = document.createElement('div');
+            s1.className = 'sec-title';
+            s1.innerHTML = '<div class="rw">RT 04 / RW 026</div>' +
+                           '<div class="title">KARTU IURAN BULANAN</div>' +
+                           '<div class="year">' + thn + '</div>';
+            card.appendChild(s1);
+
+            const s2 = document.createElement('div'); s2.className = 'sec-body';
+            const qd = document.createElement('div'); qd.className = 'qr-box';
+            if (qr) { const img = document.createElement('img'); img.src = qr; img.alt = ''; qd.appendChild(img); }
+            else { qd.innerHTML = '<span class="ph">QR</span>'; }
+            s2.appendChild(qd);
+            const inf = document.createElement('div'); inf.className = 'info-col';
+            inf.innerHTML = '<div class="nama">' + nama.toUpperCase() + '</div>' +
+                            (noR ? '<div class="no-rumah"><strong>' + noR + '</strong></div>' : '');
+            s2.appendChild(inf);
+            card.appendChild(s2);
+
+            const s3 = document.createElement('div'); s3.className = 'sec-table';
+            s3.innerHTML = '<div class="label">— Daftar Iuran —</div>';
+            const tbl = document.createElement('table'); tbl.className = 'iuran-table';
+            tbl.innerHTML = '<colgroup><col><col><col><col></colgroup>' +
+                            '<thead><tr><th>Bulan</th><th>Tgl</th><th>Paraf</th><th>Ket.</th></tr></thead>' +
+                            '<tbody>' + BULAN.map(b => '<tr><td>' + b + '</td><td></td><td></td><td></td></tr>').join('') + '</tbody>';
+            s3.appendChild(tbl);
+            card.appendChild(s3);
+
+            const s4 = document.createElement('div'); s4.className = 'sec-footer';
+            s4.innerHTML = '<span>RT 04 / RW 026</span><span>Iuran Bulanan ' + thn + '</span>';
+            card.appendChild(s4);
+
+            frag.appendChild(card);
+        });
+
+        gridEl.appendChild(frag);
+        document.getElementById('tahun-aktif').textContent = thn;
+        btnDlAll.disabled = false;
+    }
+
+    function dl1(card, nama) {
+        setStatus('⏳ Render ' + nama + '...', 'info');
+        html2canvas(card, { scale: 3, useCORS: true, backgroundColor: '#fff', logging: false })
+            .then(c => {
+                const l = document.createElement('a');
+                l.download = 'Kartu_Iuran_' + norm(nama) + '.jpg';
+                l.href = c.toDataURL('image/jpeg', 0.93);
+                l.click();
+                setStatus('✅ ' + nama + '.jpg terunduh.', 'success');
+            })
+            .catch(e => setStatus('❌ ' + e.message, 'error'));
+    }
+
+    async function dlAll() {
+        const cards = document.querySelectorAll('.kartu');
+        if (!cards.length) return;
+        btnDlAll.disabled = true;
+        const zip = new JSZip();
+        for (let i = 0; i < cards.length; i++) {
+            const card = cards[i];
+            const nama = card.dataset.nama || ('Kartu_' + (i + 1));
+            setStatus('⏳ ' + (i + 1) + '/' + cards.length + ' - ' + nama, 'info');
+            try {
+                const c = await html2canvas(card, { scale: 3, useCORS: true, backgroundColor: '#fff', logging: false });
+                const blob = await new Promise(r => c.toBlob(r, 'image/jpeg', 0.93));
+                zip.file('Kartu_Iuran_' + norm(nama) + '.jpg', blob);
+            } catch (e) { console.error(e); }
+            await new Promise(r => setTimeout(r, 50));
+        }
+        try {
+            const zb = await zip.generateAsync({ type: 'blob' });
+            const l = document.createElement('a');
+            l.download = 'Kartu_Iuran_RT04RW26_' + new Date().getFullYear() + '.zip';
+            l.href = URL.createObjectURL(zb); l.click(); URL.revokeObjectURL(l.href);
+            setStatus('✅ ZIP berisi ' + cards.length + ' kartu terunduh.', 'success');
+        } catch (e) { setStatus('❌ ' + e.message, 'error'); }
+        btnDlAll.disabled = false;
+    }
+    </script>
+</body>
+</html>
