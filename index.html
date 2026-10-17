@@ -762,7 +762,14 @@
 
         // 1. Helper Functions
         const formatRupiah = (num) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(num);
-        const parseAngka = (str) => parseInt((str || "").toString().toLowerCase().replace(/ribu/g, '000').replace(/jt/g, '000000').replace(/[^0-9]/g, '')) || 0;
+        const parseAngka = (str) => {
+    let s = (str || "").toString().toLowerCase().trim();
+    s = s.replace(/,\d{1,2}$/, '');          // buang desimal ",00"
+    s = s.replace(/ribu/g, '000').replace(/jt/g, '000000');
+    const neg = /^\(.*\)$|^-/.test(s);        // dukung angka negatif
+    const n = parseInt(s.replace(/[^0-9]/g, '')) || 0;
+    return neg ? -n : n;
+};
         const escapeHtml = (text) => text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
 
         const parseCSV = (csvText) => csvText.split('\n').map(row => row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(cell => cell.replace(/^"|"$/g, '').trim()));
@@ -1036,8 +1043,19 @@
                 const urlBO = `https://docs.google.com/spreadsheets/d/${sheetIdR}/gviz/tq?tqx=out:csv&sheet=Laporan Keuangan&range=A7:G200`;
                 const resBO = await fetch(urlBO);
                 if (!resBO.ok) throw new Error("Gagal load keuangan BO");
-                const rowsBO = parseCSV(await resBO.text()).filter(row => row.length >= 6 && row[2] !== "");
+               const rowsBO = parseCSV(await resBO.text()).filter(row =>
+    row.length >= 6 &&
+    row[2] !== "" &&
+    !/^(total|jumlah|saldo|sub\s*total)/i.test(row[2].trim())
+);
 
+allDataRekap = rowsBO;
+
+let debitBO = 0, kreditBO = 0;
+rowsBO.forEach(r => {
+    debitBO  += Math.max(parseAngka(r[4]), 0);
+    kreditBO += Math.max(parseAngka(r[5]), 0);
+});
                 allDataRekap = rowsBO;
 
                 let debitBO = 0, kreditBO = 0;
