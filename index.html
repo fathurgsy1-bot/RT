@@ -1043,19 +1043,8 @@
                 const urlBO = `https://docs.google.com/spreadsheets/d/${sheetIdR}/gviz/tq?tqx=out:csv&sheet=Laporan Keuangan&range=A7:G200`;
                 const resBO = await fetch(urlBO);
                 if (!resBO.ok) throw new Error("Gagal load keuangan BO");
-               const rowsBO = parseCSV(await resBO.text()).filter(row =>
-    row.length >= 6 &&
-    row[2] !== "" &&
-    !/^(total|jumlah|saldo|sub\s*total)/i.test(row[2].trim())
-);
+                const rowsBO = parseCSV(await resBO.text()).filter(row => row.length >= 6 && row[2] !== "");
 
-allDataRekap = rowsBO;
-
-let debitBO = 0, kreditBO = 0;
-rowsBO.forEach(r => {
-    debitBO  += Math.max(parseAngka(r[4]), 0);
-    kreditBO += Math.max(parseAngka(r[5]), 0);
-});
                 allDataRekap = rowsBO;
 
                 let debitBO = 0, kreditBO = 0;
