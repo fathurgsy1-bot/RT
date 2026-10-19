@@ -139,7 +139,7 @@
           <td>${item.tanggal}</td>
           <td>${linkHtml}</td>
           <td class="text-center">
-            <button class="btn btn-sm btn-info text-white" onclick='showDetail(${JSON.stringify(item)})'>Lihat Detail</button>
+            <button class="btn btn-sm btn-info text-white" onclick="showDetail(${index})">Lihat Detail</button>
           </td>
         </tr>
       `;
@@ -148,7 +148,9 @@
   }
 
   // Fungsi untuk menampilkan data ke dalam Modal Detail
-  function showDetail(item) {
+  function showDetail(itemOrIndex) {
+    const item = typeof itemOrIndex === 'number' ? dataSpreadsheet[itemOrIndex] : itemOrIndex;
+    if (!item) return;
     document.getElementById('detail-no').innerText = item.no;
     document.getElementById('detail-nama').innerText = item.nama;
     document.getElementById('detail-tanggal').innerText = item.tanggal;

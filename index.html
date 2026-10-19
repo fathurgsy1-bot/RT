@@ -763,13 +763,14 @@
         // 1. Helper Functions
         const formatRupiah = (num) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(num);
         const parseAngka = (str) => {
-    let s = (str || "").toString().toLowerCase().trim();
-    s = s.replace(/,\d{1,2}$/, '');          // buang desimal ",00"
-    s = s.replace(/ribu/g, '000').replace(/jt/g, '000000');
-    const neg = /^\(.*\)$|^-/.test(s);        // dukung angka negatif
-    const n = parseInt(s.replace(/[^0-9]/g, '')) || 0;
-    return neg ? -n : n;
-};
+            let s = (str || "").toString().toLowerCase().trim();
+            const neg = s.includes('-') || (s.includes('(') && s.includes(')'));
+            s = s.replace(/[()]/g, '');
+            s = s.replace(/,\d{1,2}$/, '');          // buang desimal ",00"
+            s = s.replace(/ribu/g, '000').replace(/jt/g, '000000');
+            const n = parseInt(s.replace(/[^0-9]/g, '')) || 0;
+            return n === 0 ? 0 : (neg ? -n : n);
+        };
         const escapeHtml = (text) => text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
 
         const parseCSV = (csvText) => csvText.split('\n').map(row => row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(cell => cell.replace(/^"|"$/g, '').trim()));
@@ -1019,17 +1020,26 @@
                 if (!response.ok) throw new Error("Gagal load warga");
                 const rows = parseCSV(await response.text());
 
-                document.getElementById('total-warga-display').textContent = rows.length - 1;
+                document.getElementById('total-warga-display').textContent = Math.max(rows.length - 1, 0);
                 if(rows.length > 0) {
-                    const headers = rows[0].slice(0, 3); headers[0] = "No";
-                    document.getElementById('table-head').innerHTML = headers.map(col => `<th class="px-4 md:px-6 py-3 md:py-4 text-xs md:text-sm font-semibold uppercase whitespace-nowrap">${col}</th>`).join('');
+                    const h = rows[0].map(x => x.toLowerCase().trim());
+                    let namaIdx = h.findIndex(x => x === 'nama' || x.includes('nama'));
+                    let alamatIdx = h.findIndex(x => x.includes('alamat') || x.includes('rumah'));
+                    if (namaIdx < 0) namaIdx = rows[0].length > 2 ? 2 : 1;
+                    if (alamatIdx < 0) alamatIdx = rows[0].length > 3 ? 3 : 2;
+
+                    document.getElementById('table-head').innerHTML = `
+                        <th class="px-4 md:px-6 py-3 md:py-4 text-xs md:text-sm font-semibold uppercase whitespace-nowrap">No</th>
+                        <th class="px-4 md:px-6 py-3 md:py-4 text-xs md:text-sm font-semibold uppercase whitespace-nowrap">Nama</th>
+                        <th class="px-4 md:px-6 py-3 md:py-4 text-xs md:text-sm font-semibold uppercase whitespace-nowrap">Alamat</th>
+                    `;
 
                     let noUrut = 1;
-                    document.getElementById('table-body').innerHTML = rows.slice(1).filter(r => r.length > 1).map(r => `
+                    document.getElementById('table-body').innerHTML = rows.slice(1).filter(r => r.length > 1 && (r[namaIdx] || '').trim()).map(r => `
                         <tr class="hover:bg-[var(--primary-light)] transition-colors even:bg-gray-50">
                             <td class="px-4 md:px-6 py-3 md:py-4 text-xs md:text-sm text-gray-700 w-10 md:w-12 text-center font-semibold whitespace-nowrap">${noUrut++}</td>
-                            <td class="px-4 md:px-6 py-3 md:py-4 text-xs md:text-sm text-gray-700 whitespace-nowrap">${r[1] || '-'}</td>
-                            <td class="px-4 md:px-6 py-3 md:py-4 text-xs md:text-sm text-gray-700 whitespace-nowrap">${r[2] || '-'}</td>
+                            <td class="px-4 md:px-6 py-3 md:py-4 text-xs md:text-sm text-gray-700 whitespace-nowrap font-medium">${escapeHtml(r[namaIdx] || '-')}</td>
+                            <td class="px-4 md:px-6 py-3 md:py-4 text-xs md:text-sm text-gray-700 whitespace-nowrap">${escapeHtml(r[alamatIdx] || '-')}</td>
                         </tr>`).join('');
                     document.getElementById('warga-loader').classList.add('hidden');
                     document.getElementById('tabel-warga').classList.remove('hidden');
@@ -1043,14 +1053,18 @@
                 const urlBO = `https://docs.google.com/spreadsheets/d/${sheetIdR}/gviz/tq?tqx=out:csv&sheet=Laporan Keuangan&range=A7:G200`;
                 const resBO = await fetch(urlBO);
                 if (!resBO.ok) throw new Error("Gagal load keuangan BO");
-                const rowsBO = parseCSV(await resBO.text()).filter(row => row.length >= 6 && row[2] !== "");
+                const rowsBO = parseCSV(await resBO.text()).filter(row =>
+                    row.length >= 6 &&
+                    row[2] !== "" &&
+                    !/^(total|jumlah|saldo|sub\s*total)/i.test((row[2] || "").trim())
+                );
 
                 allDataRekap = rowsBO;
 
                 let debitBO = 0, kreditBO = 0;
                 rowsBO.forEach(r => {
-                    debitBO += parseAngka(r[4]);
-                    kreditBO += parseAngka(r[5]);
+                    debitBO += Math.max(parseAngka(r[4]), 0);
+                    kreditBO += Math.max(parseAngka(r[5]), 0);
                 });
 
                 document.getElementById('dashboard-total-bo').textContent = formatRupiah(debitBO - kreditBO);
@@ -1070,22 +1084,33 @@
                 const rowsKas = parseCSV(await resKas.text());
 
                 if (rowsKas.length > 0) {
-                    const h = rowsKas[0].map(x => x.toLowerCase());
-                    kasDebitIdx = h.findIndex(x => x.includes('debit') || x.includes('masuk'));
-                    kasKreditIdx = h.findIndex(x => x.includes('kredit') || x.includes('keluar'));
+                    const h = rowsKas[0].map(x => x.toLowerCase().trim());
+                    kasDebitIdx = h.findIndex(x => x.includes('deb') || x.includes('masuk'));
+                    kasKreditIdx = h.findIndex(x => x.includes('kre') || x.includes('keluar'));
                     kasBulanIdx = h.findIndex(x => x.includes('bulan'));
-                    kasKetIdx = h.findIndex(x => x.includes('keterangan'));
+                    kasKetIdx = h.findIndex(x => x.includes('ket'));
+                    const kasTotalIdx = h.findIndex(x => x.includes('total') || x.includes('saldo'));
 
                     if(kasDebitIdx < 0) kasDebitIdx = 3;
                     if(kasKreditIdx < 0) kasKreditIdx = 4;
-                    if(kasBulanIdx < 0) kasBulanIdx = 3;
-                    if(kasKetIdx < 0) kasKetIdx = 2;
+                    if(kasBulanIdx < 0) kasBulanIdx = 2;
+                    if(kasKetIdx < 0) kasKetIdx = 1;
 
                     allKasData = rowsKas.slice(1).filter(r => r[kasKetIdx]);
+
+                    // Atur default dropdown bulan kas jika bulan sekarang belum ada transaksi
+                    const bulanSekarang = daftarBulan[new Date().getMonth()];
+                    const selKas = document.getElementById('filter-bulan-kas');
+                    if (selKas) {
+                        const hasCurrentMonth = allKasData.some(r => (r[kasBulanIdx] || '').toLowerCase() === bulanSekarang.toLowerCase());
+                        selKas.value = hasCurrentMonth ? bulanSekarang : 'Semua';
+                    }
+
                     renderKas();
                     renderIuranBulanIni();
 
-                    const asetVals = rowsKas.map(r => parseAngka(r[5])).filter(v => !isNaN(v) && v > 0);
+                    const totalCol = kasTotalIdx >= 0 ? kasTotalIdx : 5;
+                    const asetVals = rowsKas.map(r => parseAngka(r[totalCol])).filter(v => !isNaN(v) && v > 0);
                     globalAsetKas = asetVals.length > 0 ? asetVals[asetVals.length - 1] : 0;
                     document.getElementById('total-aset-kas').textContent = formatRupiah(globalAsetKas);
                     document.getElementById('total-aset-kas').classList.remove('opacity-0');
@@ -1403,8 +1428,9 @@
             try {
                 if (kasDebitIdx < 0 || kasKetIdx < 0) throw new Error("Data kas belum siap");
 
-                const regexNama = /pembayaran\s*kas\s+(.+)/i;
-                let total = 0, paidList = [];
+                const regexNama = /pembayaran\s*kas\s+(?:an\.?\s*|a\.?n\.?\s*|atas\s+nama\s+)?(.+)/i;
+                let total = 0;
+                const mapPaid = new Map();
 
                 allKasData.forEach(r => {
                     const bulanRow = (r[kasBulanIdx] || '').toString().trim();
@@ -1417,14 +1443,20 @@
                     const match = ket.match(regexNama);
                     if (!match) return;
 
-                    const nama = match[1].trim().replace(/\s+/g, ' ');
+                    let nama = match[1].trim().replace(/\s+/g, ' ');
+                    nama = nama.replace(/^(?:an\.?\s*|a\.?n\.?\s*|atas\s+nama\s+)/i, '').trim();
                     if (!nama) return;
 
                     total += nominal;
-                    paidList.push({ nama, nominal });
+                    const key = nama.toUpperCase();
+                    if (mapPaid.has(key)) {
+                        mapPaid.get(key).nominal += nominal;
+                    } else {
+                        mapPaid.set(key, { nama, nominal });
+                    }
                 });
 
-                paidList.sort((a, b) => a.nama.localeCompare(b.nama));
+                const paidList = Array.from(mapPaid.values()).sort((a, b) => a.nama.localeCompare(b.nama));
 
                 let html = paidList.map(item => {
                     let initials = item.nama.trim().split(/\s+/).slice(0,2).map(w => w[0]).join('').toUpperCase();
