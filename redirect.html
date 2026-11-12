@@ -16,7 +16,7 @@
     if (!token) {
       document.body.innerHTML = '<h3>Link tidak valid. Silakan scan ulang QR Code Anda.</h3>';
     } else {
-      window.location.replace(APPS_SCRIPT_URL + 'cek.html&token=' + encodeURIComponent(token));
+      window.location.replace(APPS_SCRIPT_URL + 'cek.html?token=' + encodeURIComponent(token));
     }
   </script>
 </body>
