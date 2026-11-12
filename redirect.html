@@ -8,7 +8,7 @@
 <body style="font-family:sans-serif;text-align:center;padding:60px 20px;">
   <p>Mengalihkan ke halaman cek tunggakan...</p>
   <script>
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzWcaBZ1ThgbJA_VTBIQWS64W7tnpUGiabQJn595s6Lutak1vB070f8XFo3E5mE-LNzKA/exec";
+    const APPS_SCRIPT_URL = "https://rt4rw26.vercel.app/";
 
     const params = new URLSearchParams(window.location.search);
     const token = params.get('token');
@@ -16,7 +16,7 @@
     if (!token) {
       document.body.innerHTML = '<h3>Link tidak valid. Silakan scan ulang QR Code Anda.</h3>';
     } else {
-      window.location.replace(APPS_SCRIPT_URL + '?mode=cek&token=' + encodeURIComponent(token));
+      window.location.replace(APPS_SCRIPT_URL + 'cek.html&token=' + encodeURIComponent(token));
     }
   </script>
 </body>
